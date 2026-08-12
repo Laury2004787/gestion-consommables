@@ -262,14 +262,32 @@ async function modifierStatut(
   nouveauStatut
 ) {
 
-  const { error } =
-    await supabaseClient
-      .from("Réservations")
-      .update({
-        statut: nouveauStatut
-      })
-      .eq("id", reservationId);
+  let error;
 
+  if (nouveauStatut === "acceptee") {
+
+    const resultat =
+      await supabaseClient.rpc(
+        "accepter_reservation",
+        {
+          reservation_id: reservationId
+        }
+      );
+
+    error = resultat.error;
+
+  } else {
+
+    const resultat =
+      await supabaseClient
+        .from("Réservations")
+        .update({
+          statut: nouveauStatut
+        })
+        .eq("id", reservationId);
+
+    error = resultat.error;
+  }
 
   if (error) {
 
@@ -280,7 +298,6 @@ async function modifierStatut(
 
     return;
   }
-
 
   chargerReservations();
 
