@@ -114,15 +114,23 @@ async function chargerReservations() {
     await supabaseClient
       .from("Réservations")
       .select(`
-        id,
-        date_demande,
-        date_debut,
-        date_retour,
-        commentaire,
-        statut,
-        utilisateur_id,
-        consommable_id
-      `)
+  id,
+  date_demande,
+  date_debut,
+  date_retour,
+  commentaire,
+  statut,
+  Profils (
+    nom,
+    prenom,
+    service
+  ),
+  Consommables (
+    "Nom du sortant",
+    Categorie,
+    Laboratoire
+  )
+`)
       .order("date_demande", {
         ascending: false
       });
@@ -168,58 +176,79 @@ async function chargerReservations() {
 
     card.innerHTML = `
 
-      <h3>
-        Demande de réservation
-      </h3>
+  <h3>
+    ${reservation.Consommables?.["Nom du sortant"] || "Consommable"}
+  </h3>
 
-      <p>
-        <strong>Date de demande :</strong>
-        ${reservation.date_demande}
-      </p>
+  <p>
+    <strong>Demandeur :</strong>
+    ${reservation.Profils?.prenom || ""}
+    ${reservation.Profils?.nom || ""}
+  </p>
 
-      <p>
-        <strong>Date de début :</strong>
-        ${reservation.date_debut}
-      </p>
+  <p>
+    <strong>Service :</strong>
+    ${reservation.Profils?.service || "Non renseigné"}
+  </p>
 
-      <p>
-        <strong>Date de retour :</strong>
-        ${reservation.date_retour}
-      </p>
+  <p>
+    <strong>Catégorie :</strong>
+    ${reservation.Consommables?.Categorie || "Non renseignée"}
+  </p>
 
-      <p>
-        <strong>Commentaire :</strong>
-        ${reservation.commentaire || "Aucun"}
-      </p>
+  <p>
+    <strong>Laboratoire :</strong>
+    ${reservation.Consommables?.Laboratoire || "Non renseigné"}
+  </p>
 
-      <p>
-        <strong>Statut :</strong>
-        ${reservation.statut}
-      </p>
+  <p>
+    <strong>Date de demande :</strong>
+    ${reservation.date_demande}
+  </p>
 
-      ${
-        reservation.statut === "en_attente"
-        ? `
-          <div class="actions">
+  <p>
+    <strong>Date de début :</strong>
+    ${reservation.date_debut}
+  </p>
 
-            <button
-              class="accept"
-              onclick="modifierStatut('${reservation.id}', 'acceptee')">
-              Accepter
-            </button>
+  <p>
+    <strong>Date de retour :</strong>
+    ${reservation.date_retour}
+  </p>
 
-            <button
-              class="refuse"
-              onclick="modifierStatut('${reservation.id}', 'refusee')">
-              Refuser
-            </button>
+  <p>
+    <strong>Commentaire :</strong>
+    ${reservation.commentaire || "Aucun"}
+  </p>
 
-          </div>
-        `
-        : ""
-      }
+  <p>
+    <strong>Statut :</strong>
+    ${reservation.statut}
+  </p>
 
-    `;
+  ${
+    reservation.statut === "en_attente"
+    ? `
+      <div class="actions">
+
+        <button
+          class="accept"
+          onclick="modifierStatut('${reservation.id}', 'acceptee')">
+          Accepter
+        </button>
+
+        <button
+          class="refuse"
+          onclick="modifierStatut('${reservation.id}', 'refusee')">
+          Refuser
+        </button>
+
+      </div>
+    `
+    : ""
+  }
+
+`;
 
     zone.appendChild(card);
 
