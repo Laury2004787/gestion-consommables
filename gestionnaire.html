@@ -120,16 +120,16 @@ async function chargerReservations() {
   date_retour,
   commentaire,
   statut,
-  Profils (
-    nom,
-    prenom,
-    service
-  ),
-  Consommables (
-    "Nom du sortant",
-    Categorie,
-    Laboratoire
-  )
+ Profils!Réservations_utilisateur_id_fkey (
+  nom,
+  prenom,
+  service
+),
+ Consommables!Réservations_consommable_id_fkey (
+  "Nom du sortant",
+  Categorie,
+  Laboratoire
+)
 `)
       .order("date_demande", {
         ascending: false
