@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Créer un compte</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: white;
+      padding: 35px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 13px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .back {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      color: #2563eb;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Créer un compte</h1>
+
+  <form id="inscriptionForm">
+
+    <label for="prenom">Prénom</label>
+    <input
+      type="text"
+      id="prenom"
+      required
+    >
+
+    <label for="nom">Nom</label>
+    <input
+      type="text"
+      id="nom"
+      required
+    >
+
+    <label for="service">Service</label>
+    <input
+      type="text"
+      id="service"
+    >
+
+    <label for="email">Adresse e-mail</label>
+    <input
+      type="email"
+      id="email"
+      required
+    >
+
+    <label for="password">Mot de passe</label>
+    <input
+      type="password"
+      id="password"
+      minlength="6"
+      required
+    >
+
+    <button type="submit">
+      Créer mon compte
+    </button>
+
+  </form>
+
+  <div id="message" class="message"></div>
+
+  <a href="index.html" class="back">
+    Retour à l'accueil
+  </a>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+const form =
+  document.getElementById("inscriptionForm");
+
+const message =
+  document.getElementById("message");
+
+
+form.addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  message.style.display = "none";
+
+
+  const prenom =
+    document.getElementById("prenom").value.trim();
+
+  const nom =
+    document.getElementById("nom").value.trim();
+
+  const service =
+    document.getElementById("service").value.trim();
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+
+  const resultat =
+    await supabaseClient.auth.signUp({
+
+      email: email,
+
+      password: password,
+
+      options: {
+        data: {
+          prenom: prenom,
+          nom: nom,
+          service: service
+        }
+      }
+
+    });
+
+
+  if (resultat.error) {
+
+    message.className = "message error";
+
+    message.textContent =
+      resultat.error.message;
+
+    message.style.display = "block";
+
+    return;
+  }
+
+
+  message.className = "message success";
+
+  message.textContent =
+    "Compte créé avec succès.";
+
+  message.style.display = "block";
+
+
+  form.reset();
+
+});
+
+</script>
+
+</body>
+</html>
