@@ -111,10 +111,10 @@
 <header>
   <h1>Gestion des consommables</h1>
 
-  <div>
-    <button onclick="connexion()">Se connecter</button>
-    <button onclick="inscription()">Créer un compte</button>
-  </div>
+<div id="zone-utilisateur">
+  <a href="connexion.html">Se connecter</a>
+  <a href="inscription.html">Créer un compte</a>
+</div>
 </header>
 
 <main>
@@ -152,7 +152,63 @@ const supabaseClient =
     SUPABASE_KEY
   );
 
+async function afficherUtilisateur() {
 
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
+
+  const zone =
+    document.getElementById("zone-utilisateur");
+
+  if (!user) {
+    return;
+  }
+
+  const { data: profil } =
+    await supabaseClient
+      .from("Profils")
+      .select("prenom, nom, role")
+      .eq("user_id", user.id)
+      .single();
+
+  if (profil) {
+
+    zone.innerHTML = `
+      <span>
+        Bonjour ${profil.prenom} ${profil.nom}
+      </span>
+
+      <button onclick="deconnexion()">
+        Se déconnecter
+      </button>
+    `;
+
+  } else {
+
+    zone.innerHTML = `
+      <span>
+        Bonjour
+      </span>
+
+      <button onclick="deconnexion()">
+        Se déconnecter
+      </button>
+    `;
+  }
+}
+
+
+async function deconnexion() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.reload();
+
+}
+
+
+afficherUtilisateur();
+  
 async function chargerConsommables() {
 
   const zone =
