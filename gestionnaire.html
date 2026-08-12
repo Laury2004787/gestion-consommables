@@ -246,18 +246,30 @@ ${
     </div>
   `
   : reservation.statut === "acceptee"
-  ? `
-    <div class="actions">
+? `
+  <div class="actions">
 
-      <button
-        class="return"
-        onclick="retournerReservation('${reservation.id}')">
-        Retourner
-      </button>
+    <button
+      class="return"
+      onclick="retournerReservation('${reservation.id}')">
+      Signaler le retour
+    </button>
 
-    </div>
-  `
-  : ""
+  </div>
+`
+: reservation.statut === "retour_signale"
+? `
+  <div class="actions">
+
+    <button
+      class="accept"
+      onclick="confirmerRetour('${reservation.id}')">
+      Confirmer le retour
+    </button>
+
+  </div>
+`
+: ""
 }
 
 `;
