@@ -243,6 +243,12 @@ async function envoyerReservation(event) {
     return;
   }
 
+  const { data: profil } =
+  await supabaseClient
+    .from("Profils")
+    .select("id")
+    .eq("user_id", user.id)
+    .single();
 
   const dateDebut =
     document.getElementById("date_debut").value;
@@ -274,7 +280,7 @@ async function envoyerReservation(event) {
       .from("Réservations")
       .insert({
 
-        utilisateur_id: user.id,
+        utilisateur_id: profil.id,
 
         consommable_id: consommableId,
 
