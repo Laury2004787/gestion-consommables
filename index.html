@@ -339,11 +339,11 @@ function inscription() {
 }
 
 
-function reserver(id) {
+function reserver(consommableId) {
 
-  alert(
-    "La réservation sera ajoutée prochainement."
-  );
+  window.location.href =
+    "reservation.html?id=" +
+    encodeURIComponent(consommableId);
 
 }
 
