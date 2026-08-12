@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Espace gestionnaire</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    header {
+      background: white;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .reservation {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .reservation h3 {
+      margin-top: 0;
+    }
+
+    .actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .accept {
+      background: #16a34a;
+      color: white;
+    }
+
+    .refuse {
+      background: #dc2626;
+      color: white;
+    }
+
+    .message {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Espace gestionnaire</h1>
+</header>
+
+<main>
+
+  <h2>Demandes de réservation</h2>
+
+  <div id="reservations">
+    Chargement des demandes...
+  </div>
+
+</main>
+
+<script>
+
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+async function chargerReservations() {
+
+  const zone =
+    document.getElementById("reservations");
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("Réservations")
+      .select(`
+        id,
+        date_demande,
+        date_debut,
+        date_retour,
+        commentaire,
+        statut,
+        utilisateur_id,
+        consommable_id
+      `)
+      .order("date_demande", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de charger les demandes.
+      </div>
+    `;
+
+    console.error(error);
+
+    return;
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucune demande de réservation.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  zone.innerHTML = "";
+
+
+  data.forEach(reservation => {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "reservation";
+
+
+    card.innerHTML = `
+
+      <h3>
+        Demande de réservation
+      </h3>
+
+      <p>
+        <strong>Date de demande :</strong>
+        ${reservation.date_demande}
+      </p>
+
+      <p>
+        <strong>Date de début :</strong>
+        ${reservation.date_debut}
+      </p>
+
+      <p>
+        <strong>Date de retour :</strong>
+        ${reservation.date_retour}
+      </p>
+
+      <p>
+        <strong>Commentaire :</strong>
+        ${reservation.commentaire || "Aucun"}
+      </p>
+
+      <p>
+        <strong>Statut :</strong>
+        ${reservation.statut}
+      </p>
+
+      ${
+        reservation.statut === "en_attente"
+        ? `
+          <div class="actions">
+
+            <button
+              class="accept"
+              onclick="modifierStatut('${reservation.id}', 'acceptee')">
+              Accepter
+            </button>
+
+            <button
+              class="refuse"
+              onclick="modifierStatut('${reservation.id}', 'refusee')">
+              Refuser
+            </button>
+
+          </div>
+        `
+        : ""
+      }
+
+    `;
+
+    zone.appendChild(card);
+
+  });
+
+}
+
+
+async function modifierStatut(
+  reservationId,
+  nouveauStatut
+) {
+
+  const { error } =
+    await supabaseClient
+      .from("Réservations")
+      .update({
+        statut: nouveauStatut
+      })
+      .eq("id", reservationId);
+
+
+  if (error) {
+
+    alert(
+      "Impossible de modifier la réservation : " +
+      error.message
+    );
+
+    return;
+  }
+
+
+  chargerReservations();
+
+}
+
+
+chargerReservations();
+
+</script>
+
+</body>
+</html>
