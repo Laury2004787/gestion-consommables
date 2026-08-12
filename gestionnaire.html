@@ -269,6 +269,33 @@ ${
 }
 
 
+async function retournerReservation(reservationId) {
+
+  const { error } =
+    await supabaseClient.rpc(
+      "retourner_reservation",
+      {
+        reservation_id: reservationId
+      }
+    );
+
+  if (error) {
+
+    alert(
+      "Impossible d'enregistrer le retour : " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert("Le consommable a été retourné.");
+
+  chargerReservations();
+
+}
+
+
 async function modifierStatut(
   reservationId,
   nouveauStatut
