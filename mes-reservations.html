@@ -1,1 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mes réservations</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    header {
+      background: white;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .reservation {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .reservation h3 {
+      margin-top: 0;
+    }
+
+    .statut {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .message {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    a {
+      color: #2563eb;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Mes réservations</h1>
+</header>
+
+<main>
+
+  <div id="reservations">
+    Chargement de vos réservations...
+  </div>
+
+  <p>
+    <a href="index.html">
+      Retour aux consommables
+    </a>
+  </p>
+
+</main>
+
+<script>
+
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+async function chargerReservations() {
+
+  const zone =
+    document.getElementById("reservations");
+
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Vous devez être connecté pour voir vos réservations.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const { data: profil, error: profilError } =
+    await supabaseClient
+      .from("Profils")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
+
+
+  if (profilError || !profil) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de trouver votre profil.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("Réservations")
+      .select(`
+        id,
+        date_demande,
+        date_debut,
+        date_retour,
+        commentaire,
+        statut,
+        consommable_id
+      `)
+      .eq("utilisateur_id", profil.id)
+      .order("date_demande", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de charger vos réservations.
+      </div>
+    `;
+
+    console.error(error);
+
+    return;
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Vous n'avez aucune réservation.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  zone.innerHTML = "";
+
+
+  for (const reservation of data) {
+
+    let nomConsommable =
+      "Consommable";
+
+
+    const { data: consommable } =
+      await supabaseClient
+        .from("Consommables")
+        .select('"Nom du sortant"')
+        .eq("id", reservation.consommable_id)
+        .single();
+
+
+    if (consommable) {
+
+      nomConsommable =
+        consommable["Nom du sortant"];
+
+    }
+
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "reservation";
+
+
+    card.innerHTML = `
+
+      <h3>
+        ${nomConsommable}
+      </h3>
+
+      <p>
+        <strong>Date de demande :</strong>
+        ${reservation.date_demande}
+      </p>
+
+      <p>
+        <strong>Date de début :</strong>
+        ${reservation.date_debut}
+      </p>
+
+      <p>
+        <strong>Date de retour :</strong>
+        ${reservation.date_retour}
+      </p>
+
+      <p>
+        <strong>Commentaire :</strong>
+        ${reservation.commentaire || "Aucun"}
+      </p>
+
+      <p class="statut">
+        <strong>Statut :</strong>
+        ${reservation.statut}
+      </p>
+
+    `;
+
+
+    zone.appendChild(card);
+
+  }
+
+}
+
+
+chargerReservations();
+
+</script>
+
+</body>
+</html>
