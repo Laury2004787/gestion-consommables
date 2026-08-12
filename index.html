@@ -175,25 +175,33 @@ async function afficherUtilisateur() {
   if (profil) {
 
     zone.innerHTML = `
-      <span>
-        Bonjour ${profil.prenom} ${profil.nom}
-      </span>
+   <span>
+  Bonjour ${profil.prenom} ${profil.nom}
+</span>
 
-      <button onclick="deconnexion()">
-        Se déconnecter
-      </button>
+<a href="mes-reservations.html">
+  Mes réservations
+</a>
+
+<button onclick="deconnexion()">
+  Se déconnecter
+</button>
     `;
 
   } else {
 
     zone.innerHTML = `
       <span>
-        Bonjour
-      </span>
+  Bonjour
+</span>
 
-      <button onclick="deconnexion()">
-        Se déconnecter
-      </button>
+<a href="mes-reservations.html">
+  Mes réservations
+</a>
+
+<button onclick="deconnexion()">
+  Se déconnecter
+</button>
     `;
   }
 }
