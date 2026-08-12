@@ -191,11 +191,11 @@ async function chargerConsommable() {
 
 
   const { data, error } =
-    await supabaseClient
-      .from("Consommables")
-      .select("Nom du sortant, Categorie, Quantite")
-      .eq("id", consommableId)
-      .single();
+  await supabaseClient
+    .from("Consommables")
+    .select("*")
+    .eq("id", consommableId)
+    .single();
 
 
   if (error || !data) {
