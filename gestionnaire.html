@@ -226,27 +226,39 @@ async function chargerReservations() {
     ${reservation.statut}
   </p>
 
-  ${
-    reservation.statut === "en_attente"
-    ? `
-      <div class="actions">
+${
+  reservation.statut === "en_attente"
+  ? `
+    <div class="actions">
 
-        <button
-          class="accept"
-          onclick="modifierStatut('${reservation.id}', 'acceptee')">
-          Accepter
-        </button>
+      <button
+        class="accept"
+        onclick="modifierStatut('${reservation.id}', 'acceptee')">
+        Accepter
+      </button>
 
-        <button
-          class="refuse"
-          onclick="modifierStatut('${reservation.id}', 'refusee')">
-          Refuser
-        </button>
+      <button
+        class="refuse"
+        onclick="modifierStatut('${reservation.id}', 'refusee')">
+        Refuser
+      </button>
 
-      </div>
-    `
-    : ""
-  }
+    </div>
+  `
+  : reservation.statut === "acceptee"
+  ? `
+    <div class="actions">
+
+      <button
+        class="return"
+        onclick="retournerReservation('${reservation.id}')">
+        Retourner
+      </button>
+
+    </div>
+  `
+  : ""
+}
 
 `;
 
