@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Demande de réservation</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 13px;
+      border: none;
+      border-radius: 6px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .back {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      color: #2563eb;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Demande de réservation</h1>
+
+  <p id="consommableInfo">
+    Chargement du consommable...
+  </p>
+
+  <form id="reservationForm">
+
+    <label for="date_debut">
+      Date de début
+    </label>
+
+    <input
+      type="date"
+      id="date_debut"
+      required
+    >
+
+    <label for="date_retour">
+      Date de retour
+    </label>
+
+    <input
+      type="date"
+      id="date_retour"
+      required
+    >
+
+    <label for="commentaire">
+      Commentaire
+    </label>
+
+    <textarea
+      id="commentaire"
+      placeholder="Commentaire facultatif"
+    ></textarea>
+
+    <button type="submit">
+      Envoyer la demande
+    </button>
+
+  </form>
+
+  <div id="message" class="message"></div>
+
+  <a href="index.html" class="back">
+    Retour aux consommables
+  </a>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const consommableId =
+  params.get("id");
+
+
+const info =
+  document.getElementById("consommableInfo");
+
+const form =
+  document.getElementById("reservationForm");
+
+const message =
+  document.getElementById("message");
+
+
+async function chargerConsommable() {
+
+  if (!consommableId) {
+
+    info.textContent =
+      "Aucun consommable sélectionné.";
+
+    form.style.display = "none";
+
+    return;
+  }
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("Consommables")
+      .select("Nom du sortant, Categorie, Quantite")
+      .eq("id", consommableId)
+      .single();
+
+
+  if (error || !data) {
+
+    info.textContent =
+      "Impossible de trouver ce consommable.";
+
+    form.style.display = "none";
+
+    return;
+  }
+
+
+  info.innerHTML = `
+    <strong>${data["Nom du sortant"]}</strong><br>
+    Catégorie : ${data.Categorie}<br>
+    Quantité disponible : ${data.Quantite}
+  `;
+}
+
+
+async function envoyerReservation(event) {
+
+  event.preventDefault();
+
+  message.style.display = "none";
+
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    message.className =
+      "message error";
+
+    message.textContent =
+      "Vous devez être connecté pour effectuer une réservation.";
+
+    message.style.display =
+      "block";
+
+    return;
+  }
+
+
+  const dateDebut =
+    document.getElementById("date_debut").value;
+
+  const dateRetour =
+    document.getElementById("date_retour").value;
+
+  const commentaire =
+    document.getElementById("commentaire").value.trim();
+
+
+  if (dateRetour < dateDebut) {
+
+    message.className =
+      "message error";
+
+    message.textContent =
+      "La date de retour doit être après la date de début.";
+
+    message.style.display =
+      "block";
+
+    return;
+  }
+
+
+  const { error } =
+    await supabaseClient
+      .from("Réservations")
+      .insert({
+
+        utilisateur_id: user.id,
+
+        consommable_id: consommableId,
+
+        date_demande:
+          new Date().toISOString().split("T")[0],
+
+        date_debut:
+          dateDebut,
+
+        date_retour:
+          dateRetour,
+
+        commentaire:
+          commentaire,
+
+        statut:
+          "en_attente"
+
+      });
+
+
+  if (error) {
+
+    message.className =
+      "message error";
+
+    message.textContent =
+      "Impossible d'envoyer la demande : " +
+      error.message;
+
+    message.style.display =
+      "block";
+
+    return;
+  }
+
+
+  message.className =
+    "message success";
+
+  message.textContent =
+    "Votre demande de réservation a été envoyée.";
+
+  message.style.display =
+    "block";
+
+  form.reset();
+
+}
+
+
+form.addEventListener(
+  "submit",
+  envoyerReservation
+);
+
+
+chargerConsommable();
+
+</script>
+
+</body>
+</html>
