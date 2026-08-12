@@ -301,7 +301,34 @@ async function retournerReservation(reservationId) {
     return;
   }
 
-  alert("Le consommable a été retourné.");
+  alert("Le retour a été signalé.");
+
+  chargerReservations();
+
+}
+
+
+async function confirmerRetour(reservationId) {
+
+  const { error } =
+    await supabaseClient.rpc(
+      "confirmer_retour_reservation",
+      {
+        reservation_id: reservationId
+      }
+    );
+
+  if (error) {
+
+    alert(
+      "Impossible de confirmer le retour : " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert("Le retour a été confirmé.");
 
   chargerReservations();
 
@@ -353,7 +380,6 @@ async function modifierStatut(
   chargerReservations();
 
 }
-
 
 async function verifierGestionnaire() {
 
