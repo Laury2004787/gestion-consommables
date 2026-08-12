@@ -239,16 +239,58 @@ async function chargerReservations() {
       </p>
 
       <p class="statut">
-        <strong>Statut :</strong>
-        ${reservation.statut}
-      </p>
+  <strong>Statut :</strong>
+  ${reservation.statut}
+</p>
 
-    `;
+${
+  reservation.statut === "acceptee"
+  ? `
+    <div class="actions">
+
+      <button
+        onclick="signalerRetour('${reservation.id}')">
+        Signaler le retour
+      </button>
+
+    </div>
+  `
+  : ""
+}
+
+`;
 
 
     zone.appendChild(card);
 
+   }
+
+}
+
+
+async function signalerRetour(reservationId) {
+
+  const { error } =
+    await supabaseClient.rpc(
+      "retourner_reservation",
+      {
+        reservation_id: reservationId
+      }
+    );
+
+  if (error) {
+
+    alert(
+      "Impossible de signaler le retour : " +
+      error.message
+    );
+
+    return;
   }
+
+  alert("Le retour a été signalé au gestionnaire.");
+
+  chargerReservations();
 
 }
 
