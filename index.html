@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestion des consommables</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -18,12 +16,12 @@
     }
 
     header {
-      background: #ffffff;
-      padding: 20px 40px;
+      background: white;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid #ddd;
     }
 
     header h1 {
@@ -31,53 +29,32 @@
       font-size: 22px;
     }
 
-    .buttons {
-      display: flex;
-      gap: 10px;
-    }
-
     button {
-      border: none;
-      padding: 10px 18px;
+      padding: 10px 16px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 15px;
-    }
-
-    .btn-login {
-      background: #ffffff;
       border: 1px solid #2563eb;
+      background: white;
       color: #2563eb;
-    }
-
-    .btn-signup {
-      background: #2563eb;
-      color: white;
     }
 
     main {
       max-width: 1100px;
-      margin: 0 auto;
-      padding: 50px 20px;
+      margin: auto;
+      padding: 40px 20px;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 45px;
+      margin-bottom: 40px;
     }
 
     .hero h2 {
-      font-size: 36px;
-      margin-bottom: 15px;
+      font-size: 34px;
     }
 
     .hero p {
-      font-size: 18px;
       color: #6b7280;
-    }
-
-    .catalogue-title {
-      margin-bottom: 20px;
     }
 
     #consommables {
@@ -90,14 +67,13 @@
       background: white;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .card img {
       width: 100%;
       height: 180px;
       object-fit: cover;
-      background: #e5e7eb;
     }
 
     .card-content {
@@ -106,7 +82,6 @@
 
     .card h3 {
       margin-top: 0;
-      margin-bottom: 8px;
     }
 
     .card p {
@@ -118,69 +93,208 @@
       width: 100%;
       background: #2563eb;
       color: white;
+      border: none;
       margin-top: 10px;
     }
 
-    .empty {
-      text-align: center;
-      padding: 30px;
-      color: #6b7280;
+    .message {
       background: white;
-      border-radius: 10px;
+      padding: 25px;
+      text-align: center;
+      border-radius: 8px;
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>Gestion des consommables</h1>
+<header>
+  <h1>Gestion des consommables</h1>
 
-    <div class="buttons">
-      <button class="btn-login" onclick="connexion()">
-        Se connecter
-      </button>
+  <div>
+    <button onclick="connexion()">Se connecter</button>
+    <button onclick="inscription()">Créer un compte</button>
+  </div>
+</header>
 
-      <button class="btn-signup" onclick="inscription()">
-        Créer un compte
-      </button>
+<main>
+
+  <section class="hero">
+    <h2>Bienvenue</h2>
+
+    <p>
+      Consultez les consommables disponibles
+      et effectuez une demande de réservation.
+    </p>
+  </section>
+
+  <h2>Consommables disponibles</h2>
+
+  <div id="consommables">
+    <div class="message">
+      Chargement des consommables...
     </div>
-  </header>
+  </div>
 
-  <main>
+</main>
 
-    <section class="hero">
-      <h2>Bienvenue</h2>
+<script>
 
-      <p>
-        Consultez les consommables disponibles
-        et effectuez une demande de réservation.
-      </p>
-    </section>
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
 
-    <section>
-      <h2 class="catalogue-title">
-        Consommables disponibles
-      </h2>
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
 
-      <div id="consommables">
-        <div class="empty">
-          Chargement des consommables...
-        </div>
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+async function chargerConsommables() {
+
+  const zone =
+    document.getElementById("consommables");
+
+  const resultat =
+    await supabaseClient
+      .from("Consommables")
+      .select("*")
+      .eq("Actif", true)
+      .eq("disponible", true)
+      .order("Date_ajout", {
+        ascending: false
+      });
+
+  if (resultat.error) {
+
+    console.error(resultat.error);
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de charger les consommables.
       </div>
-    </section>
+    `;
 
-  </main>
+    return;
+  }
 
-  <script>
-    function connexion() {
-      alert("La page de connexion sera ajoutée prochainement.");
+  const consommables = resultat.data;
+
+  if (!consommables || consommables.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucun consommable disponible actuellement.
+      </div>
+    `;
+
+    return;
+  }
+
+  zone.innerHTML = "";
+
+  consommables.forEach(function(consommable) {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "card";
+
+    let photoHTML = "";
+
+    if (consommable.photo) {
+
+      photoHTML = `
+        <img
+          src="${consommable.photo}"
+          alt="Photo du consommable"
+        >
+      `;
+
     }
 
-    function inscription() {
-      alert("La page d'inscription sera ajoutée prochainement.");
-    }
-  </script>
+    card.innerHTML = `
+
+      ${photoHTML}
+
+      <div class="card-content">
+
+        <h3>
+          ${consommable["Nom du sortant"]}
+        </h3>
+
+        <p>
+          <strong>Catégorie :</strong>
+          ${consommable.Categorie}
+        </p>
+
+        <p>
+          <strong>Laboratoire :</strong>
+          ${consommable.Laboratoire}
+        </p>
+
+        <p>
+          ${consommable.Description || ""}
+        </p>
+
+        <p>
+          <strong>État :</strong>
+          ${consommable.Etat}
+        </p>
+
+        <p>
+          <strong>Quantité :</strong>
+          ${consommable.Quantite}
+        </p>
+
+        <button
+          class="reserve"
+          onclick="reserver('${consommable.id}')">
+          Réserver
+        </button>
+
+      </div>
+    `;
+
+    zone.appendChild(card);
+
+  });
+}
+
+
+function connexion() {
+
+  alert(
+    "La page de connexion sera ajoutée prochainement."
+  );
+
+}
+
+
+function inscription() {
+
+  alert(
+    "La page d'inscription sera ajoutée prochainement."
+  );
+
+}
+
+
+function reserver(id) {
+
+  alert(
+    "La réservation sera ajoutée prochainement."
+  );
+
+}
+
+
+chargerConsommables();
+
+</script>
 
 </body>
 </html>
