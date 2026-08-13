@@ -1155,7 +1155,120 @@ async function chargerUtilisateurs() {
 
 }
 
+async function chargerMessages() {
 
+  const zone =
+    document.getElementById("listeMessages");
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("Messages")
+      .select(`
+        id,
+        sujet,
+        contenu,
+        date_envoi,
+        lu,
+        Profils!Messages_utilisateur_id_fkey (
+          nom,
+          prenom,
+          service
+        )
+      `)
+      .order("date_envoi", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    console.error(
+      "Erreur chargement messages :",
+      error
+    );
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de charger les messages.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucun message reçu.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  zone.innerHTML = "";
+
+
+  data.forEach(message => {
+
+    const card =
+      document.createElement("div");
+
+
+    card.className =
+      "card";
+
+
+    card.innerHTML = `
+
+      <h3>
+        ${message.sujet}
+      </h3>
+
+      <p>
+        <strong>De :</strong>
+        ${message.Profils?.prenom || ""}
+        ${message.Profils?.nom || ""}
+      </p>
+
+      <p>
+        <strong>Service :</strong>
+        ${message.Profils?.service || "Non renseigné"}
+      </p>
+
+      <p>
+        <strong>Date :</strong>
+        ${new Date(
+          message.date_envoi
+        ).toLocaleString("fr-FR")}
+      </p>
+
+      <p>
+        <strong>Message :</strong>
+        ${message.contenu}
+      </p>
+
+      <p>
+        <strong>Statut :</strong>
+        ${
+          message.lu
+            ? "Lu"
+            : "Non lu"
+        }
+      </p>
+
+    `;
+
+
+    zone.appendChild(card);
+
+  });
+
+}
 
 async function chargerStatistiques() {
 
