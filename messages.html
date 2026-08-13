@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mes messages</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    header {
+      background: white;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .message {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    a {
+      color: #2563eb;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Mes messages</h1>
+</header>
+
+<main>
+
+  <div id="messages">
+    Chargement de vos messages...
+  </div>
+
+  <p>
+    <a href="index.html">
+      Retour aux consommables
+    </a>
+  </p>
+
+</main>
+
+<script>
+
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+</script>
+
+</body>
+</html>
