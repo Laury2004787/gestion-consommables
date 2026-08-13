@@ -111,6 +111,75 @@
       SUPABASE_URL,
       SUPABASE_KEY
     );
+    const form =
+    document.getElementById("nouveauMotDePasseForm");
+
+  const message =
+    document.getElementById("message");
+
+
+  form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    message.style.display = "none";
+
+
+    const password =
+      document.getElementById("password").value;
+
+    const confirmation =
+      document.getElementById("confirmation").value;
+
+
+    if (password !== confirmation) {
+
+      message.className = "message error";
+
+      message.textContent =
+        "Les deux mots de passe ne correspondent pas.";
+
+      message.style.display = "block";
+
+      return;
+    }
+
+
+    const { error } =
+      await supabaseClient.auth.updateUser({
+        password: password
+      });
+
+
+    if (error) {
+
+      message.className = "message error";
+
+      message.textContent =
+        "Impossible de modifier le mot de passe : " +
+        error.message;
+
+      message.style.display = "block";
+
+      return;
+    }
+
+
+    message.className = "message success";
+
+    message.textContent =
+      "Votre mot de passe a été modifié avec succès.";
+
+    message.style.display = "block";
+
+
+    setTimeout(function() {
+
+      window.location.href = "connexion.html";
+
+    }, 2000);
+
+  });
 </script>
 </body>
 </html>
