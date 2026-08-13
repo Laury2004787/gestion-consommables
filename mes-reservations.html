@@ -92,6 +92,29 @@ const supabaseClient =
     SUPABASE_KEY
   );
 
+  function afficherStatut(statut) {
+  if (statut === "en_attente") {
+    return "En attente de validation";
+  }
+
+  if (statut === "acceptee") {
+    return "Réservation acceptée";
+  }
+
+  if (statut === "retour_declare") {
+    return "Retour déclaré — en attente de confirmation";
+  }
+
+  if (statut === "retournee") {
+    return "Retour confirmé";
+  }
+
+  if (statut === "refusee") {
+    return "Réservation refusée";
+  }
+
+  return statut;
+}
 
 async function chargerReservations() {
 
