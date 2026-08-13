@@ -261,9 +261,27 @@ async function chargerConsommables() {
     document.getElementById("consommables");
 
 
-  const {
-    data: { user }
-  } = await supabaseClient.auth.getUser();
+ let user;
+
+try {
+
+  const resultatUtilisateur =
+    await supabaseClient.auth.getUser();
+
+  user = resultatUtilisateur.data.user;
+
+} catch (error) {
+
+  console.error("Erreur utilisateur :", error);
+
+  zone.innerHTML = `
+    <div class="message">
+      Erreur de connexion à Supabase.
+    </div>
+  `;
+
+  return;
+}
 
 
   if (!user) {
@@ -276,7 +294,8 @@ async function chargerConsommables() {
 
     return;
   }
-
+console.log("Utilisateur connecté :", user);
+console.log("Tentative de chargement des consommables...");
   const resultat =
     await supabaseClient
       .from("Consommables")
@@ -286,7 +305,7 @@ async function chargerConsommables() {
       .order("Date_ajout", {
         ascending: false
       });
-
+console.log("Résultat consommables :", resultat);
   if (resultat.error) {
 
     console.error(resultat.error);
