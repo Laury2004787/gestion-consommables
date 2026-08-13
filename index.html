@@ -208,11 +208,30 @@ async function afficherUtilisateur() {
 
   // Gestionnaire ou administrateur
   if (
-    profil.role === "gestionnaire" ||
-    profil.role === "administrateur"
-  ) {
+  profil.role === "gestionnaire" ||
+  profil.role === "administrateur"
+) {
 
-    zone.innerHTML = `
+  zone.innerHTML = `
+    <span>
+      Bonjour ${profil.prenom} ${profil.nom}
+    </span>
+
+    <a href="gestionnaire.html">
+      Espace gestionnaire
+    </a>
+
+    <button onclick="deconnexion()">
+      Se déconnecter
+    </button>
+  `;
+
+  return;
+}
+
+
+  // Utilisateur classique
+zone.innerHTML = `
   <span>
     Bonjour ${profil.prenom} ${profil.nom}
   </span>
@@ -233,29 +252,6 @@ async function afficherUtilisateur() {
     Se déconnecter
   </button>
 `;
-
-    return;
-  }
-
-
-  // Utilisateur classique
-  zone.innerHTML = `
-    <span>
-      Bonjour ${profil.prenom} ${profil.nom}
-    </span>
-
-    <a href="mes-reservations.html">
-      Mes réservations
-    </a>
-
-    <button onclick="supprimerCompte()">
-      Supprimer mon compte
-    </button>
-
-    <button onclick="deconnexion()">
-      Se déconnecter
-    </button>
-  `;
 }
 
 
