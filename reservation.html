@@ -176,8 +176,30 @@ const form =
 const message =
   document.getElementById("message");
 
+async function verifierConnexion() {
 
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+
+    alert("Vous devez être connecté pour réserver.");
+
+    window.location.href = "connexion.html";
+
+    return false;
+  }
+
+  return true;
+}
 async function chargerConsommable() {
+
+  const connecte = await verifierConnexion();
+
+  if (!connecte) {
+    return;
+  }
 
   if (!consommableId) {
 
