@@ -240,6 +240,99 @@ async function chargerMessages() {
 
 
 chargerMessages();
+document
+  .getElementById("formMessage")
+  .addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const sujet =
+      document.getElementById("sujet").value.trim();
+
+    const contenu =
+      document.getElementById("contenu").value.trim();
+
+    const zoneMessage =
+      document.getElementById("messageFormulaire");
+
+
+    if (!sujet || !contenu) {
+
+      zoneMessage.textContent =
+        "Veuillez remplir tous les champs.";
+
+      return;
+    }
+
+
+    const {
+      data: { user }
+    } = await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+      zoneMessage.textContent =
+        "Vous devez être connecté pour envoyer un message.";
+
+      return;
+    }
+
+
+    const { data: profil, error: profilError } =
+      await supabaseClient
+        .from("Profils")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+
+    if (profilError || !profil) {
+
+      zoneMessage.textContent =
+        "Impossible de trouver votre profil.";
+
+      return;
+    }
+
+
+    const { error } =
+      await supabaseClient
+        .from("Messages")
+        .insert({
+          utilisateur_id: profil.id,
+          sujet: sujet,
+          contenu: contenu
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      zoneMessage.textContent =
+        "Impossible d'envoyer le message.";
+
+      return;
+    }
+
+
+    zoneMessage.textContent =
+      "Votre message a bien été envoyé.";
+
+
+    document
+      .getElementById("sujet")
+      .value = "";
+
+    document
+      .getElementById("contenu")
+      .value = "";
+
+
+    chargerMessages();
+
+  });
 </script>
 
 </body>
