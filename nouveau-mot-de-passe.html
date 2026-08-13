@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Nouveau mot de passe</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Nouveau mot de passe</h1>
+
+  <form id="nouveauMotDePasseForm">
+
+    <label for="password">
+      Nouveau mot de passe
+    </label>
+
+    <input
+      type="password"
+      id="password"
+      required
+      minlength="6"
+    >
+
+    <label for="confirmation">
+      Confirmer le nouveau mot de passe
+    </label>
+
+    <input
+      type="password"
+      id="confirmation"
+      required
+      minlength="6"
+    >
+
+    <button type="submit">
+      Enregistrer le nouveau mot de passe
+    </button>
+
+  </form>
+
+  <div id="message" class="message"></div>
+
+</div>
+
+</body>
+</html>
