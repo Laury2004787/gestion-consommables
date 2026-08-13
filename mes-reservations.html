@@ -261,9 +261,9 @@ async function chargerReservations() {
         ${reservation.commentaire || "Aucun"}
       </p>
 
-      <p class="statut">
+     <p class="statut">
   <strong>Statut :</strong>
-  ${reservation.statut}
+  ${afficherStatut(reservation.statut)}
 </p>
 
 ${
