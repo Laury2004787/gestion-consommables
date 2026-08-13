@@ -174,14 +174,15 @@ motDePasseOublie.addEventListener("click", async function(event) {
   }
 
 
-  const { error } =
-    await supabaseClient.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo:
-  window.location.origin + "/nouveau-mot-de-passe.html"
-      }
-    );
+ const { error } =
+  await supabaseClient.auth.resetPasswordForEmail(
+    email,
+    {
+      redirectTo:
+        window.location.origin +
+        "/gestion-consommables/nouveau-mot-de-passe.html"
+    }
+  );
 
 
   if (error) {
