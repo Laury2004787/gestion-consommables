@@ -190,20 +190,23 @@ async function afficherUtilisateur() {
 
   } else {
 
-    zone.innerHTML = `
-      <span>
-  Bonjour
-</span>
+  zone.innerHTML = `
+    <span>
+      Bonjour
+    </span>
 
-<a href="mes-reservations.html">
-  Mes réservations
-</a>
+    <a href="mes-reservations.html">
+      Mes réservations
+    </a>
 
-<button onclick="deconnexion()">
-  Se déconnecter
-</button>
-    `;
-  }
+    <button onclick="supprimerCompte()">
+      Supprimer mon compte
+    </button>
+
+    <button onclick="deconnexion()">
+      Se déconnecter
+    </button>
+  `;
 }
 
 
@@ -214,7 +217,41 @@ async function deconnexion() {
   window.location.reload();
 
 }
+async function supprimerCompte() {
 
+  const confirmation =
+    confirm(
+      "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est définitive."
+    );
+
+  if (!confirmation) {
+    return;
+  }
+
+  const { error } =
+    await supabaseClient.functions.invoke(
+      "supprimer-compte"
+    );
+
+  if (error) {
+
+    alert(
+      "Impossible de supprimer le compte : " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    "Votre compte a été supprimé."
+  );
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href =
+    "index.html";
+}
 
 afficherUtilisateur();
   
