@@ -1170,6 +1170,7 @@ async function chargerMessages() {
         contenu,
         date_envoi,
         lu,
+        repondu,
         Profils!messages_utilisateur_id_fkey (
           nom,
           prenom,
@@ -1252,14 +1253,16 @@ async function chargerMessages() {
         ${message.contenu}
       </p>
 
-      <p>
-        <strong>Statut :</strong>
-        ${
-          message.lu
-            ? "Lu"
-            : "Non lu"
-        }
-      </p>
+     <p>
+  <strong>Statut :</strong>
+  ${
+    message.repondu
+      ? "Répondu"
+      : message.lu
+        ? "Lu"
+        : "Non lu"
+  }
+</p>
 
     `;
 
