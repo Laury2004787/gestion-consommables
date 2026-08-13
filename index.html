@@ -223,6 +223,23 @@ async function chargerConsommables() {
   const zone =
     document.getElementById("consommables");
 
+
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Vous devez être connecté pour voir les consommables disponibles.
+      </div>
+    `;
+
+    return;
+  }
+
   const resultat =
     await supabaseClient
       .from("Consommables")
