@@ -149,6 +149,62 @@ const form =
 const message =
   document.getElementById("message");
 
+const motDePasseOublie =
+  document.getElementById("motDePasseOublie");
+
+
+motDePasseOublie.addEventListener("click", async function(event) {
+
+  event.preventDefault();
+
+  const email =
+    document.getElementById("email").value.trim();
+
+
+  if (!email) {
+
+    message.className = "message error";
+
+    message.textContent =
+      "Veuillez saisir votre adresse e-mail.";
+
+    message.style.display = "block";
+
+    return;
+  }
+
+
+  const { error } =
+    await supabaseClient.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo:
+          window.location.origin + "/connexion.html"
+      }
+    );
+
+
+  if (error) {
+
+    message.className = "message error";
+
+    message.textContent =
+      "Impossible d'envoyer l'e-mail de réinitialisation.";
+
+    message.style.display = "block";
+
+    return;
+  }
+
+
+  message.className = "message success";
+
+  message.textContent =
+    "Un e-mail de réinitialisation a été envoyé.";
+
+  message.style.display = "block";
+
+});
 
 form.addEventListener("submit", async function(event) {
 
