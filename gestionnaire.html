@@ -1214,14 +1214,26 @@ async function chargerMessages() {
   zone.innerHTML = "";
 
 
-  data.forEach(message => {
+  for (const message of data) {
 
-    const card =
-      document.createElement("div");
+  const card =
+    document.createElement("div");
 
 
-    card.className =
-      "card";
+  if (!message.lu) {
+
+    await supabaseClient
+      .from("Messages")
+      .update({
+        lu: true
+      })
+      .eq("id", message.id);
+
+  }
+
+
+  card.className =
+    "card";
 
 
     card.innerHTML = `
