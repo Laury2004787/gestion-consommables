@@ -50,7 +50,43 @@
 </header>
 
 <main>
+<div class="message">
+  <h2>Envoyer un message</h2>
 
+  <form id="formMessage">
+
+    <p>
+      <label for="sujet">Sujet</label>
+    </p>
+
+    <input
+      type="text"
+      id="sujet"
+      required
+      style="width:100%; padding:10px; box-sizing:border-box;"
+    >
+
+    <p>
+      <label for="contenu">Message</label>
+    </p>
+
+    <textarea
+      id="contenu"
+      rows="6"
+      required
+      style="width:100%; padding:10px; box-sizing:border-box;"
+    ></textarea>
+
+    <p>
+      <button type="submit">
+        Envoyer le message
+      </button>
+    </p>
+
+    <div id="messageFormulaire"></div>
+
+  </form>
+</div>
   <div id="messages">
     Chargement de vos messages...
   </div>
