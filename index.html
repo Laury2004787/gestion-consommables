@@ -213,18 +213,26 @@ async function afficherUtilisateur() {
   ) {
 
     zone.innerHTML = `
-      <span>
-        Bonjour ${profil.prenom} ${profil.nom}
-      </span>
+  <span>
+    Bonjour ${profil.prenom} ${profil.nom}
+  </span>
 
-      <a href="gestionnaire.html">
-        Espace gestionnaire
-      </a>
+  <a href="mes-reservations.html">
+    Mes réservations
+  </a>
 
-      <button onclick="deconnexion()">
-        Se déconnecter
-      </button>
-    `;
+  <a href="messages.html">
+    Mes messages
+  </a>
+
+  <button onclick="supprimerCompte()">
+    Supprimer mon compte
+  </button>
+
+  <button onclick="deconnexion()">
+    Se déconnecter
+  </button>
+`;
 
     return;
   }
