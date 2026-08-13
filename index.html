@@ -162,37 +162,78 @@ async function afficherUtilisateur() {
     document.getElementById("zone-utilisateur");
 
   if (!user) {
+
+    zone.innerHTML = `
+      <a href="connexion.html">
+        Se connecter
+      </a>
+
+      <a href="inscription.html">
+        Créer un compte
+      </a>
+    `;
+
     return;
   }
 
-  const { data: profil } =
+
+  const { data: profil, error } =
     await supabaseClient
       .from("Profils")
       .select("prenom, nom, role")
       .eq("user_id", user.id)
       .single();
 
-  if (profil) {
+
+  if (error || !profil) {
+
+    console.error(
+      "Erreur lors du chargement du profil :",
+      error
+    );
 
     zone.innerHTML = `
-   <span>
-  Bonjour ${profil.prenom} ${profil.nom}
-</span>
+      <span>
+        Bonjour
+      </span>
 
-<a href="mes-reservations.html">
-  Mes réservations
-</a>
-
-<button onclick="deconnexion()">
-  Se déconnecter
-</button>
+      <button onclick="deconnexion()">
+        Se déconnecter
+      </button>
     `;
 
-  } else {
+    return;
+  }
 
+
+  // Gestionnaire ou administrateur
+  if (
+    profil.role === "gestionnaire" ||
+    profil.role === "administrateur"
+  ) {
+
+    zone.innerHTML = `
+      <span>
+        Bonjour ${profil.prenom} ${profil.nom}
+      </span>
+
+      <a href="gestionnaire.html">
+        Espace gestionnaire
+      </a>
+
+      <button onclick="deconnexion()">
+        Se déconnecter
+      </button>
+    `;
+
+    return;
+  }
+
+
+  // Utilisateur classique
   zone.innerHTML = `
     <span>
-      Bonjour
+      Bonjour ${profil.prenom} ${profil.nom}
     </span>
 
     <a href="mes-reservations.html">
@@ -217,6 +258,8 @@ async function deconnexion() {
   window.location.reload();
 
 }
+
+
 async function supprimerCompte() {
 
   const confirmation =
@@ -228,10 +271,12 @@ async function supprimerCompte() {
     return;
   }
 
+
   const { error } =
     await supabaseClient.functions.invoke(
       "supprimer-compte"
     );
+
 
   if (error) {
 
@@ -243,15 +288,18 @@ async function supprimerCompte() {
     return;
   }
 
+
   alert(
     "Votre compte a été supprimé."
   );
+
 
   await supabaseClient.auth.signOut();
 
   window.location.href =
     "index.html";
 }
+
 
 afficherUtilisateur();
   
