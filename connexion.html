@@ -189,7 +189,7 @@ motDePasseOublie.addEventListener("click", async function(event) {
     message.className = "message error";
 
     message.textContent =
-      "Impossible d'envoyer l'e-mail de réinitialisation.";
+      "Erreur : " + error.message;
 
     message.style.display = "block";
 
