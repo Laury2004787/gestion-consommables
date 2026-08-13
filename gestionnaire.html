@@ -2,14 +2,19 @@
 <html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Espace gestionnaire</title>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
+  <title>Tableau de bord gestionnaire</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -19,32 +24,24 @@
 
     header {
       background: white;
-      padding: 20px 40px;
+      padding: 20px 30px;
       border-bottom: 1px solid #e5e7eb;
     }
 
-    main {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 0 20px;
+    header h1 {
+      margin: 0 0 15px 0;
     }
 
-    .reservation {
-      background: white;
-      padding: 20px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .reservation h3 {
-      margin-top: 0;
-    }
-
-    .actions {
-      margin-top: 15px;
+    .header-actions {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
     }
 
     button {
@@ -53,6 +50,20 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
+    }
+
+    .nav-button {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .nav-button:hover {
+      background: #d1d5db;
+    }
+
+    .danger {
+      background: #dc2626;
+      color: white;
     }
 
     .accept {
@@ -65,37 +76,341 @@
       color: white;
     }
 
+    .return-button {
+      background: #2563eb;
+      color: white;
+    }
+
+    .confirm-button {
+      background: #16a34a;
+      color: white;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(200px, 1fr));
+
+      gap: 15px;
+
+      margin-bottom: 30px;
+    }
+
+    .stat {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .stat h3 {
+      margin: 0 0 10px 0;
+      font-size: 15px;
+      color: #6b7280;
+    }
+
+    .stat strong {
+      font-size: 30px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f3f4f6;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
     .message {
       background: white;
       padding: 20px;
       border-radius: 8px;
+      margin-bottom: 15px;
     }
+
+    .statut {
+      font-weight: bold;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
+
 <header>
-  <h1>Espace gestionnaire</h1>
+
+  <h1>
+    Tableau de bord gestionnaire
+  </h1>
+
+  <div class="header-actions">
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('dashboard')">
+      Tableau de bord
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('reservations')">
+      Réservations
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('consommables')">
+      Consommables
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('utilisateurs')">
+      Utilisateurs
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="retourPage()">
+      ← Retour
+    </button>
+
+    <button
+      class="danger"
+      onclick="deconnexion()">
+      Se déconnecter
+    </button>
+
+  </div>
+
 </header>
+
 
 <main>
 
-  <h2>Demandes de réservation</h2>
 
-  <div id="reservations">
-    Chargement des demandes...
-  </div>
+  <!-- TABLEAU DE BORD -->
+
+  <section
+    id="dashboard"
+    class="section active">
+
+    <h2>
+      Vue d'ensemble
+    </h2>
+
+    <div class="dashboard">
+
+      <div class="stat">
+
+        <h3>
+          Réservations en attente
+        </h3>
+
+        <strong id="statAttente">
+          0
+        </strong>
+
+      </div>
+
+
+      <div class="stat">
+
+        <h3>
+          Réservations acceptées
+        </h3>
+
+        <strong id="statAcceptee">
+          0
+        </strong>
+
+      </div>
+
+
+      <div class="stat">
+
+        <h3>
+          Retours à traiter
+        </h3>
+
+        <strong id="statRetour">
+          0
+        </strong>
+
+      </div>
+
+
+      <div class="stat">
+
+        <h3>
+          Consommables disponibles
+        </h3>
+
+        <strong id="statConsommables">
+          0
+        </strong>
+
+      </div>
+
+
+      <div class="stat">
+
+        <h3>
+          Utilisateurs
+        </h3>
+
+        <strong id="statUtilisateurs">
+          0
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Activité
+      </h3>
+
+      <p>
+        Utilisez les boutons ci-dessus pour gérer
+        les réservations, les consommables et
+        les utilisateurs.
+      </p>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- RESERVATIONS -->
+
+  <section
+    id="reservations"
+    class="section">
+
+    <h2>
+      Toutes les réservations
+    </h2>
+
+    <div id="listeReservations">
+
+      <div class="message">
+        Chargement des réservations...
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- CONSOMMABLES -->
+
+  <section
+    id="consommables"
+    class="section">
+
+    <h2>
+      Tous les consommables
+    </h2>
+
+    <div id="listeConsommables">
+
+      <div class="message">
+        Chargement des consommables...
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- UTILISATEURS -->
+
+  <section
+    id="utilisateurs"
+    class="section">
+
+    <h2>
+      Utilisateurs
+    </h2>
+
+    <div id="listeUtilisateurs">
+
+      <div class="message">
+        Chargement des utilisateurs...
+      </div>
+
+    </div>
+
+  </section>
+
 
 </main>
 
+
 <script>
+
 
 const SUPABASE_URL =
   "https://zqgoeskiwkyelsgzebyl.supabase.co";
 
+
 const SUPABASE_KEY =
   "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
 
 const supabaseClient =
   window.supabase.createClient(
@@ -104,49 +419,123 @@ const supabaseClient =
   );
 
 
+
+function afficherSection(sectionId) {
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section => {
+
+      section.classList.remove("active");
+
+    });
+
+
+  const section =
+    document.getElementById(sectionId);
+
+
+  if (section) {
+
+    section.classList.add("active");
+
+  }
+
+
+  if (sectionId === "reservations") {
+
+    chargerReservations();
+
+  }
+
+
+  if (sectionId === "consommables") {
+
+    chargerConsommables();
+
+  }
+
+
+  if (sectionId === "utilisateurs") {
+
+    chargerUtilisateurs();
+
+  }
+
+}
+
+
+
+function retourPage() {
+
+  window.history.back();
+
+}
+
+
+
+async function deconnexion() {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+
 async function chargerReservations() {
 
   const zone =
-    document.getElementById("reservations");
+    document.getElementById(
+      "listeReservations"
+    );
 
 
   const { data, error } =
     await supabaseClient
       .from("Réservations")
       .select(`
-  id,
-  date_demande,
-  date_debut,
-  date_retour,
-  commentaire,
-  statut,
- Profils!Réservations_utilisateur_id_fkey (
-  nom,
-  prenom,
-  service
-),
- Consommables!Réservations_consommable_id_fkey (
-  "Nom du sortant",
-  Categorie,
-  Laboratoire
-)
-`)
-      .order("date_demande", {
-        ascending: false
-      });
+        id,
+        date_demande,
+        date_debut,
+        date_retour,
+        commentaire,
+        statut,
+
+        Profils!Réservations_utilisateur_id_fkey (
+          nom,
+          prenom,
+          service
+        ),
+
+        Consommables!Réservations_consommable_id_fkey (
+          "Nom du sortant",
+          Categorie,
+          Laboratoire
+        )
+      `)
+      .order(
+        "date_demande",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
 
+    console.error(error);
+
     zone.innerHTML = `
       <div class="message">
-        Impossible de charger les demandes.
+        Impossible de charger les réservations.
       </div>
     `;
 
-    console.error(error);
-
     return;
+
   }
 
 
@@ -154,11 +543,12 @@ async function chargerReservations() {
 
     zone.innerHTML = `
       <div class="message">
-        Aucune demande de réservation.
+        Aucune réservation.
       </div>
     `;
 
     return;
+
   }
 
 
@@ -170,109 +560,166 @@ async function chargerReservations() {
     const card =
       document.createElement("div");
 
+
     card.className =
-      "reservation";
+      "card";
 
 
     card.innerHTML = `
 
-  <h3>
-    ${reservation.Consommables?.["Nom du sortant"] || "Consommable"}
-  </h3>
+      <h3>
+        ${
+          reservation
+            .Consommables
+            ?.["Nom du sortant"]
+          ||
+          "Consommable"
+        }
+      </h3>
 
-  <p>
-    <strong>Demandeur :</strong>
-    ${reservation.Profils?.prenom || ""}
-    ${reservation.Profils?.nom || ""}
-  </p>
+      <p>
+        <strong>Demandeur :</strong>
+        ${
+          reservation.Profils?.prenom
+          || ""
+        }
+        ${
+          reservation.Profils?.nom
+          || ""
+        }
+      </p>
 
-  <p>
-    <strong>Service :</strong>
-    ${reservation.Profils?.service || "Non renseigné"}
-  </p>
+      <p>
+        <strong>Service :</strong>
+        ${
+          reservation.Profils?.service
+          || "Non renseigné"
+        }
+      </p>
 
-  <p>
-    <strong>Catégorie :</strong>
-    ${reservation.Consommables?.Categorie || "Non renseignée"}
-  </p>
+      <p>
+        <strong>Catégorie :</strong>
+        ${
+          reservation.Consommables?.Categorie
+          || "Non renseignée"
+        }
+      </p>
 
-  <p>
-    <strong>Laboratoire :</strong>
-    ${reservation.Consommables?.Laboratoire || "Non renseigné"}
-  </p>
+      <p>
+        <strong>Laboratoire :</strong>
+        ${
+          reservation.Consommables?.Laboratoire
+          || "Non renseigné"
+        }
+      </p>
 
-  <p>
-    <strong>Date de demande :</strong>
-    ${reservation.date_demande}
-  </p>
+      <p>
+        <strong>Date de demande :</strong>
+        ${
+          reservation.date_demande
+        }
+      </p>
 
-  <p>
-    <strong>Date de début :</strong>
-    ${reservation.date_debut}
-  </p>
+      <p>
+        <strong>Date de début :</strong>
+        ${
+          reservation.date_debut
+        }
+      </p>
 
-  <p>
-    <strong>Date de retour :</strong>
-    ${reservation.date_retour}
-  </p>
+      <p>
+        <strong>Date de retour :</strong>
+        ${
+          reservation.date_retour
+        }
+      </p>
 
-  <p>
-    <strong>Commentaire :</strong>
-    ${reservation.commentaire || "Aucun"}
-  </p>
+      <p>
+        <strong>Commentaire :</strong>
+        ${
+          reservation.commentaire
+          || "Aucun"
+        }
+      </p>
 
-  <p>
-    <strong>Statut :</strong>
-    ${reservation.statut}
-  </p>
+      <p class="statut">
 
-${
-  reservation.statut === "en_attente"
-  ? `
-    <div class="actions">
+        <strong>Statut :</strong>
 
-      <button
-        class="accept"
-        onclick="modifierStatut('${reservation.id}', 'acceptee')">
-        Accepter
-      </button>
+        ${
+          reservation.statut
+        }
 
-      <button
-        class="refuse"
-        onclick="modifierStatut('${reservation.id}', 'refusee')">
-        Refuser
-      </button>
+      </p>
 
-    </div>
-  `
-  : reservation.statut === "acceptee"
-? `
-  <div class="actions">
 
-    <button
-      class="return"
-      onclick="retournerReservation('${reservation.id}')">
-      Signaler le retour
-    </button>
+      ${
+        reservation.statut ===
+        "en_attente"
 
-  </div>
-`
-: reservation.statut === "retour_signale"
-? `
-  <div class="actions">
+        ? `
 
-    <button
-      class="accept"
-      onclick="confirmerRetour('${reservation.id}')">
-      Confirmer le retour
-    </button>
+          <div class="actions">
 
-  </div>
-`
-: ""
-}
+            <button
+              class="accept"
+              onclick="
+                modifierStatut(
+                  '${reservation.id}',
+                  'acceptee'
+                )
+              ">
+              Accepter
+            </button>
 
-`;
+            <button
+              class="refuse"
+              onclick="
+                modifierStatut(
+                  '${reservation.id}',
+                  'refusee'
+                )
+              ">
+              Refuser
+            </button>
+
+          </div>
+
+        `
+
+        : ""
+
+      }
+
+
+      ${
+        reservation.statut ===
+        "retour_signale"
+
+        ? `
+
+          <div class="actions">
+
+            <button
+              class="confirm-button"
+              onclick="
+                confirmerRetour(
+                  '${reservation.id}'
+                )
+              ">
+              Confirmer le retour
+            </button>
+
+          </div>
+
+        `
+
+        : ""
+
+      }
+
+    `;
+
 
     zone.appendChild(card);
 
@@ -280,59 +727,6 @@ ${
 
 }
 
-
-async function retournerReservation(reservationId) {
-
-  const { error } =
-    await supabaseClient.rpc(
-      "retourner_reservation",
-      {
-        reservation_id: reservationId
-      }
-    );
-
-  if (error) {
-
-    alert(
-      "Impossible d'enregistrer le retour : " +
-      error.message
-    );
-
-    return;
-  }
-
-  alert("Le retour a été signalé.");
-
-  chargerReservations();
-
-}
-
-
-async function confirmerRetour(reservationId) {
-
-  const { error } =
-    await supabaseClient.rpc(
-      "confirmer_retour_reservation",
-      {
-        reservation_id: reservationId
-      }
-    );
-
-  if (error) {
-
-    alert(
-      "Impossible de confirmer le retour : " +
-      error.message
-    );
-
-    return;
-  }
-
-  alert("Le retour a été confirmé.");
-
-  chargerReservations();
-
-}
 
 
 async function modifierStatut(
@@ -342,30 +736,48 @@ async function modifierStatut(
 
   let error;
 
-  if (nouveauStatut === "acceptee") {
+
+  if (
+    nouveauStatut ===
+    "acceptee"
+  ) {
 
     const resultat =
       await supabaseClient.rpc(
         "accepter_reservation",
         {
-          reservation_id: reservationId
+          reservation_id:
+            reservationId
         }
       );
 
-    error = resultat.error;
 
-  } else {
+    error =
+      resultat.error;
+
+  }
+
+
+  else {
 
     const resultat =
       await supabaseClient
         .from("Réservations")
         .update({
-          statut: nouveauStatut
+          statut:
+            nouveauStatut
         })
-        .eq("id", reservationId);
+        .eq(
+          "id",
+          reservationId
+        );
 
-    error = resultat.error;
+
+    error =
+      resultat.error;
+
   }
+
 
   if (error) {
 
@@ -375,58 +787,537 @@ async function modifierStatut(
     );
 
     return;
+
   }
+
 
   chargerReservations();
 
+  chargerStatistiques();
+
 }
+
+
+
+async function confirmerRetour(
+  reservationId
+) {
+
+  const { error } =
+    await supabaseClient.rpc(
+      "confirmer_retour_reservation",
+      {
+        reservation_id:
+          reservationId
+      }
+    );
+
+
+  if (error) {
+
+    alert(
+      "Impossible de confirmer le retour : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "Le retour a été confirmé."
+  );
+
+
+  chargerReservations();
+
+  chargerStatistiques();
+
+}
+
+
+
+async function chargerConsommables() {
+
+  const zone =
+    document.getElementById(
+      "listeConsommables"
+    );
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("Consommables")
+      .select("*")
+      .order(
+        "Date_ajout",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de charger les consommables.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucun consommable.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = `
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Nom
+            </th>
+
+            <th>
+              Catégorie
+            </th>
+
+            <th>
+              Laboratoire
+            </th>
+
+            <th>
+              Quantité
+            </th>
+
+            <th>
+              État
+            </th>
+
+            <th>
+              Disponible
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${
+            data.map(
+              consommable => `
+
+              <tr>
+
+                <td>
+                  ${
+                    consommable[
+                      "Nom du sortant"
+                    ]
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    consommable.Categorie
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    consommable.Laboratoire
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    consommable.Quantite
+                    ?? 0
+                  }
+                </td>
+
+                <td>
+                  ${
+                    consommable.Etat
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    consommable.disponible
+                    ? "Oui"
+                    : "Non"
+                  }
+                </td>
+
+              </tr>
+
+            `
+            ).join("")
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+
+async function chargerUtilisateurs() {
+
+  const zone =
+    document.getElementById(
+      "listeUtilisateurs"
+    );
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("Profils")
+      .select(
+        "id, nom, prenom, service, role"
+      )
+      .order(
+        "nom",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    zone.innerHTML = `
+      <div class="message">
+        Impossible de charger les utilisateurs.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucun utilisateur.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = `
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Nom
+            </th>
+
+            <th>
+              Prénom
+            </th>
+
+            <th>
+              Service
+            </th>
+
+            <th>
+              Rôle
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${
+            data.map(
+              profil => `
+
+              <tr>
+
+                <td>
+                  ${
+                    profil.nom
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    profil.prenom
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    profil.service
+                    || ""
+                  }
+                </td>
+
+                <td>
+                  ${
+                    profil.role
+                    || ""
+                  }
+                </td>
+
+              </tr>
+
+            `
+            ).join("")
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+
+async function chargerStatistiques() {
+
+  const { data, error } =
+    await supabaseClient
+      .from("Réservations")
+      .select(
+        "statut"
+      );
+
+
+  if (!error && data) {
+
+    document.getElementById(
+      "statAttente"
+    ).textContent =
+      data.filter(
+        r =>
+          r.statut ===
+          "en_attente"
+      ).length;
+
+
+    document.getElementById(
+      "statAcceptee"
+    ).textContent =
+      data.filter(
+        r =>
+          r.statut ===
+          "acceptee"
+      ).length;
+
+
+    document.getElementById(
+      "statRetour"
+    ).textContent =
+      data.filter(
+        r =>
+          r.statut ===
+          "retour_signale"
+      ).length;
+
+  }
+
+
+  const consommables =
+    await supabaseClient
+      .from("Consommables")
+      .select(
+        "id",
+        {
+          count: "exact",
+          head: true
+        }
+      )
+      .eq(
+        "Actif",
+        true
+      )
+      .eq(
+        "disponible",
+        true
+      );
+
+
+  document.getElementById(
+    "statConsommables"
+  ).textContent =
+    consommables.count
+    ?? 0;
+
+
+  const utilisateurs =
+    await supabaseClient
+      .from("Profils")
+      .select(
+        "id",
+        {
+          count: "exact",
+          head: true
+        }
+      );
+
+
+  document.getElementById(
+    "statUtilisateurs"
+  ).textContent =
+    utilisateurs.count
+    ?? 0;
+
+}
+
+
 
 async function verifierGestionnaire() {
 
   const {
     data: { user }
-  } = await supabaseClient.auth.getUser();
+  } =
+    await supabaseClient.auth.getUser();
+
 
   if (!user) {
 
-    document.getElementById("reservations").innerHTML = `
-      <div class="message">
-        Vous devez être connecté pour accéder à cet espace.
-      </div>
+    document.body.innerHTML = `
+      <main>
+
+        <div class="message">
+
+          Vous devez être connecté
+          pour accéder à cet espace.
+
+          <br><br>
+
+          <a href="connexion.html">
+            Se connecter
+          </a>
+
+        </div>
+
+      </main>
     `;
 
     return;
+
   }
+
 
   const { data: profil, error } =
     await supabaseClient
       .from("Profils")
-      .select("role")
-      .eq("user_id", user.id)
+      .select(
+        "role"
+      )
+      .eq(
+        "user_id",
+        user.id
+      )
       .single();
+
 
   if (
     error ||
     !profil ||
-    !["gestionnaire", "administrateur"].includes(profil.role)
+    ![
+      "gestionnaire",
+      "administrateur"
+    ].includes(
+      profil.role
+    )
   ) {
 
-    document.getElementById("reservations").innerHTML = `
-      <div class="message">
-        Accès refusé. Cette page est réservée aux gestionnaires.
-      </div>
+    document.body.innerHTML = `
+      <main>
+
+        <div class="message">
+
+          Accès refusé.
+
+          <br><br>
+
+          Cette page est réservée
+          aux gestionnaires.
+
+          <br><br>
+
+          <button
+            onclick="retourPage()">
+            ← Retour
+          </button>
+
+        </div>
+
+      </main>
     `;
 
     return;
+
   }
 
-  chargerReservations();
+
+  await chargerStatistiques();
 
 }
+
 
 verifierGestionnaire();
 
 </script>
 
 </body>
+
 </html>
