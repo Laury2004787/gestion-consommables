@@ -186,15 +186,26 @@ motDePasseOublie.addEventListener("click", async function(event) {
 
   if (error) {
 
-    message.className = "message error";
+  message.className = "message error";
+
+  if (error.message.includes("email rate limit exceeded")) {
 
     message.textContent =
-      "Erreur : " + error.message;
+      "Trop de demandes de réinitialisation ont été effectuées. " +
+      "Veuillez réessayer dans environ une heure.";
 
-    message.style.display = "block";
+  } else {
 
-    return;
+    message.textContent =
+      "Impossible d'envoyer l'e-mail de réinitialisation. " +
+      "Veuillez réessayer plus tard.";
+
   }
+
+  message.style.display = "block";
+
+  return;
+}
 
 
   message.className = "message success";
