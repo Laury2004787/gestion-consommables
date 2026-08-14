@@ -967,19 +967,21 @@ async function chargerConsommables() {
 
 
       if (
-        consommable.photo
-      ) {
+  consommable.photo
+) {
 
-        photoHTML = `
+  photoHTML = `
 
-          <img
-            src="${consommable.photo}"
-            alt="Photo du consommable"
-          >
+    <img
+      src="${consommable.photo}"
+      alt="Photo du consommable"
+      class="photo-consommable"
+      onclick="afficherPhotoGrande('${consommable.photo}')"
+    >
 
-        `;
+  `;
 
-      }
+}
 
 
       card.innerHTML = `
