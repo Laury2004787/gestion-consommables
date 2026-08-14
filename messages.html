@@ -112,6 +112,7 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_KEY
   );
+```js
 async function chargerMessages() {
 
   const zone =
@@ -163,7 +164,14 @@ async function chargerMessages() {
         sujet,
         contenu,
         date_envoi,
-        lu
+        lu,
+        repondu,
+        ReponsesMessages (
+          id,
+          contenu,
+          date_reponse,
+          gestionnaire_id
+        )
       `)
       .eq("utilisateur_id", profil.id)
       .order("date_envoi", {
@@ -209,7 +217,20 @@ async function chargerMessages() {
       "message";
 
 
-    card.innerHTML = `
+    let statut = "Non lu";
+
+    if (message.repondu) {
+
+      statut = "Répondu";
+
+    } else if (message.lu) {
+
+      statut = "Lu";
+
+    }
+
+
+    let html = `
 
       <h3>
         ${message.sujet}
@@ -221,15 +242,82 @@ async function chargerMessages() {
 
       <p>
         <strong>Date :</strong>
-        ${new Date(message.date_envoi).toLocaleString("fr-FR")}
+        ${new Date(
+          message.date_envoi
+        ).toLocaleString("fr-FR")}
       </p>
 
       <p>
         <strong>Statut :</strong>
-        ${message.lu ? "Lu" : "Non lu"}
+        ${statut}
       </p>
 
     `;
+
+
+    /*
+     * Affichage des réponses
+     * du gestionnaire.
+     */
+
+    const reponses =
+      message.ReponsesMessages || [];
+
+
+    reponses.sort(function(a, b) {
+
+      return new Date(a.date_reponse) -
+             new Date(b.date_reponse);
+
+    });
+
+
+    if (reponses.length > 0) {
+
+      html += `
+
+        <hr>
+
+        <h4>
+          Réponse(s) du gestionnaire
+        </h4>
+
+      `;
+
+
+      reponses.forEach(function(reponse) {
+
+        html += `
+
+          <div style="
+            background:#f3f4f6;
+            padding:15px;
+            margin-top:10px;
+            border-radius:6px;
+          ">
+
+            <p>
+              ${reponse.contenu}
+            </p>
+
+            <p>
+              <strong>Date :</strong>
+              ${new Date(
+                reponse.date_reponse
+              ).toLocaleString("fr-FR")}
+            </p>
+
+          </div>
+
+        `;
+
+      });
+
+    }
+
+
+    card.innerHTML =
+      html;
 
 
     zone.appendChild(card);
@@ -237,6 +325,8 @@ async function chargerMessages() {
   });
 
 }
+```
+
 
 
 chargerMessages();
