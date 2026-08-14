@@ -76,13 +76,13 @@
       color: white;
     }
 
-    .return-button {
-      background: #2563eb;
+    .confirm-button {
+      background: #16a34a;
       color: white;
     }
 
-    .confirm-button {
-      background: #16a34a;
+    .reply-button {
+      background: #2563eb;
       color: white;
     }
 
@@ -140,6 +140,35 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .reply-box {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .reply-box textarea {
+      width: 100%;
+      min-height: 100px;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .reply-item {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f3f4f6;
+      border-radius: 6px;
+    }
+
+    .reply-item p {
+      margin: 5px 0;
     }
 
     table {
@@ -215,13 +244,13 @@
       onclick="afficherSection('utilisateurs')">
       Utilisateurs
     </button>
-    
+
     <button
       class="nav-button"
       onclick="afficherSection('messages')">
       Messages
     </button>
-    
+
     <button
       class="nav-button"
       onclick="retourPage()">
@@ -329,8 +358,8 @@
 
       <p>
         Utilisez les boutons ci-dessus pour gérer
-        les réservations, les consommables et
-        les utilisateurs.
+        les réservations, les consommables,
+        les utilisateurs et les messages.
       </p>
 
     </div>
@@ -402,25 +431,29 @@
     </div>
 
   </section>
-<!-- MESSAGES -->
 
-<section
-  id="messages"
-  class="section">
 
-  <h2>
-    Messages reçus
-  </h2>
 
-  <div id="listeMessages">
+  <!-- MESSAGES -->
 
-    <div class="message">
-      Chargement des messages...
+  <section
+    id="messages"
+    class="section">
+
+    <h2>
+      Messages reçus
+    </h2>
+
+    <div id="listeMessages">
+
+      <div class="message">
+        Chargement des messages...
+      </div>
+
     </div>
 
-  </div>
+  </section>
 
-</section>
 
 </main>
 
@@ -433,7 +466,7 @@ const SUPABASE_URL =
 
 
 const SUPABASE_KEY =
-  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+  "TA_PUBLISHABLE_KEY";
 
 
 const supabaseClient =
@@ -485,11 +518,14 @@ function afficherSection(sectionId) {
     chargerUtilisateurs();
 
   }
-if (sectionId === "messages") {
 
-  chargerMessages();
 
-}
+  if (sectionId === "messages") {
+
+    chargerMessages();
+
+  }
+
 }
 
 
@@ -1155,10 +1191,21 @@ async function chargerUtilisateurs() {
 
 }
 
+
+
 async function chargerMessages() {
 
   const zone =
-    document.getElementById("listeMessages");
+    document.getElementById(
+      "listeMessages"
+    );
+
+
+  zone.innerHTML = `
+    <div class="message">
+      Chargement des messages...
+    </div>
+  `;
 
 
   const { data, error } =
@@ -1171,15 +1218,20 @@ async function chargerMessages() {
         date_envoi,
         lu,
         repondu,
+        utilisateur_id,
+
         Profils!messages_utilisateur_id_fkey (
           nom,
           prenom,
           service
         )
       `)
-      .order("date_envoi", {
-        ascending: false
-      });
+      .order(
+        "date_envoi",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
@@ -1189,13 +1241,16 @@ async function chargerMessages() {
       error
     );
 
+
     zone.innerHTML = `
       <div class="message">
         Impossible de charger les messages.
       </div>
     `;
 
+
     return;
+
   }
 
 
@@ -1207,7 +1262,9 @@ async function chargerMessages() {
       </div>
     `;
 
+
     return;
+
   }
 
 
@@ -1216,24 +1273,131 @@ async function chargerMessages() {
 
   for (const message of data) {
 
-  const card =
-    document.createElement("div");
+
+    /*
+     * Le message est marqué comme lu
+     * lorsqu'il est consulté.
+     */
+
+    if (!message.lu) {
+
+      const {
+        error: erreurLecture
+      } =
+        await supabaseClient
+          .from("Messages")
+          .update({
+            lu: true
+          })
+          .eq(
+            "id",
+            message.id
+          );
 
 
-  if (!message.lu) {
+      if (erreurLecture) {
 
-    await supabaseClient
-      .from("Messages")
-      .update({
-        lu: true
-      })
-      .eq("id", message.id);
+        console.error(
+          "Erreur marquage comme lu :",
+          erreurLecture
+        );
 
-  }
+      }
+      else {
+
+        message.lu = true;
+
+      }
+
+    }
 
 
-  card.className =
-    "card";
+    /*
+     * Récupération de toutes les réponses
+     * liées à ce message.
+     */
+
+    const {
+      data: reponses,
+      error: erreurReponses
+    } =
+      await supabaseClient
+        .from("ReponsesMessages")
+        .select(`
+          id,
+          contenu,
+          date_envoi,
+          gestionnaire_id
+        `)
+        .eq(
+          "message_id",
+          message.id
+        )
+        .order(
+          "date_envoi",
+          {
+            ascending: true
+          }
+        );
+
+
+    if (erreurReponses) {
+
+      console.error(
+        "Erreur chargement réponses :",
+        erreurReponses
+      );
+
+    }
+
+
+    const listeReponses =
+      reponses || [];
+
+
+    let historiqueHTML =
+      "";
+
+
+    if (
+      listeReponses.length > 0
+    ) {
+
+      historiqueHTML = `
+
+        <div class="reply-box">
+
+          <h4>
+            Historique des réponses
+          </h4>
+
+          ${
+            await construireHistoriqueReponses(
+              listeReponses
+            )
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+    const statut =
+      message.repondu
+        ? "Répondu"
+        : message.lu
+          ? "Lu"
+          : "Non lu";
+
+
+    const card =
+      document.createElement("div");
+
+
+    card.className =
+      "card";
 
 
     card.innerHTML = `
@@ -1242,39 +1406,92 @@ async function chargerMessages() {
         ${message.sujet}
       </h3>
 
+
       <p>
         <strong>De :</strong>
-        ${message.Profils?.prenom || ""}
-        ${message.Profils?.nom || ""}
+
+        ${
+          message.Profils?.prenom
+          || ""
+        }
+
+        ${
+          message.Profils?.nom
+          || ""
+        }
       </p>
+
 
       <p>
         <strong>Service :</strong>
-        ${message.Profils?.service || "Non renseigné"}
+
+        ${
+          message.Profils?.service
+          || "Non renseigné"
+        }
       </p>
+
 
       <p>
         <strong>Date :</strong>
-        ${new Date(
-          message.date_envoi
-        ).toLocaleString("fr-FR")}
+
+        ${
+          new Date(
+            message.date_envoi
+          ).toLocaleString(
+            "fr-FR"
+          )
+        }
       </p>
+
 
       <p>
         <strong>Message :</strong>
+
         ${message.contenu}
       </p>
 
-     <p>
-  <strong>Statut :</strong>
-  ${
-    message.repondu
-      ? "Répondu"
-      : message.lu
-        ? "Lu"
-        : "Non lu"
-  }
-</p>
+
+      <p class="statut">
+
+        <strong>Statut :</strong>
+
+        ${statut}
+
+      </p>
+
+
+      ${historiqueHTML}
+
+
+      <div class="reply-box">
+
+        <h4>
+          Répondre
+        </h4>
+
+
+        <textarea
+          id="reponse-${message.id}"
+          placeholder="Écrivez votre réponse..."
+        ></textarea>
+
+
+        <div class="actions">
+
+          <button
+            class="reply-button"
+            onclick="
+              repondreMessage(
+                '${message.id}'
+              )
+            ">
+            Envoyer la réponse
+          </button>
+
+        </div>
+
+      </div>
 
     `;
 
@@ -1284,6 +1501,303 @@ async function chargerMessages() {
   }
 
 }
+
+
+
+async function construireHistoriqueReponses(
+  reponses
+) {
+
+  let html = "";
+
+
+  for (
+    const reponse
+    of reponses
+  ) {
+
+
+    let nomGestionnaire =
+      "Gestionnaire";
+
+
+    const {
+      data: profil,
+      error
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(
+          "prenom, nom"
+        )
+        .eq(
+          "id",
+          reponse.gestionnaire_id
+        )
+        .single();
+
+
+    if (
+      !error &&
+      profil
+    ) {
+
+      nomGestionnaire =
+        `${profil.prenom || ""} ${profil.nom || ""}`
+          .trim()
+        ||
+        "Gestionnaire";
+
+    }
+
+
+    html += `
+
+      <div class="reply-item">
+
+        <p>
+
+          <strong>
+            ${nomGestionnaire}
+          </strong>
+
+        </p>
+
+
+        <p>
+
+          <small>
+
+            ${
+              new Date(
+                reponse.date_envoi
+              ).toLocaleString(
+                "fr-FR"
+              )
+            }
+
+          </small>
+
+        </p>
+
+
+        <p>
+          ${reponse.contenu}
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+
+  return html;
+
+}
+
+
+
+async function repondreMessage(
+  messageId
+) {
+
+
+  const zoneReponse =
+    document.getElementById(
+      `reponse-${messageId}`
+    );
+
+
+  if (!zoneReponse) {
+
+    alert(
+      "Impossible de trouver le champ de réponse."
+    );
+
+    return;
+
+  }
+
+
+  const contenu =
+    zoneReponse.value.trim();
+
+
+  if (!contenu) {
+
+    alert(
+      "Veuillez écrire une réponse."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Utilisateur actuellement connecté.
+   */
+
+  const {
+    data: { user },
+    error: erreurUtilisateur
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (
+    erreurUtilisateur ||
+    !user
+  ) {
+
+    alert(
+      "Vous devez être connecté pour répondre."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Recherche du profil du gestionnaire.
+   */
+
+  const {
+    data: profil,
+    error: erreurProfil
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select(
+        "id, role"
+      )
+      .eq(
+        "user_id",
+        user.id
+      )
+      .single();
+
+
+  if (
+    erreurProfil ||
+    !profil ||
+    ![
+      "gestionnaire",
+      "administrateur"
+    ].includes(
+      profil.role
+    )
+  ) {
+
+    alert(
+      "Votre profil ne permet pas d'envoyer une réponse."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Enregistrement de la réponse
+   * dans ReponsesMessages.
+   */
+
+  const {
+    error: erreurInsertion
+  } =
+    await supabaseClient
+      .from("ReponsesMessages")
+      .insert({
+
+        message_id:
+          messageId,
+
+        gestionnaire_id:
+          profil.id,
+
+        contenu:
+          contenu
+
+      });
+
+
+  if (erreurInsertion) {
+
+    console.error(
+      "Erreur insertion réponse :",
+      erreurInsertion
+    );
+
+
+    alert(
+      "Impossible d'envoyer la réponse : " +
+      erreurInsertion.message
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+   * Passage du message à "Répondu".
+   */
+
+  const {
+    error: erreurStatut
+  } =
+    await supabaseClient
+      .from("Messages")
+      .update({
+
+        repondu:
+          true,
+
+        lu:
+          true
+
+      })
+      .eq(
+        "id",
+        messageId
+      );
+
+
+  if (erreurStatut) {
+
+    console.error(
+      "Erreur mise à jour du statut :",
+      erreurStatut
+    );
+
+
+    alert(
+      "La réponse a été enregistrée, mais le statut n'a pas pu être mis à jour."
+    );
+
+
+    chargerMessages();
+
+
+    return;
+
+  }
+
+
+  alert(
+    "Réponse envoyée."
+  );
+
+
+  chargerMessages();
+
+}
+
+
 
 async function chargerStatistiques() {
 
@@ -1295,7 +1809,10 @@ async function chargerStatistiques() {
       );
 
 
-  if (!error && data) {
+  if (
+    !error &&
+    data
+  ) {
 
     document.getElementById(
       "statAttente"
@@ -1353,7 +1870,8 @@ async function chargerStatistiques() {
     "statConsommables"
   ).textContent =
     consommables.count
-    ?? 0;
+    ??
+    0;
 
 
   const utilisateurs =
@@ -1372,7 +1890,8 @@ async function chargerStatistiques() {
     "statUtilisateurs"
   ).textContent =
     utilisateurs.count
-    ?? 0;
+    ??
+    0;
 
 }
 
@@ -1389,6 +1908,7 @@ async function verifierGestionnaire() {
   if (!user) {
 
     document.body.innerHTML = `
+
       <main>
 
         <div class="message">
@@ -1405,6 +1925,7 @@ async function verifierGestionnaire() {
         </div>
 
       </main>
+
     `;
 
     return;
@@ -1412,7 +1933,10 @@ async function verifierGestionnaire() {
   }
 
 
-  const { data: profil, error } =
+  const {
+    data: profil,
+    error
+  } =
     await supabaseClient
       .from("Profils")
       .select(
@@ -1437,6 +1961,7 @@ async function verifierGestionnaire() {
   ) {
 
     document.body.innerHTML = `
+
       <main>
 
         <div class="message">
@@ -1458,6 +1983,7 @@ async function verifierGestionnaire() {
         </div>
 
       </main>
+
     `;
 
     return;
@@ -1470,7 +1996,9 @@ async function verifierGestionnaire() {
 }
 
 
+
 verifierGestionnaire();
+
 
 </script>
 
