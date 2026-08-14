@@ -3050,10 +3050,10 @@ document
         );
 
 
-      const photo =
-        document.getElementById(
-          "photoConsommable"
-        ).value.trim();
+      const fichierPhoto =
+  document.getElementById(
+    "photoConsommable"
+  ).files[0] || null;
 
 
       if (
@@ -3074,7 +3074,21 @@ document
         return;
 
       }
+if (fichierPhoto) {
 
+  if (!fichierPhoto.type.startsWith("image/")) {
+
+    zone.innerHTML = `
+      <div class="error-box">
+        Le fichier sélectionné doit être une image.
+      </div>
+    `;
+
+    return;
+
+  }
+
+}
 
       await chargerProfilGestionnaire();
 
@@ -3082,7 +3096,69 @@ document
       const laboratoire =
         profilGestionnaire?.service ||
         "";
+let urlPhoto = null;
 
+if (fichierPhoto) {
+
+  const extension =
+    fichierPhoto.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+  const nomFichier =
+    `${crypto.randomUUID()}.${extension}`;
+
+  const chemin =
+    `${nomFichier}`;
+
+  const {
+    error: erreurUpload
+  } =
+    await supabaseClient
+      .storage
+      .from("photos-consommables")
+      .upload(
+        chemin,
+        fichierPhoto,
+        {
+          cacheControl: "3600",
+          upsert: false
+        }
+      );
+
+  if (erreurUpload) {
+
+    console.error(
+      "Erreur upload photo :",
+      erreurUpload
+    );
+
+    zone.innerHTML = `
+      <div class="error-box">
+        Impossible d'envoyer la photo :
+        ${echapperHTML(
+          erreurUpload.message
+        )}
+      </div>
+    `;
+
+    return;
+
+  }
+const {
+  data: urlData
+} =
+  supabaseClient
+    .storage
+    .from("photos-consommables")
+    .getPublicUrl(
+      chemin
+    );
+
+urlPhoto =
+  urlData.publicUrl;
+}
 
       const {
         error
@@ -3110,7 +3186,7 @@ document
               quantite,
 
             photo:
-              photo || null,
+              urlPhoto,
 
             Actif:
               true,
