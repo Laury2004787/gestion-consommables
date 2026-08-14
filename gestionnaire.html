@@ -15,6 +15,10 @@
 
   <style>
 
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -26,6 +30,9 @@
       background: white;
       padding: 20px 30px;
       border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     header h1 {
@@ -34,12 +41,12 @@
 
     .header-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     main {
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 30px auto;
       padding: 0 20px;
     }
@@ -52,6 +59,10 @@
       font-size: 14px;
     }
 
+    button:hover {
+      opacity: 0.9;
+    }
+
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -62,8 +73,9 @@
       color: #111827;
     }
 
-    .nav-button:hover {
-      background: #d1d5db;
+    .primary {
+      background: #2563eb;
+      color: white;
     }
 
     .danger {
@@ -102,10 +114,20 @@
       color: white;
     }
 
+    .delete-button {
+      background: #dc2626;
+      color: white;
+    }
+
+    .small-button {
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+
     .dashboard {
       display: grid;
       grid-template-columns:
-        repeat(auto-fit, minmax(200px, 1fr));
+        repeat(auto-fit, minmax(190px, 1fr));
       gap: 15px;
       margin-bottom: 30px;
     }
@@ -120,7 +142,7 @@
 
     .stat h3 {
       margin: 0 0 10px 0;
-      font-size: 15px;
+      font-size: 14px;
       color: #6b7280;
     }
 
@@ -156,87 +178,6 @@
       flex-wrap: wrap;
     }
 
-    .reply-box {
-      margin-top: 18px;
-      padding-top: 15px;
-      border-top: 1px solid #e5e7eb;
-    }
-
-    .reply-box textarea {
-      width: 100%;
-      min-height: 100px;
-      box-sizing: border-box;
-      padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      resize: vertical;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-    }
-
-    .reply-item {
-      margin-top: 12px;
-      padding: 15px;
-      background: #f3f4f6;
-      border-radius: 6px;
-      border-left: 4px solid #2563eb;
-    }
-
-    .reply-item p {
-      margin: 5px 0;
-    }
-
-    .conversation {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 15px;
-    }
-
-    .conversation-header {
-      background: #f3f4f6;
-      padding: 15px;
-    }
-
-    .conversation-header h4 {
-      margin: 0 0 8px 0;
-    }
-
-    .conversation-body {
-      padding: 15px;
-    }
-
-    .message-original {
-      background: white;
-      border: 1px solid #e5e7eb;
-      padding: 15px;
-      border-radius: 6px;
-    }
-
-    .message-reponse {
-      background: #eff6ff;
-      border-left: 4px solid #2563eb;
-      padding: 15px;
-      margin-top: 10px;
-      border-radius: 6px;
-    }
-
-    .statut {
-      font-weight: bold;
-    }
-
-    .statut-non-lu {
-      color: #dc2626;
-    }
-
-    .statut-lu {
-      color: #2563eb;
-    }
-
-    .statut-repondu {
-      color: #16a34a;
-    }
-
     .message {
       background: white;
       padding: 20px;
@@ -244,21 +185,27 @@
       margin-bottom: 15px;
     }
 
-    .succes {
-      color: #16a34a;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .erreur {
-      color: #dc2626;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
     .info {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .success-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
       padding: 15px;
       border-radius: 6px;
       margin-bottom: 20px;
@@ -288,7 +235,6 @@
     .form-group select {
       width: 100%;
       padding: 11px;
-      box-sizing: border-box;
       border: 1px solid #d1d5db;
       border-radius: 6px;
       font-family: Arial, sans-serif;
@@ -296,61 +242,12 @@
     }
 
     .form-group textarea {
-      min-height: 100px;
+      min-height: 120px;
       resize: vertical;
     }
 
-    .success-box {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-
-    .error-box {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #991b1b;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-
-    .proposition-en-attente {
-      border-left: 5px solid #f59e0b;
-    }
-
-    .proposition-acceptee {
-      border-left: 5px solid #16a34a;
-    }
-
-    .proposition-refusee {
-      border-left: 5px solid #dc2626;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .badge-attente {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .badge-acceptee {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .badge-refusee {
-      background: #fee2e2;
-      color: #991b1b;
+    .table-container {
+      overflow-x: auto;
     }
 
     table {
@@ -366,14 +263,246 @@
       padding: 12px;
       text-align: left;
       border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
     }
 
     th {
       background: #f3f4f6;
     }
 
-    .table-container {
-      overflow-x: auto;
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .proposition-en-attente {
+      border-left: 5px solid #f59e0b;
+    }
+
+    .proposition-acceptee {
+      border-left: 5px solid #16a34a;
+    }
+
+    .proposition-refusee {
+      border-left: 5px solid #dc2626;
+    }
+
+    .conversation {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .conversation-header {
+      background: #f3f4f6;
+      padding: 15px;
+    }
+
+    .conversation-header h4 {
+      margin: 0 0 8px 0;
+    }
+
+    .conversation-body {
+      padding: 15px;
+    }
+
+    .message-original {
+      background: white;
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 6px;
+    }
+
+    .reply-box {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .reply-box textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+    }
+
+    .reply-item {
+      margin-top: 12px;
+      padding: 15px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      border-left: 4px solid #2563eb;
+    }
+
+    .statut {
+      font-weight: bold;
+    }
+
+    .statut-non-lu {
+      color: #dc2626;
+    }
+
+    .statut-lu {
+      color: #2563eb;
+    }
+
+    .statut-repondu {
+      color: #16a34a;
+    }
+
+    .publication {
+      border-left: 5px solid #2563eb;
+    }
+
+    .publication img {
+      max-width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 650px;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow:
+        0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .close-modal {
+      float: right;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .danger-zone {
+      border: 2px solid #fecaca;
+      background: #fff7f7;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 25px;
+    }
+
+    .profile-header {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .profile-role {
+      color: #6b7280;
+      margin-top: 5px;
+    }
+
+    .chart-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .bar {
+      margin: 12px 0;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .bar-background {
+      height: 18px;
+      background: #e5e7eb;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+
+      header {
+        padding: 15px;
+      }
+
+      main {
+        padding: 0 12px;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+
     }
 
   </style>
@@ -430,6 +559,18 @@
 
     <button
       class="nav-button"
+      onclick="afficherSection('informations')">
+      Informations
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('profil')">
+      Mon profil
+    </button>
+
+    <button
+      class="nav-button"
       onclick="retourPage()">
       ← Retour
     </button>
@@ -448,451 +589,1016 @@
 <main>
 
 
-  <!-- =====================================================
-       TABLEAU DE BORD
-       ===================================================== -->
+<!-- ======================================================
+     DASHBOARD
+     ====================================================== -->
 
-  <section
-    id="dashboard"
-    class="section active">
+<section
+  id="dashboard"
+  class="section active">
 
-    <h2>
-      Vue d'ensemble
-    </h2>
+  <h2>
+    Vue d'ensemble
+  </h2>
 
-    <div class="dashboard">
+  <div class="dashboard">
 
-      <div class="stat">
-
-        <h3>
-          Réservations en attente
-        </h3>
-
-        <strong id="statAttente">
-          0
-        </strong>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          Réservations acceptées
-        </h3>
-
-        <strong id="statAcceptee">
-          0
-        </strong>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          Retours à traiter
-        </h3>
-
-        <strong id="statRetour">
-          0
-        </strong>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          Consommables disponibles
-        </h3>
-
-        <strong id="statConsommables">
-          0
-        </strong>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          Propositions en attente
-        </h3>
-
-        <strong id="statPropositions">
-          0
-        </strong>
-
-      </div>
-
-
-      <div class="stat">
-
-        <h3>
-          Utilisateurs
-        </h3>
-
-        <strong id="statUtilisateurs">
-          0
-        </strong>
-
-      </div>
-
-    </div>
-
-
-    <div class="card">
+    <div class="stat">
 
       <h3>
-        Activité
+        Réservations en attente
       </h3>
 
-      <p>
-        Utilisez les boutons ci-dessus pour gérer
-        les réservations, les propositions,
-        les consommables, les utilisateurs
-        et les messages.
-      </p>
+      <strong id="statAttente">
+        0
+      </strong>
 
     </div>
 
-  </section>
+
+    <div class="stat">
+
+      <h3>
+        Réservations acceptées
+      </h3>
+
+      <strong id="statAcceptee">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <h3>
+        Retours à traiter
+      </h3>
+
+      <strong id="statRetour">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <h3>
+        Consommables disponibles
+      </h3>
+
+      <strong id="statConsommables">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <h3>
+        Quantité disponible
+      </h3>
+
+      <strong id="statQuantite">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <h3>
+        Retours confirmés
+      </h3>
+
+      <strong id="statCollectes">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <h3>
+        Propositions en attente
+      </h3>
+
+      <strong id="statPropositions">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <h3>
+        Utilisateurs
+      </h3>
+
+      <strong id="statUtilisateurs">
+        0
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <div class="chart-card">
+
+    <h3>
+      État des consommables
+    </h3>
+
+    <div id="statistiquesConsommables">
+
+      Chargement...
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h3>
+      Activité
+    </h3>
+
+    <p>
+      Utilisez les boutons ci-dessus pour gérer
+      les réservations, propositions, consommables,
+      utilisateurs, messages et informations.
+    </p>
+
+  </div>
+
+</section>
 
 
 
-  <!-- =====================================================
-       RESERVATIONS
-       ===================================================== -->
+<!-- ======================================================
+     RESERVATIONS
+     ====================================================== -->
 
-  <section
-    id="reservations"
-    class="section">
+<section
+  id="reservations"
+  class="section">
 
-    <h2>
-      Toutes les réservations
-    </h2>
+  <h2>
+    Toutes les réservations
+  </h2>
 
-    <div id="listeReservations">
+  <div id="listeReservations">
 
-      <div class="message">
-        Chargement des réservations...
+    <div class="message">
+      Chargement des réservations...
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     PROPOSITIONS
+     ====================================================== -->
+
+<section
+  id="propositions"
+  class="section">
+
+  <h2>
+    Propositions de consommables
+  </h2>
+
+  <div class="info">
+
+    Les utilisateurs peuvent proposer
+    des consommables disponibles dans
+    leur laboratoire ou service.
+
+  </div>
+
+  <div id="listePropositions">
+
+    <div class="message">
+      Chargement des propositions...
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     CONSOMMABLES
+     ====================================================== -->
+
+<section
+  id="consommables"
+  class="section">
+
+  <h2>
+    Tous les consommables
+  </h2>
+
+  <button
+    class="add-button"
+    onclick="afficherFormulaireAjout()">
+
+    + Ajouter un consommable
+
+  </button>
+
+
+  <div
+    id="formulaireAjout"
+    style="display:none;">
+
+    <div class="form-card">
+
+      <h3>
+        Ajouter directement un consommable
+      </h3>
+
+      <div class="info">
+
+        Laboratoire/service :
+
+        <strong id="serviceGestionnaire">
+          Chargement...
+        </strong>
+
       </div>
 
-    </div>
+      <form id="formAjoutConsommable">
 
-  </section>
+        <div class="form-group">
 
+          <label>
+            Nom du consommable
+          </label>
 
-
-  <!-- =====================================================
-       PROPOSITIONS
-       ===================================================== -->
-
-  <section
-    id="propositions"
-    class="section">
-
-    <h2>
-      Propositions de consommables
-    </h2>
-
-    <div class="info">
-
-      Les utilisateurs peuvent proposer
-      des consommables disponibles dans
-      leur laboratoire ou service.
-
-      <br><br>
-
-      Vous pouvez accepter une proposition
-      pour l'ajouter aux consommables disponibles,
-      ou la refuser.
-
-    </div>
-
-
-    <div id="listePropositions">
-
-      <div class="message">
-        Chargement des propositions...
-      </div>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =====================================================
-       CONSOMMABLES
-       ===================================================== -->
-
-  <section
-    id="consommables"
-    class="section">
-
-    <h2>
-      Tous les consommables
-    </h2>
-
-
-    <button
-      class="add-button"
-      onclick="afficherFormulaireAjout()">
-
-      + Ajouter un consommable
-
-    </button>
-
-
-    <div
-      id="formulaireAjout"
-      style="display:none;">
-
-      <div class="form-card">
-
-        <h3>
-          Ajouter directement un consommable
-        </h3>
-
-
-        <div class="info">
-
-          Vous pouvez ajouter un consommable
-          directement, même s'il n'a pas été
-          proposé par un utilisateur.
-
-          <br><br>
-
-          <strong>
-            Laboratoire/service :
-          </strong>
-
-          <span id="serviceGestionnaire">
-            Chargement...
-          </span>
+          <input
+            type="text"
+            id="nomConsommable"
+            required
+            placeholder="Exemple : Bécher 500 ml">
 
         </div>
 
 
-        <form id="formAjoutConsommable">
+        <div class="form-group">
+
+          <label>
+            Catégorie
+          </label>
+
+          <input
+            type="text"
+            id="categorieConsommable"
+            required
+            placeholder="Exemple : Verrerie">
+
+        </div>
 
 
-          <div class="form-group">
+        <div class="form-group">
 
-            <label for="nomConsommable">
+          <label>
+            Description
+          </label>
 
-              Nom du consommable
+          <textarea
+            id="descriptionConsommable"
+            placeholder="Description..."></textarea>
 
-            </label>
-
-            <input
-              type="text"
-              id="nomConsommable"
-              required
-              placeholder="Exemple : Bécher 500 ml">
-
-          </div>
+        </div>
 
 
-          <div class="form-group">
+        <div class="form-group">
 
-            <label for="categorieConsommable">
+          <label>
+            État
+          </label>
 
-              Catégorie
+          <select
+            id="etatConsommable"
+            required>
 
-            </label>
+            <option value="">
+              Sélectionnez l'état
+            </option>
 
-            <input
-              type="text"
-              id="categorieConsommable"
-              required
-              placeholder="Exemple : Verrerie">
+            <option value="Bon état">
+              Bon état
+            </option>
 
-          </div>
+            <option value="État correct">
+              État correct
+            </option>
 
+            <option value="Usé">
+              Usé
+            </option>
 
-          <div class="form-group">
+            <option value="Endommagé">
+              Endommagé
+            </option>
 
-            <label for="descriptionConsommable">
+          </select>
 
-              Description
-
-            </label>
-
-            <textarea
-              id="descriptionConsommable"
-              placeholder="Description du consommable...">
-            </textarea>
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="etatConsommable">
-
-              État
-
-            </label>
-
-            <select
-              id="etatConsommable"
-              required>
-
-              <option value="">
-                Sélectionnez l'état
-              </option>
-
-              <option value="Bon état">
-                Bon état
-              </option>
-
-              <option value="État correct">
-                État correct
-              </option>
-
-              <option value="Usé">
-                Usé
-              </option>
-
-              <option value="Endommagé">
-                Endommagé
-              </option>
-
-            </select>
-
-          </div>
+        </div>
 
 
-          <div class="form-group">
+        <div class="form-group">
 
-            <label for="quantiteConsommable">
+          <label>
+            Quantité
+          </label>
 
-              Quantité
+          <input
+            type="number"
+            id="quantiteConsommable"
+            min="1"
+            value="1"
+            required>
 
-            </label>
-
-            <input
-              type="number"
-              id="quantiteConsommable"
-              min="1"
-              value="1"
-              required>
-
-          </div>
+        </div>
 
 
-          <div class="form-group">
+        <div class="form-group">
 
-            <label for="photoConsommable">
+          <label>
+            Photo URL
+          </label>
 
-              Photo (URL facultative)
+          <input
+            type="url"
+            id="photoConsommable"
+            placeholder="https://...">
 
-            </label>
-
-            <input
-              type="url"
-              id="photoConsommable"
-              placeholder="https://...">
-
-          </div>
+        </div>
 
 
-          <div class="actions">
+        <div class="actions">
 
-            <button
-              type="submit"
-              class="accept">
+          <button
+            type="submit"
+            class="accept">
 
-              Ajouter le consommable
+            Ajouter
 
-            </button>
+          </button>
 
+          <button
+            type="button"
+            class="nav-button"
+            onclick="fermerFormulaireAjout()">
 
-            <button
-              type="button"
-              class="nav-button"
-              onclick="fermerFormulaireAjout()">
+            Annuler
 
-              Annuler
+          </button>
 
-            </button>
+        </div>
 
-          </div>
+        <div id="messageAjoutConsommable"></div>
 
-
-          <div id="messageAjoutConsommable"></div>
-
-
-        </form>
-
-      </div>
+      </form>
 
     </div>
 
+  </div>
 
-    <div id="listeConsommables">
 
-      <div class="message">
-        Chargement des consommables...
-      </div>
+  <div id="listeConsommables">
+
+    <div class="message">
+      Chargement des consommables...
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     UTILISATEURS
+     ====================================================== -->
+
+<section
+  id="utilisateurs"
+  class="section">
+
+  <h2>
+    Utilisateurs
+  </h2>
+
+  <div id="listeUtilisateurs">
+
+    <div class="message">
+      Chargement des utilisateurs...
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     MESSAGES
+     ====================================================== -->
+
+<section
+  id="messages"
+  class="section">
+
+  <h2>
+    Messages reçus
+  </h2>
+
+  <div id="listeMessages">
+
+    <div class="message">
+      Chargement des messages...
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     INFORMATIONS
+     ====================================================== -->
+
+<section
+  id="informations"
+  class="section">
+
+  <h2>
+    Informations partagées
+  </h2>
+
+  <div class="info">
+
+    Les informations publiées ici seront visibles
+    par les utilisateurs connectés.
+
+  </div>
+
+
+  <button
+    class="add-button"
+    onclick="ouvrirModalInformation()">
+
+    + Publier une information
+
+  </button>
+
+
+  <div id="listeInformations">
+
+    <div class="message">
+      Chargement des informations...
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     PROFIL
+     ====================================================== -->
+
+<section
+  id="profil"
+  class="section">
+
+  <h2>
+    Mon profil
+  </h2>
+
+
+  <div class="profile-header">
+
+    <div
+      class="profile-name"
+      id="profilNomAffiche">
+
+      Chargement...
 
     </div>
 
-  </section>
+    <div
+      class="profile-role"
+      id="profilRoleAffiche">
 
-
-
-  <!-- =====================================================
-       UTILISATEURS
-       ===================================================== -->
-
-  <section
-    id="utilisateurs"
-    class="section">
-
-    <h2>
-      Utilisateurs
-    </h2>
-
-    <div id="listeUtilisateurs">
-
-      <div class="message">
-        Chargement des utilisateurs...
-      </div>
+      Gestionnaire
 
     </div>
 
-  </section>
+  </div>
 
 
+  <div class="form-card">
 
-  <!-- =====================================================
-       MESSAGES
-       ===================================================== -->
+    <h3>
+      Informations personnelles
+    </h3>
 
-  <section
-    id="messages"
-    class="section">
 
-    <h2>
-      Messages reçus
-    </h2>
+    <form id="formProfil">
 
-    <div id="listeMessages">
+      <div class="form-group">
 
-      <div class="message">
-        Chargement des messages...
+        <label>
+          Prénom
+        </label>
+
+        <input
+          type="text"
+          id="profilPrenom"
+          required>
+
       </div>
 
-    </div>
 
-  </section>
+      <div class="form-group">
+
+        <label>
+          Nom
+        </label>
+
+        <input
+          type="text"
+          id="profilNom"
+          required>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Service / laboratoire
+        </label>
+
+        <input
+          type="text"
+          id="profilService">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Adresse e-mail
+        </label>
+
+        <input
+          type="email"
+          id="profilEmail">
+
+        <small>
+          La modification de l'e-mail peut nécessiter
+          une confirmation envoyée par Supabase.
+        </small>
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="primary">
+
+        Enregistrer les modifications
+
+      </button>
+
+
+      <div id="messageProfil"></div>
+
+    </form>
+
+  </div>
+
+
+  <div class="form-card">
+
+    <h3>
+      Sécurité
+    </h3>
+
+    <form id="formMotDePasse">
+
+      <div class="form-group">
+
+        <label>
+          Nouveau mot de passe
+        </label>
+
+        <input
+          type="password"
+          id="nouveauMotDePasse"
+          minlength="6"
+          required>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Confirmation
+        </label>
+
+        <input
+          type="password"
+          id="confirmationMotDePasse"
+          minlength="6"
+          required>
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="primary">
+
+        Modifier le mot de passe
+
+      </button>
+
+
+      <div id="messageMotDePasse"></div>
+
+    </form>
+
+  </div>
+
+
+  <div class="danger-zone">
+
+    <h3>
+      Zone dangereuse
+    </h3>
+
+    <p>
+      La suppression de votre compte peut être
+      définitive.
+    </p>
+
+    <button
+      class="danger"
+      onclick="supprimerCompte()">
+
+      Supprimer définitivement mon compte
+
+    </button>
+
+  </div>
+
+</section>
 
 
 </main>
+
+
+
+<!-- ======================================================
+     MODAL MODIFICATION CONSOMMABLE
+     ====================================================== -->
+
+<div
+  id="modalConsommable"
+  class="modal">
+
+  <div class="modal-content">
+
+    <button
+      class="close-modal"
+      onclick="fermerModalConsommable()">
+
+      ✕
+
+    </button>
+
+    <h2>
+      Modifier le consommable
+    </h2>
+
+
+    <form id="formModificationConsommable">
+
+      <input
+        type="hidden"
+        id="editConsommableId">
+
+
+      <div class="form-group">
+
+        <label>
+          Nom du consommable
+        </label>
+
+        <input
+          type="text"
+          id="editNom"
+          required>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Catégorie
+        </label>
+
+        <input
+          type="text"
+          id="editCategorie"
+          required>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Description
+        </label>
+
+        <textarea
+          id="editDescription"></textarea>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Quantité
+        </label>
+
+        <input
+          type="number"
+          id="editQuantite"
+          min="0"
+          required>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Laboratoire
+        </label>
+
+        <input
+          type="text"
+          id="editLaboratoire"
+          required>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          État
+        </label>
+
+        <select
+          id="editEtat"
+          required>
+
+          <option value="Bon état">
+            Bon état
+          </option>
+
+          <option value="État correct">
+            État correct
+          </option>
+
+          <option value="Usé">
+            Usé
+          </option>
+
+          <option value="Endommagé">
+            Endommagé
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Photo URL
+        </label>
+
+        <input
+          type="url"
+          id="editPhoto">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Disponible
+        </label>
+
+        <select
+          id="editDisponible">
+
+          <option value="true">
+            Oui
+          </option>
+
+          <option value="false">
+            Non
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          type="submit"
+          class="accept">
+
+          Enregistrer
+
+        </button>
+
+        <button
+          type="button"
+          class="nav-button"
+          onclick="fermerModalConsommable()">
+
+          Annuler
+
+        </button>
+
+      </div>
+
+
+      <div id="messageModificationConsommable"></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
+<!-- ======================================================
+     MODAL INFORMATION
+     ====================================================== -->
+
+<div
+  id="modalInformation"
+  class="modal">
+
+  <div class="modal-content">
+
+    <button
+      class="close-modal"
+      onclick="fermerModalInformation()">
+
+      ✕
+
+    </button>
+
+    <h2 id="titreModalInformation">
+      Publier une information
+    </h2>
+
+
+    <form id="formInformation">
+
+      <input
+        type="hidden"
+        id="informationId">
+
+
+      <div class="form-group">
+
+        <label>
+          Titre
+        </label>
+
+        <input
+          type="text"
+          id="informationTitre"
+          required
+          maxlength="200">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Contenu
+        </label>
+
+        <textarea
+          id="informationContenu"
+          required></textarea>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Image URL facultative
+        </label>
+
+        <input
+          type="url"
+          id="informationImage">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Publication
+        </label>
+
+        <select id="informationPublie">
+
+          <option value="true">
+            Publier maintenant
+          </option>
+
+          <option value="false">
+            Enregistrer comme brouillon
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="actions">
+
+        <button
+          type="submit"
+          class="accept">
+
+          Enregistrer
+
+        </button>
+
+        <button
+          type="button"
+          class="nav-button"
+          onclick="fermerModalInformation()">
+
+          Annuler
+
+        </button>
+
+      </div>
+
+
+      <div id="messageInformation"></div>
+
+    </form>
+
+  </div>
+
+</div>
+
 
 
 <script>
@@ -905,17 +1611,14 @@
 const SUPABASE_URL =
   "https://zqgoeskiwkyelsgzebyl.supabase.co";
 
-
 const SUPABASE_KEY =
   "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
-
 
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
-
 
 
 /* =========================================================
@@ -925,9 +1628,8 @@ const supabaseClient =
 let profilGestionnaire = null;
 
 
-
 /* =========================================================
-   SECURISATION HTML
+   SECURITE HTML
    ========================================================= */
 
 function echapperHTML(texte) {
@@ -936,147 +1638,92 @@ function echapperHTML(texte) {
     texte === null ||
     texte === undefined
   ) {
-
     return "";
-
   }
 
   return String(texte)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
-
 /* =========================================================
-   FORMATAGE DATE
+   DATE
    ========================================================= */
 
 function formaterDate(date) {
 
   if (!date) {
-
     return "";
-
   }
 
   return new Date(date)
-    .toLocaleString(
-      "fr-FR"
-    );
-
+    .toLocaleString("fr-FR");
 }
-
 
 
 /* =========================================================
    NAVIGATION
    ========================================================= */
 
-function afficherSection(
-  sectionId
-) {
+function afficherSection(sectionId) {
 
   document
-    .querySelectorAll(
-      ".section"
-    )
-    .forEach(
-      section => {
+    .querySelectorAll(".section")
+    .forEach(section => {
 
-        section.classList.remove(
-          "active"
-        );
+      section.classList.remove("active");
 
-      }
-    );
+    });
 
 
   const section =
-    document.getElementById(
-      sectionId
-    );
+    document.getElementById(sectionId);
 
 
   if (section) {
 
-    section.classList.add(
-      "active"
-    );
+    section.classList.add("active");
 
   }
 
 
-  if (
-    sectionId ===
-    "reservations"
-  ) {
+  if (sectionId === "dashboard") {
+    chargerStatistiques();
+  }
 
+  if (sectionId === "reservations") {
     chargerReservations();
-
   }
 
-
-  if (
-    sectionId ===
-    "propositions"
-  ) {
-
+  if (sectionId === "propositions") {
     chargerPropositions();
-
   }
 
-
-  if (
-    sectionId ===
-    "consommables"
-  ) {
-
+  if (sectionId === "consommables") {
     chargerConsommables();
-
   }
 
-
-  if (
-    sectionId ===
-    "utilisateurs"
-  ) {
-
+  if (sectionId === "utilisateurs") {
     chargerUtilisateurs();
-
   }
 
-
-  if (
-    sectionId ===
-    "messages"
-  ) {
-
+  if (sectionId === "messages") {
     chargerMessages();
+  }
 
+  if (sectionId === "informations") {
+    chargerInformations();
+  }
+
+  if (sectionId === "profil") {
+    chargerProfilGestionnaire();
   }
 
 }
-
 
 
 function retourPage() {
@@ -1084,7 +1731,6 @@ function retourPage() {
   window.history.back();
 
 }
-
 
 
 async function deconnexion() {
@@ -1095,7 +1741,6 @@ async function deconnexion() {
     "index.html";
 
 }
-
 
 
 /* =========================================================
@@ -1149,328 +1794,230 @@ async function chargerReservations() {
     console.error(error);
 
     zone.innerHTML = `
-
-      <div class="message">
-
-        Impossible de charger
-        les réservations.
-
+      <div class="error-box">
+        Impossible de charger les réservations.
+        <br><br>
+        ${echapperHTML(error.message)}
       </div>
-
     `;
 
     return;
-
   }
 
 
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  if (!data || data.length === 0) {
 
     zone.innerHTML = `
-
       <div class="message">
-
         Aucune réservation.
-
       </div>
-
     `;
 
     return;
-
   }
 
 
   zone.innerHTML = "";
 
 
-  data.forEach(
-    reservation => {
+  data.forEach(reservation => {
 
-      const card =
-        document.createElement(
-          "div"
-        );
+    const card =
+      document.createElement("div");
 
 
-      card.className =
-        "card";
+    card.className =
+      "card";
 
 
-      card.innerHTML = `
+    card.innerHTML = `
 
-        <h3>
-
-          ${
-            echapperHTML(
-              reservation
-                .Consommables
-                ?.["Nom du sortant"]
-              ||
-              "Consommable"
-            )
-          }
-
-        </h3>
+      <h3>
+        ${
+          echapperHTML(
+            reservation.Consommables?.[
+              "Nom du sortant"
+            ] ||
+            "Consommable"
+          )
+        }
+      </h3>
 
 
-        <p>
-
-          <strong>
-            Demandeur :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation
-                .Profils
-                ?.prenom
-              || ""
-            )
-          }
-
-          ${
-            echapperHTML(
-              reservation
-                .Profils
-                ?.nom
-              || ""
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Demandeur :</strong>
+        ${
+          echapperHTML(
+            reservation.Profils?.prenom || ""
+          )
+        }
+        ${
+          echapperHTML(
+            reservation.Profils?.nom || ""
+          )
+        }
+      </p>
 
 
-        <p>
-
-          <strong>
-            Service :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation
-                .Profils
-                ?.service
-              ||
-              "Non renseigné"
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Service :</strong>
+        ${
+          echapperHTML(
+            reservation.Profils?.service ||
+            "Non renseigné"
+          )
+        }
+      </p>
 
 
-        <p>
-
-          <strong>
-            Catégorie :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation
-                .Consommables
-                ?.Categorie
-              ||
-              "Non renseignée"
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Catégorie :</strong>
+        ${
+          echapperHTML(
+            reservation.Consommables?.Categorie ||
+            "Non renseignée"
+          )
+        }
+      </p>
 
 
-        <p>
-
-          <strong>
-            Laboratoire :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation
-                .Consommables
-                ?.Laboratoire
-              ||
-              "Non renseigné"
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Laboratoire :</strong>
+        ${
+          echapperHTML(
+            reservation.Consommables?.Laboratoire ||
+            "Non renseigné"
+          )
+        }
+      </p>
 
 
-        <p>
-
-          <strong>
-            Date de demande :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.date_demande
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Date de demande :</strong>
+        ${echapperHTML(reservation.date_demande)}
+      </p>
 
 
-        <p>
-
-          <strong>
-            Date de début :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.date_debut
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Date de début :</strong>
+        ${echapperHTML(reservation.date_debut)}
+      </p>
 
 
-        <p>
-
-          <strong>
-            Date de retour :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.date_retour
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Date de retour :</strong>
+        ${echapperHTML(reservation.date_retour)}
+      </p>
 
 
-        <p>
-
-          <strong>
-            Commentaire :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.commentaire
-              ||
-              "Aucun"
-            )
-          }
-
-        </p>
+      <p>
+        <strong>Commentaire :</strong>
+        ${
+          echapperHTML(
+            reservation.commentaire || "Aucun"
+          )
+        }
+      </p>
 
 
-        <p class="statut">
+      <p class="statut">
 
-          <strong>
-            Statut :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.statut
-            )
-          }
-
-        </p>
-
+        <strong>Statut :</strong>
 
         ${
-          reservation.statut ===
-          "en_attente"
-
-          ?
-
-          `
-
-            <div class="actions">
-
-              <button
-                class="accept"
-                onclick="
-                  modifierStatut(
-                    '${reservation.id}',
-                    'acceptee'
-                  )
-                ">
-
-                Accepter
-
-              </button>
-
-
-              <button
-                class="refuse"
-                onclick="
-                  modifierStatut(
-                    '${reservation.id}',
-                    'refusee'
-                  )
-                ">
-
-                Refuser
-
-              </button>
-
-            </div>
-
-          `
-
-          :
-
-          ""
-
+          echapperHTML(
+            reservation.statut
+          )
         }
 
-
-        ${
-          reservation.statut ===
-          "retour_signale"
-
-          ?
-
-          `
-
-            <div class="actions">
-
-              <button
-                class="confirm-button"
-                onclick="
-                  confirmerRetour(
-                    '${reservation.id}'
-                  )
-                ">
-
-                Confirmer le retour
-
-              </button>
-
-            </div>
-
-          `
-
-          :
-
-          ""
-
-        }
-
-      `;
+      </p>
 
 
-      zone.appendChild(
-        card
-      );
+      ${
+        reservation.statut === "en_attente"
 
-    }
-  );
+        ?
+
+        `
+          <div class="actions">
+
+            <button
+              class="accept"
+              onclick="
+                modifierStatut(
+                  '${reservation.id}',
+                  'acceptee'
+                )
+              ">
+
+              Accepter
+
+            </button>
+
+
+            <button
+              class="refuse"
+              onclick="
+                modifierStatut(
+                  '${reservation.id}',
+                  'refusee'
+                )
+              ">
+
+              Refuser
+
+            </button>
+
+          </div>
+        `
+
+        :
+
+        ""
+      }
+
+
+      ${
+        reservation.statut === "retour_signale"
+
+        ?
+
+        `
+          <div class="actions">
+
+            <button
+              class="confirm-button"
+              onclick="
+                confirmerRetour(
+                  '${reservation.id}'
+                )
+              ">
+
+              Confirmer le retour
+
+            </button>
+
+          </div>
+        `
+
+        :
+
+        ""
+      }
+
+    `;
+
+
+    zone.appendChild(card);
+
+  });
 
 }
 
 
+/* =========================================================
+   MODIFICATION STATUT RESERVATION
+   ========================================================= */
 
 async function modifierStatut(
   reservationId,
@@ -1480,10 +2027,7 @@ async function modifierStatut(
   let error;
 
 
-  if (
-    nouveauStatut ===
-    "acceptee"
-  ) {
+  if (nouveauStatut === "acceptee") {
 
     const resultat =
       await supabaseClient.rpc(
@@ -1538,6 +2082,9 @@ async function modifierStatut(
 }
 
 
+/* =========================================================
+   CONFIRMER RETOUR
+   ========================================================= */
 
 async function confirmerRetour(
   reservationId
@@ -1579,7 +2126,6 @@ async function confirmerRetour(
 }
 
 
-
 /* =========================================================
    PROPOSITIONS
    ========================================================= */
@@ -1593,13 +2139,9 @@ async function chargerPropositions() {
 
 
   zone.innerHTML = `
-
     <div class="message">
-
       Chargement des propositions...
-
     </div>
-
   `;
 
 
@@ -1608,9 +2150,7 @@ async function chargerPropositions() {
     error
   } =
     await supabaseClient
-      .from(
-        "Propositions_consommables"
-      )
+      .from("Propositions_consommables")
       .select(`
         id,
         utilisateur_id,
@@ -1633,27 +2173,12 @@ async function chargerPropositions() {
 
   if (error) {
 
-    console.error(
-      "Erreur propositions :",
-      error
-    );
-
-
     zone.innerHTML = `
-
       <div class="error-box">
-
-        Impossible de charger
-        les propositions.
-
+        Impossible de charger les propositions.
         <br><br>
-
-        ${echapperHTML(
-          error.message
-        )}
-
+        ${echapperHTML(error.message)}
       </div>
-
     `;
 
     return;
@@ -1661,30 +2186,18 @@ async function chargerPropositions() {
   }
 
 
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  if (!data || data.length === 0) {
 
     zone.innerHTML = `
-
       <div class="message">
-
-        Aucune proposition
-        de consommable.
-
+        Aucune proposition de consommable.
       </div>
-
     `;
 
     return;
 
   }
 
-
-  /*
-   * Récupération des profils.
-   */
 
   const ids =
     [
@@ -1700,334 +2213,273 @@ async function chargerPropositions() {
   let profils = [];
 
 
-  if (
-    ids.length > 0
-  ) {
+  if (ids.length > 0) {
 
-    const resultatProfils =
+    const resultat =
       await supabaseClient
         .from("Profils")
         .select(`
           id,
+          user_id,
           nom,
           prenom,
           service
         `)
         .in(
-          "id",
+          "user_id",
           ids
         );
 
 
-    if (
-      !resultatProfils.error
-    ) {
+    if (!resultat.error) {
 
       profils =
-        resultatProfils.data || [];
+        resultat.data || [];
 
     }
 
   }
 
 
-  const profilsParId = {};
+  const profilsParUserId = {};
 
 
-  profils.forEach(
-    profil => {
+  profils.forEach(profil => {
 
-      profilsParId[
-        profil.id
-      ] =
-        profil;
+    profilsParUserId[
+      profil.user_id
+    ] = profil;
 
-    }
-  );
+  });
 
 
   zone.innerHTML = "";
 
 
-  data.forEach(
-    proposition => {
+  data.forEach(proposition => {
 
-      const profil =
-        profilsParId[
-          proposition.utilisateur_id
-        ];
+    const profil =
+      profilsParUserId[
+        proposition.utilisateur_id
+      ];
 
 
-      let classe =
-        "proposition-en-attente";
+    let classe =
+      "proposition-en-attente";
 
+    let badge =
+      "badge-warning";
 
-      let classeBadge =
-        "badge-attente";
+    let statut =
+      "En attente";
 
 
-      let texteStatut =
-        "En attente";
+    if (
+      proposition.statut ===
+      "acceptee"
+    ) {
 
+      classe =
+        "proposition-acceptee";
 
-      if (
-        proposition.statut ===
-        "acceptee"
-      ) {
+      badge =
+        "badge-success";
 
-        classe =
-          "proposition-acceptee";
-
-        classeBadge =
-          "badge-acceptee";
-
-        texteStatut =
-          "Acceptée";
-
-      }
-
-
-      else if (
-        proposition.statut ===
-        "refusee"
-      ) {
-
-        classe =
-          "proposition-refusee";
-
-        classeBadge =
-          "badge-refusee";
-
-        texteStatut =
-          "Refusée";
-
-      }
-
-
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "card " +
-        classe;
-
-
-      card.innerHTML = `
-
-        <h3>
-
-          ${
-            echapperHTML(
-              proposition.nom_consommable
-            )
-          }
-
-        </h3>
-
-
-        <p>
-
-          <strong>
-            Proposé par :
-          </strong>
-
-          ${
-            echapperHTML(
-              profil?.prenom
-              || ""
-            )
-          }
-
-          ${
-            echapperHTML(
-              profil?.nom
-              || ""
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Service :
-          </strong>
-
-          ${
-            echapperHTML(
-              profil?.service
-              ||
-              "Non renseigné"
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Catégorie :
-          </strong>
-
-          ${
-            echapperHTML(
-              proposition.categorie
-              || ""
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            État :
-          </strong>
-
-          ${
-            echapperHTML(
-              proposition.Etat
-              ||
-              "Non renseigné"
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Quantité :
-          </strong>
-
-          ${
-            proposition.quantite
-            ??
-            0
-          }
-
-        </p>
-
-
-        ${
-          proposition.description
-
-          ?
-
-          `
-
-            <p>
-
-              <strong>
-                Description :
-              </strong>
-
-              ${
-                echapperHTML(
-                  proposition.description
-                )
-              }
-
-            </p>
-
-          `
-
-          :
-
-          ""
-
-        }
-
-
-        <p>
-
-          <strong>
-            Date de proposition :
-          </strong>
-
-          ${
-            formaterDate(
-              proposition.date_proposition
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Statut :
-          </strong>
-
-          <span
-            class="badge ${classeBadge}">
-
-            ${texteStatut}
-
-          </span>
-
-        </p>
-
-
-        ${
-          proposition.statut ===
-          "en_attente"
-
-          ?
-
-          `
-
-            <div class="actions">
-
-              <button
-  class="accept"
-  onclick="
-    accepterProposition('${proposition.id}')
-  ">
-
-  Accepter
-
-</button>
-
-              <button
-                class="refuse"
-                onclick="
-                  refuserProposition(
-                    '${proposition.id}'
-                  )
-                ">
-
-                Refuser
-
-              </button>
-
-            </div>
-
-          `
-
-          :
-
-          ""
-
-        }
-
-      `;
-
-
-      zone.appendChild(
-        card
-      );
+      statut =
+        "Acceptée";
 
     }
-  );
+
+
+    if (
+      proposition.statut ===
+      "refusee"
+    ) {
+
+      classe =
+        "proposition-refusee";
+
+      badge =
+        "badge-danger";
+
+      statut =
+        "Refusée";
+
+    }
+
+
+    const card =
+      document.createElement("div");
+
+
+    card.className =
+      "card " + classe;
+
+
+    card.innerHTML = `
+
+      <h3>
+        ${echapperHTML(
+          proposition.nom_consommable
+        )}
+      </h3>
+
+
+      <p>
+        <strong>Proposé par :</strong>
+
+        ${
+          echapperHTML(
+            profil?.prenom || ""
+          )
+        }
+
+        ${
+          echapperHTML(
+            profil?.nom || ""
+          )
+        }
+      </p>
+
+
+      <p>
+        <strong>Service :</strong>
+
+        ${
+          echapperHTML(
+            profil?.service ||
+            "Non renseigné"
+          )
+        }
+      </p>
+
+
+      <p>
+        <strong>Catégorie :</strong>
+
+        ${
+          echapperHTML(
+            proposition.categorie || ""
+          )
+        }
+      </p>
+
+
+      <p>
+        <strong>État :</strong>
+
+        ${
+          echapperHTML(
+            proposition.Etat ||
+            "Non renseigné"
+          )
+        }
+      </p>
+
+
+      <p>
+        <strong>Quantité :</strong>
+
+        ${
+          proposition.quantite ?? 0
+        }
+      </p>
+
+
+      <p>
+        <strong>Date :</strong>
+
+        ${
+          formaterDate(
+            proposition.date_proposition
+          )
+        }
+      </p>
+
+
+      <p>
+
+        <strong>Statut :</strong>
+
+        <span class="badge ${badge}">
+          ${statut}
+        </span>
+
+      </p>
+
+
+      ${
+        proposition.description
+
+        ?
+
+        `
+          <p>
+
+            <strong>
+              Description :
+            </strong>
+
+            ${echapperHTML(
+              proposition.description
+            )}
+
+          </p>
+        `
+
+        :
+
+        ""
+      }
+
+
+      ${
+        proposition.statut === "en_attente"
+
+        ?
+
+        `
+          <div class="actions">
+
+            <button
+              class="accept"
+              onclick="
+                accepterProposition(
+                  '${proposition.id}'
+                )
+              ">
+
+              Accepter
+
+            </button>
+
+
+            <button
+              class="refuse"
+              onclick="
+                refuserProposition(
+                  '${proposition.id}'
+                )
+              ">
+
+              Refuser
+
+            </button>
+
+          </div>
+        `
+
+        :
+
+        ""
+      }
+
+    `;
+
+
+    zone.appendChild(card);
+
+  });
 
 
   await chargerStatistiques();
@@ -2035,255 +2487,220 @@ async function chargerPropositions() {
 }
 
 
+/* =========================================================
+   ACCEPTER PROPOSITION
+   ========================================================= */
 
 async function accepterProposition(
   propositionId
 ) {
 
-  const confirmation = confirm(
-    "Accepter cette proposition et ajouter le consommable ?"
-  );
+  if (
+    !confirm(
+      "Accepter cette proposition et ajouter le consommable ?"
+    )
+  ) {
 
-  if (!confirmation) {
     return;
+
   }
 
-  try {
 
-    /* ================================
-       1. Récupérer la proposition
-       ================================= */
+  try {
 
     const {
       data: proposition,
       error: erreurProposition
-    } = await supabaseClient
-      .from("Propositions_consommables")
-      .select(`
-        id,
-        nom_consommable,
-        description,
-        categorie,
-        photo,
-        date_proposition,
-        statut,
-        quantite,
-        Etat,
-        utilisateur_id
-      `)
-      .eq("id", propositionId)
-      .single();
+    } =
+      await supabaseClient
+        .from("Propositions_consommables")
+        .select(`
+          id,
+          nom_consommable,
+          description,
+          categorie,
+          photo,
+          date_proposition,
+          statut,
+          quantite,
+          Etat,
+          utilisateur_id
+        `)
+        .eq(
+          "id",
+          propositionId
+        )
+        .single();
+
 
     if (erreurProposition) {
-      console.error(
-        "Erreur récupération proposition :",
-        erreurProposition
-      );
 
       alert(
-        "Erreur lors de la récupération de la proposition : " +
         erreurProposition.message
       );
 
       return;
+
     }
 
-    if (!proposition) {
-      alert("Proposition introuvable.");
-      return;
-    }
 
-    /* ================================
-       2. Vérifier le statut
-       ================================= */
-
-    if (proposition.statut !== "en_attente") {
+    if (
+      proposition.statut !==
+      "en_attente"
+    ) {
 
       alert(
         "Cette proposition a déjà été traitée."
       );
 
       return;
+
     }
 
-   /* ================================
-   3. Vérifier le laboratoire/service
-   ================================= */
-
-const {
-  data: profil,
-  error: erreurProfil
-} = await supabaseClient
-  .from("Profils")
-  .select(`
-    id,
-    user_id,
-    nom,
-    prenom,
-    service
-  `)
-  .eq(
-    "user_id",
-    proposition.utilisateur_id
-  )
-  .single();
-
-
-if (
-  erreurProfil ||
-  !profil
-) {
-
-  console.error(
-    "ERREUR PROFIL :",
-    erreurProfil
-  );
-
-  alert(
-    "Impossible de récupérer le profil du proposant.\n\n" +
-    (
-      erreurProfil?.message ||
-      "Profil introuvable."
-    )
-  );
-
-  return;
-
-}
-
-
-const laboratoire =
-  profil.service
-  ? profil.service.trim()
-  : "";
-
-
-if (!laboratoire) {
-
-  alert(
-    "Le service du proposant n'est pas renseigné dans son profil."
-  );
-
-  return;
-
-}
-
-    /* ================================
-       4. Ajouter le consommable
-       ================================= */
 
     const {
-      data: nouveauConsommable,
+      data: profil,
+      error: erreurProfil
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(`
+          id,
+          user_id,
+          nom,
+          prenom,
+          service
+        `)
+        .eq(
+          "user_id",
+          proposition.utilisateur_id
+        )
+        .single();
+
+
+    if (
+      erreurProfil ||
+      !profil
+    ) {
+
+      alert(
+        "Impossible de récupérer le profil du proposant."
+      );
+
+      return;
+
+    }
+
+
+    const laboratoire =
+      profil.service?.trim() || "";
+
+
+    if (!laboratoire) {
+
+      alert(
+        "Le service du proposant n'est pas renseigné."
+      );
+
+      return;
+
+    }
+
+
+    const {
       error: erreurInsertion
-    } = await supabaseClient
-      .from("Consommables")
-      .insert({
+    } =
+      await supabaseClient
+        .from("Consommables")
+        .insert({
 
-        "Nom du sortant":
-          proposition.nom_consommable,
+          "Nom du sortant":
+            proposition.nom_consommable,
 
-        Categorie:
-          proposition.categorie || null,
+          Categorie:
+            proposition.categorie || null,
 
-        Description:
-          proposition.description || null,
+          Description:
+            proposition.description || null,
 
-        Laboratoire:
-          laboratoire,
+          Laboratoire:
+            laboratoire,
 
-        Etat:
-          proposition.Etat || null,
+          Etat:
+            proposition.Etat || null,
 
-        Quantite:
-          proposition.quantite || 1,
+          Quantite:
+            proposition.quantite || 1,
 
-        photo:
-          proposition.photo || null,
+          photo:
+            proposition.photo || null,
 
-        Actif:
-          true,
+          Actif:
+            true,
 
-        disponible:
-          true
+          disponible:
+            true
 
-      })
-      .select()
-      .single();
+        });
+
 
     if (erreurInsertion) {
 
-      console.error(
-        "ERREUR INSERTION CONSOMMABLE :",
-        erreurInsertion
-      );
-
       alert(
-        "Impossible d'ajouter le consommable.\n\n" +
+        "Impossible d'ajouter le consommable : " +
         erreurInsertion.message
       );
 
       return;
+
     }
 
-    console.log(
-      "Consommable ajouté :",
-      nouveauConsommable
-    );
-
-    /* ================================
-       5. Marquer la proposition acceptée
-       ================================= */
 
     const {
       error: erreurStatut
-    } = await supabaseClient
-      .from("Propositions_consommables")
-      .update({
-        statut: "acceptee"
-      })
-      .eq("id", propositionId);
+    } =
+      await supabaseClient
+        .from("Propositions_consommables")
+        .update({
+          statut:
+            "acceptee"
+        })
+        .eq(
+          "id",
+          propositionId
+        );
+
 
     if (erreurStatut) {
 
-      console.error(
-        "ERREUR MISE À JOUR PROPOSITION :",
-        erreurStatut
-      );
-
       alert(
-        "Le consommable a été ajouté, " +
-        "mais la proposition n'a pas pu être marquée comme acceptée.\n\n" +
-        erreurStatut.message
+        "Le consommable a été ajouté mais la proposition n'a pas pu être mise à jour."
       );
 
       return;
+
     }
 
-    /* ================================
-       6. Succès
-       ================================= */
 
     alert(
-      "Proposition acceptée.\n\n" +
-      "Le consommable a été ajouté avec succès."
+      "Proposition acceptée et consommable ajouté."
     );
 
+
     await chargerPropositions();
+
     await chargerConsommables();
+
     await chargerStatistiques();
 
   }
 
   catch (erreur) {
 
-    console.error(
-      "ERREUR INATTENDUE accepterProposition :",
-      erreur
-    );
+    console.error(erreur);
 
     alert(
-      "Une erreur inattendue est survenue :\n\n" +
-      erreur.message
+      "Une erreur inattendue est survenue."
     );
 
   }
@@ -2292,20 +2709,18 @@ if (!laboratoire) {
 
 
 /* =========================================================
-   REFUSER UNE PROPOSITION
+   REFUSER PROPOSITION
    ========================================================= */
 
 async function refuserProposition(
   propositionId
 ) {
 
-  const confirmation =
-    confirm(
+  if (
+    !confirm(
       "Voulez-vous vraiment refuser cette proposition ?"
-    );
-
-
-  if (!confirmation) {
+    )
+  ) {
 
     return;
 
@@ -2316,14 +2731,10 @@ async function refuserProposition(
     error
   } =
     await supabaseClient
-      .from(
-        "Propositions_consommables"
-      )
+      .from("Propositions_consommables")
       .update({
-
         statut:
           "refusee"
-
       })
       .eq(
         "id",
@@ -2343,11 +2754,6 @@ async function refuserProposition(
   }
 
 
-  alert(
-    "La proposition a été refusée."
-  );
-
-
   await chargerPropositions();
 
   await chargerStatistiques();
@@ -2355,9 +2761,8 @@ async function refuserProposition(
 }
 
 
-
 /* =========================================================
-   FORMULAIRE AJOUT DIRECT
+   FORMULAIRE AJOUT
    ========================================================= */
 
 function afficherFormulaireAjout() {
@@ -2367,11 +2772,9 @@ function afficherFormulaireAjout() {
   ).style.display =
     "block";
 
-
   chargerProfilGestionnaire();
 
 }
-
 
 
 function fermerFormulaireAjout() {
@@ -2382,9 +2785,11 @@ function fermerFormulaireAjout() {
     "none";
 
 
-  document.getElementById(
-    "formAjoutConsommable"
-  ).reset();
+  document
+    .getElementById(
+      "formAjoutConsommable"
+    )
+    .reset();
 
 
   document.getElementById(
@@ -2401,24 +2806,11 @@ function fermerFormulaireAjout() {
 }
 
 
+/* =========================================================
+   PROFIL GESTIONNAIRE
+   ========================================================= */
 
 async function chargerProfilGestionnaire() {
-
-  if (
-    profilGestionnaire
-  ) {
-
-    document.getElementById(
-      "serviceGestionnaire"
-    ).textContent =
-      profilGestionnaire.service
-      ||
-      "Non renseigné";
-
-    return;
-
-  }
-
 
   const {
     data: {
@@ -2443,10 +2835,11 @@ async function chargerProfilGestionnaire() {
       .from("Profils")
       .select(`
         id,
-        prenom,
         nom,
+        prenom,
+        service,
         role,
-        service
+        user_id
       `)
       .eq(
         "user_id",
@@ -2460,10 +2853,7 @@ async function chargerProfilGestionnaire() {
     !profil
   ) {
 
-    console.error(
-      "Erreur profil gestionnaire :",
-      error
-    );
+    console.error(error);
 
     return;
 
@@ -2474,19 +2864,114 @@ async function chargerProfilGestionnaire() {
     profil;
 
 
-  document.getElementById(
-    "serviceGestionnaire"
-  ).textContent =
-    profil.service
-    ||
-    "Non renseigné";
+  const service =
+    document.getElementById(
+      "serviceGestionnaire"
+    );
+
+
+  if (service) {
+
+    service.textContent =
+      profil.service ||
+      "Non renseigné";
+
+  }
+
+
+  const prenom =
+    document.getElementById(
+      "profilPrenom"
+    );
+
+
+  if (prenom) {
+
+    prenom.value =
+      profil.prenom || "";
+
+  }
+
+
+  const nom =
+    document.getElementById(
+      "profilNom"
+    );
+
+
+  if (nom) {
+
+    nom.value =
+      profil.nom || "";
+
+  }
+
+
+  const serviceProfil =
+    document.getElementById(
+      "profilService"
+    );
+
+
+  if (serviceProfil) {
+
+    serviceProfil.value =
+      profil.service || "";
+
+  }
+
+
+  const email =
+    document.getElementById(
+      "profilEmail"
+    );
+
+
+  if (email) {
+
+    email.value =
+      user.email || "";
+
+  }
+
+
+  const nomAffiche =
+    document.getElementById(
+      "profilNomAffiche"
+    );
+
+
+  if (nomAffiche) {
+
+    nomAffiche.textContent =
+      `${profil.prenom || ""} ${profil.nom || ""}`;
+
+  }
+
+
+  const roleAffiche =
+    document.getElementById(
+      "profilRoleAffiche"
+    );
+
+
+  if (roleAffiche) {
+
+    roleAffiche.textContent =
+      profil.role ===
+      "administrateur"
+      ?
+      "Administrateur"
+      :
+      "Gestionnaire";
+
+  }
 
 }
 
 
-
 /* =========================================================
-   AJOUT DIRECT D'UN CONSOMMABLE
+   AJOUT CONSOMMABLE
    ========================================================= */
 
 document
@@ -2506,83 +2991,58 @@ document
         );
 
 
-      zone.innerHTML =
-        "";
-
-
       const nom =
-        document
-          .getElementById(
-            "nomConsommable"
-          )
-          .value
-          .trim();
+        document.getElementById(
+          "nomConsommable"
+        ).value.trim();
 
 
       const categorie =
-        document
-          .getElementById(
-            "categorieConsommable"
-          )
-          .value
-          .trim();
+        document.getElementById(
+          "categorieConsommable"
+        ).value.trim();
 
 
       const description =
-        document
-          .getElementById(
-            "descriptionConsommable"
-          )
-          .value
-          .trim();
+        document.getElementById(
+          "descriptionConsommable"
+        ).value.trim();
 
 
       const etat =
-        document
-          .getElementById(
-            "etatConsommable"
-          )
-          .value
-          .trim();
+        document.getElementById(
+          "etatConsommable"
+        ).value;
 
 
       const quantite =
         parseInt(
-          document
-            .getElementById(
-              "quantiteConsommable"
-            )
-            .value,
+          document.getElementById(
+            "quantiteConsommable"
+          ).value,
           10
         );
 
 
       const photo =
-        document
-          .getElementById(
-            "photoConsommable"
-          )
-          .value
-          .trim();
+        document.getElementById(
+          "photoConsommable"
+        ).value.trim();
 
 
       if (
         !nom ||
         !categorie ||
         !etat ||
-        !quantite ||
+        Number.isNaN(quantite) ||
         quantite < 1
       ) {
 
         zone.innerHTML = `
-
           <div class="error-box">
-
             Veuillez remplir correctement
-            tous les champs obligatoires.
-
+            les champs obligatoires.
           </div>
-
         `;
 
         return;
@@ -2594,8 +3054,7 @@ document
 
 
       const laboratoire =
-        profilGestionnaire?.service
-        ||
+        profilGestionnaire?.service ||
         "";
 
 
@@ -2613,14 +3072,10 @@ document
               categorie,
 
             Description:
-              description
-              ||
-              null,
+              description || null,
 
             Laboratoire:
-              laboratoire
-              ||
-              null,
+              laboratoire || null,
 
             Etat:
               etat,
@@ -2629,9 +3084,7 @@ document
               quantite,
 
             photo:
-              photo
-              ||
-              null,
+              photo || null,
 
             Actif:
               true,
@@ -2644,27 +3097,10 @@ document
 
       if (error) {
 
-        console.error(
-          "Erreur ajout consommable :",
-          error
-        );
-
-
         zone.innerHTML = `
-
           <div class="error-box">
-
-            Impossible d'ajouter
-            le consommable.
-
-            <br><br>
-
-            ${echapperHTML(
-              error.message
-            )}
-
+            ${echapperHTML(error.message)}
           </div>
-
         `;
 
         return;
@@ -2673,14 +3109,9 @@ document
 
 
       zone.innerHTML = `
-
         <div class="success-box">
-
-          Le consommable a été ajouté
-          avec succès.
-
+          Le consommable a été ajouté avec succès.
         </div>
-
       `;
 
 
@@ -2703,7 +3134,6 @@ document
 
     }
   );
-
 
 
 /* =========================================================
@@ -2735,18 +3165,12 @@ async function chargerConsommables() {
 
   if (error) {
 
-    console.error(error);
-
-
     zone.innerHTML = `
-
-      <div class="message">
-
-        Impossible de charger
-        les consommables.
-
+      <div class="error-box">
+        Impossible de charger les consommables.
+        <br><br>
+        ${echapperHTML(error.message)}
       </div>
-
     `;
 
     return;
@@ -2754,19 +3178,12 @@ async function chargerConsommables() {
   }
 
 
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  if (!data || data.length === 0) {
 
     zone.innerHTML = `
-
       <div class="message">
-
         Aucun consommable.
-
       </div>
-
     `;
 
     return;
@@ -2809,7 +3226,11 @@ async function chargerConsommables() {
             </th>
 
             <th>
-              Action
+              Actif
+            </th>
+
+            <th>
+              Actions
             </th>
 
           </tr>
@@ -2820,116 +3241,181 @@ async function chargerConsommables() {
         <tbody>
 
           ${
-            data.map(
-              consommable => `
+            data.map(consommable => `
 
-                <tr>
+              <tr>
 
-                  <td>
-
-                    ${
-                      echapperHTML(
-                        consommable[
-                          "Nom du sortant"
-                        ]
-                        ||
-                        ""
-                      )
-                    }
-
-                  </td>
+                <td>
+                  ${
+                    echapperHTML(
+                      consommable[
+                        "Nom du sortant"
+                      ] || ""
+                    )
+                  }
+                </td>
 
 
-                  <td>
-
-                    ${
-                      echapperHTML(
-                        consommable.Categorie
-                        ||
-                        ""
-                      )
-                    }
-
-                  </td>
+                <td>
+                  ${
+                    echapperHTML(
+                      consommable.Categorie ||
+                      ""
+                    )
+                  }
+                </td>
 
 
-                  <td>
-
-                    ${
-                      echapperHTML(
-                        consommable.Laboratoire
-                        ||
-                        ""
-                      )
-                    }
-
-                  </td>
+                <td>
+                  ${
+                    echapperHTML(
+                      consommable.Laboratoire ||
+                      ""
+                    )
+                  }
+                </td>
 
 
-                  <td>
-
-                    ${
-                      consommable.Quantite
-                      ??
-                      0
-                    }
-
-                  </td>
+                <td>
+                  ${
+                    consommable.Quantite ??
+                    0
+                  }
+                </td>
 
 
-                  <td>
-
-                    ${
-                      echapperHTML(
-                        consommable.Etat
-                        ||
-                        "Non renseigné"
-                      )
-                    }
-
-                  </td>
+                <td>
+                  ${
+                    echapperHTML(
+                      consommable.Etat ||
+                      "Non renseigné"
+                    )
+                  }
+                </td>
 
 
-                  <td>
+                <td>
 
-                    ${
-                      consommable.disponible
-                      ?
-                      "Oui"
-                      :
-                      "Non"
-                    }
+                  ${
+                    consommable.disponible
 
-                  </td>
+                    ?
+
+                    `<span class="badge badge-success">
+                      Oui
+                    </span>`
+
+                    :
+
+                    `<span class="badge badge-danger">
+                      Non
+                    </span>`
+                  }
+
+                </td>
 
 
-                  <td>
+                <td>
+
+                  ${
+                    consommable.Actif
+
+                    ?
+
+                    `<span class="badge badge-success">
+                      Oui
+                    </span>`
+
+                    :
+
+                    `<span class="badge badge-danger">
+                      Non
+                    </span>`
+                  }
+
+                </td>
+
+
+                <td>
+
+                  <div class="actions">
 
                     <button
-                      class="edit-button"
+                      class="edit-button small-button"
+                      onclick="
+                        ouvrirModificationConsommable(
+                          '${consommable.id}'
+                        )
+                      ">
+
+                      Modifier
+
+                    </button>
+
+
+                    <button
+                      class="primary small-button"
                       onclick="
                         changerDisponibilite(
                           '${consommable.id}',
-                          ${consommable.disponible}
+                          ${!!consommable.disponible}
                         )
                       ">
 
                       ${
                         consommable.disponible
                         ?
-                        "Rendre indisponible"
+                        "Indisponible"
                         :
-                        "Rendre disponible"
+                        "Disponible"
                       }
 
                     </button>
 
-                  </td>
 
-                </tr>
+                    ${
+                      consommable.Actif
 
-              `
-            ).join("")
+                      ?
+
+                      `
+                        <button
+                          class="delete-button small-button"
+                          onclick="
+                            desactiverConsommable(
+                              '${consommable.id}'
+                            )
+                          ">
+
+                          Supprimer
+
+                        </button>
+                      `
+
+                      :
+
+                      `
+                        <button
+                          class="accept small-button"
+                          onclick="
+                            reactiverConsommable(
+                              '${consommable.id}'
+                            )
+                          ">
+
+                          Réactiver
+
+                        </button>
+                      `
+                    }
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            `).join("")
           }
 
         </tbody>
@@ -2943,19 +3429,235 @@ async function chargerConsommables() {
 }
 
 
+/* =========================================================
+   MODIFICATION CONSOMMABLE
+   ========================================================= */
+
+async function ouvrirModificationConsommable(
+  id
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .single();
+
+
+  if (error || !data) {
+
+    alert(
+      "Impossible de récupérer le consommable."
+    );
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "editConsommableId"
+  ).value =
+    data.id;
+
+
+  document.getElementById(
+    "editNom"
+  ).value =
+    data["Nom du sortant"] || "";
+
+
+  document.getElementById(
+    "editCategorie"
+  ).value =
+    data.Categorie || "";
+
+
+  document.getElementById(
+    "editDescription"
+  ).value =
+    data.Description || "";
+
+
+  document.getElementById(
+    "editQuantite"
+  ).value =
+    data.Quantite ?? 0;
+
+
+  document.getElementById(
+    "editLaboratoire"
+  ).value =
+    data.Laboratoire || "";
+
+
+  document.getElementById(
+    "editEtat"
+  ).value =
+    data.Etat || "Bon état";
+
+
+  document.getElementById(
+    "editPhoto"
+  ).value =
+    data.photo || "";
+
+
+  document.getElementById(
+    "editDisponible"
+  ).value =
+    String(
+      !!data.disponible
+    );
+
+
+  document.getElementById(
+    "modalConsommable"
+  ).classList.add("active");
+
+}
+
+
+function fermerModalConsommable() {
+
+  document.getElementById(
+    "modalConsommable"
+  ).classList.remove("active");
+
+}
+
+
+document
+  .getElementById(
+    "formModificationConsommable"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const id =
+        document.getElementById(
+          "editConsommableId"
+        ).value;
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("Consommables")
+          .update({
+
+            "Nom du sortant":
+              document.getElementById(
+                "editNom"
+              ).value.trim(),
+
+            Categorie:
+              document.getElementById(
+                "editCategorie"
+              ).value.trim(),
+
+            Description:
+              document.getElementById(
+                "editDescription"
+              ).value.trim() ||
+              null,
+
+            Quantite:
+              parseInt(
+                document.getElementById(
+                  "editQuantite"
+                ).value,
+                10
+              ),
+
+            Laboratoire:
+              document.getElementById(
+                "editLaboratoire"
+              ).value.trim(),
+
+            Etat:
+              document.getElementById(
+                "editEtat"
+              ).value,
+
+            photo:
+              document.getElementById(
+                "editPhoto"
+              ).value.trim() ||
+              null,
+
+            disponible:
+              document.getElementById(
+                "editDisponible"
+              ).value === "true"
+
+          })
+          .eq(
+            "id",
+            id
+          );
+
+
+      const message =
+        document.getElementById(
+          "messageModificationConsommable"
+        );
+
+
+      if (error) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            ${echapperHTML(error.message)}
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      message.innerHTML = `
+        <div class="success-box">
+          Consommable modifié avec succès.
+        </div>
+      `;
+
+
+      await chargerConsommables();
+
+      await chargerStatistiques();
+
+
+      setTimeout(
+        fermerModalConsommable,
+        700
+      );
+
+    }
+  );
+
 
 /* =========================================================
-   DISPONIBILITE CONSOMMABLE
+   DISPONIBILITE
    ========================================================= */
 
 async function changerDisponibilite(
-  consommableId,
-  disponibiliteActuelle
+  id,
+  actuelle
 ) {
-
-  const nouvelleDisponibilite =
-    !disponibiliteActuelle;
-
 
   const {
     error
@@ -2963,14 +3665,12 @@ async function changerDisponibilite(
     await supabaseClient
       .from("Consommables")
       .update({
-
         disponible:
-          nouvelleDisponibilite
-
+          !actuelle
       })
       .eq(
         "id",
-        consommableId
+        id
       );
 
 
@@ -2992,6 +3692,108 @@ async function changerDisponibilite(
 
 }
 
+
+/* =========================================================
+   SUPPRESSION LOGIQUE
+   ========================================================= */
+
+async function desactiverConsommable(
+  id
+) {
+
+  const confirmation =
+    confirm(
+      "Voulez-vous vraiment supprimer ce consommable ?\n\nIl sera désactivé mais conservé dans la base afin de préserver l'historique."
+    );
+
+
+  if (!confirmation) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .update({
+
+        Actif:
+          false,
+
+        disponible:
+          false
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      "Impossible de supprimer le consommable : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await chargerConsommables();
+
+  await chargerStatistiques();
+
+}
+
+
+async function reactiverConsommable(
+  id
+) {
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .update({
+
+        Actif:
+          true,
+
+        disponible:
+          true
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      "Impossible de réactiver le consommable : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await chargerConsommables();
+
+  await chargerStatistiques();
+
+}
 
 
 /* =========================================================
@@ -3025,18 +3827,12 @@ async function chargerUtilisateurs() {
 
   if (error) {
 
-    console.error(error);
-
-
     zone.innerHTML = `
-
-      <div class="message">
-
-        Impossible de charger
-        les utilisateurs.
-
+      <div class="error-box">
+        Impossible de charger les utilisateurs.
+        <br><br>
+        ${echapperHTML(error.message)}
       </div>
-
     `;
 
     return;
@@ -3044,19 +3840,12 @@ async function chargerUtilisateurs() {
   }
 
 
-  if (
-    !data ||
-    data.length === 0
-  ) {
+  if (!data || data.length === 0) {
 
     zone.innerHTML = `
-
       <div class="message">
-
         Aucun utilisateur.
-
       </div>
-
     `;
 
     return;
@@ -3074,21 +3863,13 @@ async function chargerUtilisateurs() {
 
           <tr>
 
-            <th>
-              Nom
-            </th>
+            <th>Nom</th>
 
-            <th>
-              Prénom
-            </th>
+            <th>Prénom</th>
 
-            <th>
-              Service
-            </th>
+            <th>Service</th>
 
-            <th>
-              Rôle
-            </th>
+            <th>Rôle</th>
 
           </tr>
 
@@ -3098,66 +3879,29 @@ async function chargerUtilisateurs() {
         <tbody>
 
           ${
-            data.map(
-              profil => `
+            data.map(profil => `
 
-                <tr>
+              <tr>
 
-                  <td>
+                <td>
+                  ${echapperHTML(profil.nom || "")}
+                </td>
 
-                    ${
-                      echapperHTML(
-                        profil.nom
-                        ||
-                        ""
-                      )
-                    }
+                <td>
+                  ${echapperHTML(profil.prenom || "")}
+                </td>
 
-                  </td>
+                <td>
+                  ${echapperHTML(profil.service || "")}
+                </td>
 
+                <td>
+                  ${echapperHTML(profil.role || "")}
+                </td>
 
-                  <td>
+              </tr>
 
-                    ${
-                      echapperHTML(
-                        profil.prenom
-                        ||
-                        ""
-                      )
-                    }
-
-                  </td>
-
-
-                  <td>
-
-                    ${
-                      echapperHTML(
-                        profil.service
-                        ||
-                        ""
-                      )
-                    }
-
-                  </td>
-
-
-                  <td>
-
-                    ${
-                      echapperHTML(
-                        profil.role
-                        ||
-                        ""
-                      )
-                    }
-
-                  </td>
-
-                </tr>
-
-              `
-            ).join("")
+            `).join("")
           }
 
         </tbody>
@@ -3169,7 +3913,6 @@ async function chargerUtilisateurs() {
   `;
 
 }
-
 
 
 /* =========================================================
@@ -3185,13 +3928,9 @@ async function chargerMessages() {
 
 
   zone.innerHTML = `
-
     <div class="message">
-
       Chargement des messages...
-
     </div>
-
   `;
 
 
@@ -3220,30 +3959,14 @@ async function chargerMessages() {
 
   if (erreurMessages) {
 
-    console.error(
-      "Erreur chargement messages :",
-      erreurMessages
-    );
-
-
     zone.innerHTML = `
-
-      <div class="message">
-
+      <div class="error-box">
         Impossible de charger les messages.
-
         <br><br>
-
-        <small>
-
-          ${echapperHTML(
-            erreurMessages.message
-          )}
-
-        </small>
-
+        ${echapperHTML(
+          erreurMessages.message
+        )}
       </div>
-
     `;
 
     return;
@@ -3251,19 +3974,12 @@ async function chargerMessages() {
   }
 
 
-  if (
-    !messages ||
-    messages.length === 0
-  ) {
+  if (!messages || messages.length === 0) {
 
     zone.innerHTML = `
-
       <div class="message">
-
         Aucun message reçu.
-
       </div>
-
     `;
 
     return;
@@ -3271,7 +3987,7 @@ async function chargerMessages() {
   }
 
 
-  const idsUtilisateurs =
+  const ids =
     [
       ...new Set(
         messages.map(
@@ -3285,14 +4001,9 @@ async function chargerMessages() {
   let profils = [];
 
 
-  if (
-    idsUtilisateurs.length > 0
-  ) {
+  if (ids.length > 0) {
 
-    const {
-      data,
-      error
-    } =
+    const resultat =
       await supabaseClient
         .from("Profils")
         .select(`
@@ -3303,50 +4014,38 @@ async function chargerMessages() {
         `)
         .in(
           "id",
-          idsUtilisateurs
+          ids
         );
 
 
-    if (error) {
-
-      console.error(
-        "Erreur chargement profils :",
-        error
-      );
-
-    }
-    else {
+    if (!resultat.error) {
 
       profils =
-        data || [];
+        resultat.data || [];
 
     }
 
   }
 
 
-  const profilsParId =
-    {};
+  const profilsParId = {};
 
 
-  profils.forEach(
-    profil => {
+  profils.forEach(profil => {
 
-      profilsParId[
-        profil.id
-      ] =
-        profil;
+    profilsParId[
+      profil.id
+    ] =
+      profil;
 
-    }
-  );
+  });
 
 
   zone.innerHTML = "";
 
 
   for (
-    const message
-    of messages
+    const message of messages
   ) {
 
     const profil =
@@ -3355,49 +4054,27 @@ async function chargerMessages() {
       ];
 
 
-    if (
-      !message.lu
-    ) {
+    if (!message.lu) {
 
-      const {
-        error:
-          erreurLecture
-      } =
-        await supabaseClient
-          .from("Messages")
-          .update({
-            lu:
-              true
-          })
-          .eq(
-            "id",
-            message.id
-          );
-
-
-      if (
-        erreurLecture
-      ) {
-
-        console.error(
-          "Erreur marquage comme lu :",
-          erreurLecture
+      await supabaseClient
+        .from("Messages")
+        .update({
+          lu:
+            true
+        })
+        .eq(
+          "id",
+          message.id
         );
 
-      }
-      else {
-
-        message.lu =
-          true;
-
-      }
+      message.lu =
+        true;
 
     }
 
 
     const {
-      data: reponses,
-      error: erreurReponses
+      data: reponses
     } =
       await supabaseClient
         .from("ReponsesMessages")
@@ -3420,33 +4097,14 @@ async function chargerMessages() {
         );
 
 
-    if (
-      erreurReponses
-    ) {
-
-      console.error(
-        "Erreur chargement réponses :",
-        erreurReponses
-      );
-
-    }
-
-
-    const listeReponses =
-      reponses || [];
-
-
     let texteStatut =
-      "Non lu";
-
+      "Lu";
 
     let classeStatut =
-      "statut-non-lu";
+      "statut-lu";
 
 
-    if (
-      message.repondu
-    ) {
+    if (message.repondu) {
 
       texteStatut =
         "Répondu";
@@ -3456,106 +4114,55 @@ async function chargerMessages() {
 
     }
 
-    else if (
-      message.lu
-    ) {
 
-      texteStatut =
-        "Lu";
+    const historique =
+      reponses?.length
 
-      classeStatut =
-        "statut-lu";
+      ?
 
-    }
-
-
-    let historiqueHTML =
-      "";
-
-
-    if (
-      listeReponses.length > 0
-    ) {
-
-      historiqueHTML = `
-
+      `
         <div class="reply-box">
 
           <h4>
-            Historique de la conversation
+            Historique
           </h4>
 
           ${
-            listeReponses.map(
-              reponse => `
+            reponses.map(reponse => `
 
-                <div class="reply-item">
+              <div class="reply-item">
 
-                  <p>
+                <strong>
+                  Gestionnaire
+                </strong>
 
-                    <strong>
-                      Gestionnaire
-                    </strong>
+                <p>
+                  ${echapperHTML(
+                    reponse.contenu
+                  )}
+                </p>
 
-                  </p>
+                <small>
+                  ${formaterDate(
+                    reponse.date_reponse
+                  )}
+                </small>
 
-                  <p>
+              </div>
 
-                    ${echapperHTML(
-                      reponse.contenu
-                    )}
-
-                  </p>
-
-                  <p>
-
-                    <small>
-
-                      ${formaterDate(
-                        reponse.date_reponse
-                      )}
-
-                    </small>
-
-                  </p>
-
-                </div>
-
-              `
-            ).join("")
+            `).join("")
           }
 
         </div>
+      `
 
-      `;
+      :
 
-    }
-
-    else {
-
-      historiqueHTML = `
-
-        <div class="reply-box">
-
-          <p>
-
-            <em>
-              Aucune réponse envoyée pour le moment.
-            </em>
-
-          </p>
-
-        </div>
-
-      `;
-
-    }
+      "";
 
 
     const card =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
 
     card.className =
@@ -3572,17 +4179,13 @@ async function chargerMessages() {
 
             ${
               echapperHTML(
-                profil?.prenom
-                ||
-                ""
+                profil?.prenom || ""
               )
             }
 
             ${
               echapperHTML(
-                profil?.nom
-                ||
-                ""
+                profil?.nom || ""
               )
             }
 
@@ -3597,8 +4200,7 @@ async function chargerMessages() {
 
             ${
               echapperHTML(
-                profil?.service
-                ||
+                profil?.service ||
                 "Non renseigné"
               )
             }
@@ -3622,20 +4224,16 @@ async function chargerMessages() {
           <div class="message-original">
 
             <p>
-
               <strong>
                 Message de l'utilisateur
               </strong>
-
             </p>
 
 
             <p>
-
               ${echapperHTML(
                 message.contenu
               )}
-
             </p>
 
 
@@ -3654,8 +4252,7 @@ async function chargerMessages() {
           </div>
 
 
-          <p
-            class="statut ${classeStatut}">
+          <p class="statut ${classeStatut}">
 
             <strong>
               Statut :
@@ -3666,20 +4263,19 @@ async function chargerMessages() {
           </p>
 
 
-          ${historiqueHTML}
+          ${historique}
 
 
           <div class="reply-box">
 
             <h4>
-              Répondre à cet utilisateur
+              Répondre
             </h4>
 
 
             <textarea
               id="reponse-${message.id}"
-              placeholder="Écrivez votre réponse...">
-            </textarea>
+              placeholder="Écrivez votre réponse..."></textarea>
 
 
             <div class="actions">
@@ -3713,14 +4309,11 @@ async function chargerMessages() {
     `;
 
 
-    zone.appendChild(
-      card
-    );
+    zone.appendChild(card);
 
   }
 
 }
-
 
 
 /* =========================================================
@@ -3749,27 +4342,14 @@ async function repondreMessage(
     );
 
 
-  if (
-    !zoneReponse
-  ) {
-
-    alert(
-      "Impossible de trouver le champ de réponse."
-    );
-
-    return;
-
-  }
-
-
   const contenu =
-    zoneReponse.value.trim();
+    zoneReponse?.value.trim();
 
 
   if (!contenu) {
 
     resultat.className =
-      "erreur";
+      "error-box";
 
     resultat.textContent =
       "Veuillez écrire une réponse.";
@@ -3783,33 +4363,21 @@ async function repondreMessage(
     true;
 
 
-  bouton.textContent =
-    "Envoi en cours...";
-
-
   try {
 
     const {
       data: {
         user
-      },
-      error: erreurUtilisateur
+      }
     } =
       await supabaseClient.auth.getUser();
 
 
-    if (
-      erreurUtilisateur ||
-      !user
-    ) {
+    if (!user) {
 
-      resultat.className =
-        "erreur";
-
-      resultat.textContent =
-        "Vous devez être connecté.";
-
-      return;
+      throw new Error(
+        "Vous devez être connecté."
+      );
 
     }
 
@@ -3835,13 +4403,9 @@ async function repondreMessage(
       !profil
     ) {
 
-      resultat.className =
-        "erreur";
-
-      resultat.textContent =
-        "Impossible de trouver votre profil.";
-
-      return;
+      throw new Error(
+        "Profil introuvable."
+      );
 
     }
 
@@ -3855,51 +4419,14 @@ async function repondreMessage(
       )
     ) {
 
-      resultat.className =
-        "erreur";
-
-      resultat.textContent =
-        "Votre profil ne permet pas d'envoyer une réponse.";
-
-      return;
+      throw new Error(
+        "Vous n'êtes pas autorisé."
+      );
 
     }
 
 
     const {
-      data: message,
-      error: erreurMessage
-    } =
-      await supabaseClient
-        .from("Messages")
-        .select(
-          "id, utilisateur_id"
-        )
-        .eq(
-          "id",
-          messageId
-        )
-        .single();
-
-
-    if (
-      erreurMessage ||
-      !message
-    ) {
-
-      resultat.className =
-        "erreur";
-
-      resultat.textContent =
-        "Impossible de retrouver ce message.";
-
-      return;
-
-    }
-
-
-    const {
-      data: nouvelleReponse,
       error: erreurInsertion
     } =
       await supabaseClient
@@ -3915,37 +4442,14 @@ async function repondreMessage(
           contenu:
             contenu
 
-        })
-        .select()
-        .single();
+        });
 
 
-    if (
-      erreurInsertion
-    ) {
+    if (erreurInsertion) {
 
-      console.error(
-        "Erreur insertion réponse :",
-        erreurInsertion
-      );
-
-
-      resultat.className =
-        "erreur";
-
-      resultat.textContent =
-        "Impossible d'envoyer la réponse : " +
-        erreurInsertion.message;
-
-      return;
+      throw erreurInsertion;
 
     }
-
-
-    console.log(
-      "Réponse créée :",
-      nouvelleReponse
-    );
 
 
     const {
@@ -3968,76 +4472,917 @@ async function repondreMessage(
         );
 
 
-    if (
-      erreurStatut
-    ) {
+    if (erreurStatut) {
 
-      console.error(
-        "Erreur mise à jour statut :",
-        erreurStatut
-      );
-
-
-      resultat.className =
-        "erreur";
-
-      resultat.textContent =
-        "La réponse a été envoyée, mais le statut n'a pas pu être mis à jour.";
-
-      await chargerMessages();
-
-      return;
+      throw erreurStatut;
 
     }
+
+
+    resultat.className =
+      "success-box";
+
+    resultat.textContent =
+      "Réponse envoyée.";
 
 
     zoneReponse.value =
       "";
 
 
-    resultat.className =
-      "succes";
-
-
-    resultat.textContent =
-      "Réponse envoyée.";
-
-
     await chargerMessages();
 
   }
 
-
   catch (erreur) {
 
-    console.error(
-      "Erreur inattendue :",
-      erreur
-    );
-
-
     resultat.className =
-      "erreur";
-
+      "error-box";
 
     resultat.textContent =
-      "Une erreur est survenue.";
+      erreur.message;
 
   }
-
 
   finally {
 
     bouton.disabled =
       false;
 
-    bouton.textContent =
-      "Envoyer la réponse";
-
   }
 
 }
 
+
+/* =========================================================
+   INFORMATIONS
+   ========================================================= */
+
+async function chargerInformations() {
+
+  const zone =
+    document.getElementById(
+      "listeInformations"
+    );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Informations")
+      .select("*")
+      .order(
+        "date_creation",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    zone.innerHTML = `
+      <div class="error-box">
+        Impossible de charger les informations.
+        <br><br>
+        ${echapperHTML(error.message)}
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucune information publiée.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = "";
+
+
+  data.forEach(info => {
+
+    const card =
+      document.createElement("div");
+
+
+    card.className =
+      "card publication";
+
+
+    card.innerHTML = `
+
+      <h3>
+        ${echapperHTML(info.titre)}
+      </h3>
+
+
+      <p>
+
+        ${
+          info.publie
+
+          ?
+
+          `<span class="badge badge-success">
+            Publiée
+          </span>`
+
+          :
+
+          `<span class="badge badge-warning">
+            Brouillon
+          </span>`
+
+        }
+
+      </p>
+
+
+      <p>
+        ${echapperHTML(
+          info.contenu
+        ).replace(
+          /\n/g,
+          "<br>"
+        )}
+      </p>
+
+
+      ${
+        info.image
+
+        ?
+
+        `
+          <img
+            src="${echapperHTML(info.image)}"
+            alt="Image de l'information"
+            onerror="this.style.display='none'">
+        `
+
+        :
+
+        ""
+      }
+
+
+      <p>
+
+        <small>
+
+          Créée le
+          ${formaterDate(
+            info.date_creation
+          )}
+
+        </small>
+
+      </p>
+
+
+      ${
+        info.date_modification
+
+        ?
+
+        `
+          <p>
+
+            <small>
+
+              Dernière modification :
+              ${formaterDate(
+                info.date_modification
+              )}
+
+            </small>
+
+          </p>
+        `
+
+        :
+
+        ""
+      }
+
+
+      <div class="actions">
+
+        <button
+          class="edit-button"
+          onclick="
+            modifierInformation(
+              '${info.id}'
+            )
+          ">
+
+          Modifier
+
+        </button>
+
+
+        <button
+          class="delete-button"
+          onclick="
+            supprimerInformation(
+              '${info.id}'
+            )
+          ">
+
+          Supprimer
+
+        </button>
+
+      </div>
+
+    `;
+
+
+    zone.appendChild(card);
+
+  });
+
+}
+
+
+/* =========================================================
+   MODAL INFORMATION
+   ========================================================= */
+
+function ouvrirModalInformation() {
+
+  document.getElementById(
+    "titreModalInformation"
+  ).textContent =
+    "Publier une information";
+
+
+  document.getElementById(
+    "informationId"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "informationTitre"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "informationContenu"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "informationImage"
+  ).value =
+    "";
+
+
+  document.getElementById(
+    "informationPublie"
+  ).value =
+    "true";
+
+
+  document.getElementById(
+    "modalInformation"
+  ).classList.add("active");
+
+}
+
+
+function fermerModalInformation() {
+
+  document.getElementById(
+    "modalInformation"
+  ).classList.remove("active");
+
+}
+
+
+/* =========================================================
+   MODIFIER INFORMATION
+   ========================================================= */
+
+async function modifierInformation(
+  id
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Informations")
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .single();
+
+
+  if (error || !data) {
+
+    alert(
+      "Impossible de récupérer l'information."
+    );
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "titreModalInformation"
+  ).textContent =
+    "Modifier l'information";
+
+
+  document.getElementById(
+    "informationId"
+  ).value =
+    data.id;
+
+
+  document.getElementById(
+    "informationTitre"
+  ).value =
+    data.titre || "";
+
+
+  document.getElementById(
+    "informationContenu"
+  ).value =
+    data.contenu || "";
+
+
+  document.getElementById(
+    "informationImage"
+  ).value =
+    data.image || "";
+
+
+  document.getElementById(
+    "informationPublie"
+  ).value =
+    String(
+      !!data.publie
+    );
+
+
+  document.getElementById(
+    "modalInformation"
+  ).classList.add("active");
+
+}
+
+
+/* =========================================================
+   CREER / MODIFIER INFORMATION
+   ========================================================= */
+
+document
+  .getElementById(
+    "formInformation"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const id =
+        document.getElementById(
+          "informationId"
+        ).value;
+
+
+      const titre =
+        document.getElementById(
+          "informationTitre"
+        ).value.trim();
+
+
+      const contenu =
+        document.getElementById(
+          "informationContenu"
+        ).value.trim();
+
+
+      const image =
+        document.getElementById(
+          "informationImage"
+        ).value.trim();
+
+
+      const publie =
+        document.getElementById(
+          "informationPublie"
+        ).value === "true";
+
+
+      const message =
+        document.getElementById(
+          "messageInformation"
+        );
+
+
+      if (!titre || !contenu) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            Le titre et le contenu sont obligatoires.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      let resultat;
+
+
+      if (id) {
+
+        resultat =
+          await supabaseClient
+            .from("Informations")
+            .update({
+
+              titre:
+                titre,
+
+              contenu:
+                contenu,
+
+              image:
+                image || null,
+
+              publie:
+                publie,
+
+              date_modification:
+                new Date().toISOString()
+
+            })
+            .eq(
+              "id",
+              id
+            );
+
+      }
+
+      else {
+
+        await chargerProfilGestionnaire();
+
+
+        resultat =
+          await supabaseClient
+            .from("Informations")
+            .insert({
+
+              titre:
+                titre,
+
+              contenu:
+                contenu,
+
+              image:
+                image || null,
+
+              publie:
+                publie,
+
+              created_by:
+                profilGestionnaire?.id ||
+                null
+
+            });
+
+      }
+
+
+      if (resultat.error) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            ${echapperHTML(
+              resultat.error.message
+            )}
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      message.innerHTML = `
+        <div class="success-box">
+          Information enregistrée avec succès.
+        </div>
+      `;
+
+
+      await chargerInformations();
+
+
+      setTimeout(
+        fermerModalInformation,
+        700
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   SUPPRIMER INFORMATION
+   ========================================================= */
+
+async function supprimerInformation(
+  id
+) {
+
+  if (
+    !confirm(
+      "Voulez-vous vraiment supprimer cette information ?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Informations")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    alert(
+      "Impossible de supprimer l'information : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await chargerInformations();
+
+}
+
+
+/* =========================================================
+   PROFIL : ENREGISTREMENT
+   ========================================================= */
+
+document
+  .getElementById(
+    "formProfil"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const message =
+        document.getElementById(
+          "messageProfil"
+        );
+
+
+      try {
+
+        const {
+          data: {
+            user
+          },
+          error: erreurUser
+        } =
+          await supabaseClient.auth.getUser();
+
+
+        if (
+          erreurUser ||
+          !user
+        ) {
+
+          throw new Error(
+            "Utilisateur non connecté."
+          );
+
+        }
+
+
+        const prenom =
+          document.getElementById(
+            "profilPrenom"
+          ).value.trim();
+
+
+        const nom =
+          document.getElementById(
+            "profilNom"
+          ).value.trim();
+
+
+        const service =
+          document.getElementById(
+            "profilService"
+          ).value.trim();
+
+
+        const email =
+          document.getElementById(
+            "profilEmail"
+          ).value.trim();
+
+
+        const {
+          error: erreurProfil
+        } =
+          await supabaseClient
+            .from("Profils")
+            .update({
+
+              prenom:
+                prenom,
+
+              nom:
+                nom,
+
+              service:
+                service || null
+
+            })
+            .eq(
+              "user_id",
+              user.id
+            );
+
+
+        if (erreurProfil) {
+
+          throw erreurProfil;
+
+        }
+
+
+        /*
+         * Modification de l'e-mail Auth.
+         */
+
+        if (
+          email &&
+          email !== user.email
+        ) {
+
+          const {
+            error: erreurEmail
+          } =
+            await supabaseClient.auth.updateUser({
+              email:
+                email
+            });
+
+
+          if (erreurEmail) {
+
+            throw erreurEmail;
+
+          }
+
+        }
+
+
+        message.innerHTML = `
+          <div class="success-box">
+            Votre profil a été mis à jour.
+          </div>
+        `;
+
+
+        await chargerProfilGestionnaire();
+
+      }
+
+      catch (erreur) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            ${echapperHTML(
+              erreur.message
+            )}
+          </div>
+        `;
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   MOT DE PASSE
+   ========================================================= */
+
+document
+  .getElementById(
+    "formMotDePasse"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const message =
+        document.getElementById(
+          "messageMotDePasse"
+        );
+
+
+      const motDePasse =
+        document.getElementById(
+          "nouveauMotDePasse"
+        ).value;
+
+
+      const confirmation =
+        document.getElementById(
+          "confirmationMotDePasse"
+        ).value;
+
+
+      if (
+        motDePasse !==
+        confirmation
+      ) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            Les deux mots de passe sont différents.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      if (motDePasse.length < 6) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            Le mot de passe doit contenir au moins 6 caractères.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      const {
+        error
+      } =
+        await supabaseClient.auth.updateUser({
+          password:
+            motDePasse
+        });
+
+
+      if (error) {
+
+        message.innerHTML = `
+          <div class="error-box">
+            ${echapperHTML(error.message)}
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      message.innerHTML = `
+        <div class="success-box">
+          Votre mot de passe a été modifié.
+        </div>
+      `;
+
+
+      document
+        .getElementById(
+          "formMotDePasse"
+        )
+        .reset();
+
+    }
+  );
+
+
+/* =========================================================
+   SUPPRESSION COMPTE
+   ========================================================= */
+
+async function supprimerCompte() {
+
+  const confirmation =
+    prompt(
+      "ATTENTION : cette action peut être définitive.\n\nTapez SUPPRIMER pour confirmer."
+    );
+
+
+  if (
+    confirmation !==
+    "SUPPRIMER"
+  ) {
+
+    return;
+
+  }
+
+
+  const deuxiemeConfirmation =
+    confirm(
+      "Êtes-vous absolument certain de vouloir supprimer votre compte ?"
+    );
+
+
+  if (!deuxiemeConfirmation) {
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient.rpc(
+      "supprimer_mon_compte"
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "Impossible de supprimer le compte :\n\n" +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "Votre compte a été supprimé."
+  );
+
+
+  window.location.href =
+    "index.html";
+
+}
 
 
 /* =========================================================
@@ -4046,9 +5391,12 @@ async function repondreMessage(
 
 async function chargerStatistiques() {
 
+  /*
+   * Réservations
+   */
+
   const {
-    data,
-    error
+    data: reservations
   } =
     await supabaseClient
       .from("Réservations")
@@ -4057,15 +5405,12 @@ async function chargerStatistiques() {
       );
 
 
-  if (
-    !error &&
-    data
-  ) {
+  if (reservations) {
 
     document.getElementById(
       "statAttente"
     ).textContent =
-      data.filter(
+      reservations.filter(
         r =>
           r.statut ===
           "en_attente"
@@ -4075,7 +5420,7 @@ async function chargerStatistiques() {
     document.getElementById(
       "statAcceptee"
     ).textContent =
-      data.filter(
+      reservations.filter(
         r =>
           r.statut ===
           "acceptee"
@@ -4085,46 +5430,223 @@ async function chargerStatistiques() {
     document.getElementById(
       "statRetour"
     ).textContent =
-      data.filter(
+      reservations.filter(
         r =>
           r.statut ===
           "retour_signale"
       ).length;
 
+
+    /*
+     * Ici "retournee" représente un retour
+     * confirmé.
+     */
+
+    document.getElementById(
+      "statCollectes"
+    ).textContent =
+      reservations.filter(
+        r =>
+          r.statut ===
+          "retournee"
+      ).length;
+
   }
 
 
-  const consommables =
+  /*
+   * Consommables
+   */
+
+  const {
+    data: consommables,
+    error: erreurConsommables
+  } =
     await supabaseClient
       .from("Consommables")
-      .select(
-        "id",
-        {
-          count:
-            "exact",
-          head:
-            true
-        }
-      )
-      .eq(
-        "Actif",
-        true
-      )
-      .eq(
-        "disponible",
-        true
+      .select(`
+        id,
+        Quantite,
+        disponible,
+        Actif,
+        Categorie
+      `);
+
+
+  if (
+    !erreurConsommables &&
+    consommables
+  ) {
+
+    const actifs =
+      consommables.filter(
+        c =>
+          c.Actif === true
       );
 
 
-  document.getElementById(
-    "statConsommables"
-  ).textContent =
-    consommables.count
-    ??
-    0;
+    const disponibles =
+      actifs.filter(
+        c =>
+          c.disponible === true
+      );
 
 
-  const propositions =
+    const quantiteDisponible =
+      disponibles.reduce(
+        (
+          total,
+          consommable
+        ) =>
+          total +
+          (
+            Number(
+              consommable.Quantite
+            ) || 0
+          ),
+        0
+      );
+
+
+    document.getElementById(
+      "statConsommables"
+    ).textContent =
+      disponibles.length;
+
+
+    document.getElementById(
+      "statQuantite"
+    ).textContent =
+      quantiteDisponible;
+
+
+    /*
+     * Statistiques visuelles
+     */
+
+    const total =
+      actifs.length;
+
+
+    const indisponibles =
+      actifs.filter(
+        c =>
+          c.disponible !== true
+      ).length;
+
+
+    const zone =
+      document.getElementById(
+        "statistiquesConsommables"
+      );
+
+
+    if (total === 0) {
+
+      zone.innerHTML =
+        "Aucun consommable actif.";
+
+    }
+
+    else {
+
+      const pourcentageDisponible =
+        Math.round(
+          (
+            disponibles.length /
+            total
+          ) *
+          100
+        );
+
+
+      const pourcentageIndisponible =
+        Math.round(
+          (
+            indisponibles /
+            total
+          ) *
+          100
+        );
+
+
+      zone.innerHTML = `
+
+        <div class="bar">
+
+          <div class="bar-label">
+
+            <span>
+              Disponibles
+            </span>
+
+            <strong>
+              ${disponibles.length}
+              (${pourcentageDisponible}%)
+            </strong>
+
+          </div>
+
+
+          <div class="bar-background">
+
+            <div
+              class="bar-fill"
+              style="
+                width:${pourcentageDisponible}%;
+              ">
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="bar">
+
+          <div class="bar-label">
+
+            <span>
+              Indisponibles
+            </span>
+
+            <strong>
+              ${indisponibles}
+              (${pourcentageIndisponible}%)
+            </strong>
+
+          </div>
+
+
+          <div class="bar-background">
+
+            <div
+              class="bar-fill"
+              style="
+                width:${pourcentageIndisponible}%;
+              ">
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+  }
+
+
+  /*
+   * Propositions
+   */
+
+  const {
+    count: nombrePropositions
+  } =
     await supabaseClient
       .from(
         "Propositions_consommables"
@@ -4147,12 +5669,17 @@ async function chargerStatistiques() {
   document.getElementById(
     "statPropositions"
   ).textContent =
-    propositions.count
-    ??
+    nombrePropositions ||
     0;
 
 
-  const utilisateurs =
+  /*
+   * Utilisateurs
+   */
+
+  const {
+    count: nombreUtilisateurs
+  } =
     await supabaseClient
       .from("Profils")
       .select(
@@ -4169,12 +5696,10 @@ async function chargerStatistiques() {
   document.getElementById(
     "statUtilisateurs"
   ).textContent =
-    utilisateurs.count
-    ??
+    nombreUtilisateurs ||
     0;
 
 }
-
 
 
 /* =========================================================
@@ -4199,8 +5724,7 @@ async function verifierGestionnaire() {
 
         <div class="message">
 
-          Vous devez être connecté
-          pour accéder à cet espace.
+          Vous devez être connecté.
 
           <br><br>
 
@@ -4226,7 +5750,7 @@ async function verifierGestionnaire() {
     await supabaseClient
       .from("Profils")
       .select(
-        "id, prenom, nom, role, service"
+        "id, prenom, nom, role, service, user_id"
       )
       .eq(
         "user_id",
@@ -4252,14 +5776,14 @@ async function verifierGestionnaire() {
 
         <div class="message">
 
-          Accès refusé.
+          <h2>
+            Accès refusé
+          </h2>
 
-          <br><br>
-
-          Cette page est réservée
-          aux gestionnaires.
-
-          <br><br>
+          <p>
+            Cette page est réservée
+            aux gestionnaires.
+          </p>
 
           <button
             onclick="retourPage()">
@@ -4283,18 +5807,57 @@ async function verifierGestionnaire() {
     profil;
 
 
-  document.getElementById(
-    "serviceGestionnaire"
-  ).textContent =
-    profil.service
-    ||
-    "Non renseigné";
-
+  await chargerProfilGestionnaire();
 
   await chargerStatistiques();
 
 }
 
+
+/* =========================================================
+   FERMETURE MODALS AU CLIC EXTÉRIEUR
+   ========================================================= */
+
+document
+  .getElementById(
+    "modalConsommable"
+  )
+  .addEventListener(
+    "click",
+    function(event) {
+
+      if (
+        event.target ===
+        this
+      ) {
+
+        fermerModalConsommable();
+
+      }
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "modalInformation"
+  )
+  .addEventListener(
+    "click",
+    function(event) {
+
+      if (
+        event.target ===
+        this
+      ) {
+
+        fermerModalInformation();
+
+      }
+
+    }
+  );
 
 
 /* =========================================================
