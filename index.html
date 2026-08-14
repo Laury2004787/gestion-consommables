@@ -1064,17 +1064,41 @@ async function chargerConsommables() {
           </p>
 
 
-          <button
-            class="reserve"
-            onclick="
-              reserver(
-                '${consommable.id}'
-              )
-            ">
+          ${
+  consommable.Quantite > 0
 
-            Réserver
+  ?
 
-          </button>
+  `
+    <button
+      class="reserve"
+      onclick="
+        reserver(
+          '${consommable.id}'
+        )
+      ">
+
+      Réserver
+
+    </button>
+  `
+
+  :
+
+  `
+    <button
+      class="reserve"
+      disabled
+      style="
+        background:#9ca3af;
+        cursor:not-allowed;
+      ">
+
+      Indisponible
+
+    </button>
+  `
+}
 
         </div>
 
