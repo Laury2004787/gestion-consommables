@@ -2559,37 +2559,59 @@ async function accepterProposition(
 
 
     const {
-      data: profil,
-      error: erreurProfil
-    } =
-      await supabaseClient
-        .from("Profils")
-        .select(`
-          id,
-          user_id,
-          nom,
-          prenom,
-          service
-        `)
-        .eq(
-  "id",
-  proposition.utilisateur_id
-)
-        .single();
+  data: profil,
+  error: erreurProfil
+} =
+  await supabaseClient
+    .from("Profils")
+    .select(`
+      id,
+      user_id,
+      nom,
+      prenom,
+      service
+    `)
+    .eq(
+      "id",
+      proposition.utilisateur_id
+    )
+    .maybeSingle();
 
 
-    if (
-      erreurProfil ||
-      !profil
-    ) {
+if (erreurProfil) {
 
-      alert(
-        "Impossible de récupérer le profil du proposant."
-      );
+  console.error(
+    "ERREUR PROFIL :",
+    erreurProfil
+  );
 
-      return;
+  alert(
+    "Erreur lors de la récupération du profil :\n\n" +
+    erreurProfil.message
+  );
 
-    }
+  return;
+
+}
+
+
+if (!profil) {
+
+  console.error(
+    "Aucun profil trouvé.",
+    "proposition.utilisateur_id =",
+    proposition.utilisateur_id
+  );
+
+  alert(
+    "Aucun profil trouvé pour l'utilisateur de cette proposition.\n\n" +
+    "ID utilisé : " +
+    proposition.utilisateur_id
+  );
+
+  return;
+
+}
 
 
     const laboratoire =
