@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -23,6 +24,10 @@
       border-bottom: 1px solid #e5e7eb;
     }
 
+    header h1 {
+      margin: 0;
+    }
+
     main {
       max-width: 900px;
       margin: 40px auto;
@@ -35,6 +40,110 @@
       margin-bottom: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .message h3 {
+      margin-top: 0;
+    }
+
+    .message-original {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      margin-top: 15px;
+    }
+
+    .reponse {
+      background: #f3f4f6;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border-left: 4px solid #2563eb;
+    }
+
+    .statut {
+      font-weight: bold;
+    }
+
+    .statut-non-lu {
+      color: #dc2626;
+    }
+
+    .statut-lu {
+      color: #2563eb;
+    }
+
+    .statut-repondu {
+      color: #16a34a;
+    }
+
+    .formulaire-message {
+      background: white;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .succes {
+      color: #16a34a;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .erreur {
+      color: #dc2626;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .chargement {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .aucun-message {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
     }
 
     a {
@@ -50,46 +159,70 @@
 </header>
 
 <main>
-<div class="message">
-  <h2>Envoyer un message</h2>
 
-  <form id="formMessage">
+  <!-- FORMULAIRE D'ENVOI -->
 
-    <p>
-      <label for="sujet">Sujet</label>
-    </p>
+  <div class="formulaire-message">
 
-    <input
-      type="text"
-      id="sujet"
-      required
-      style="width:100%; padding:10px; box-sizing:border-box;"
-    >
+    <h2>
+      Envoyer un message
+    </h2>
 
-    <p>
-      <label for="contenu">Message</label>
-    </p>
+    <form id="formMessage">
 
-    <textarea
-      id="contenu"
-      rows="6"
-      required
-      style="width:100%; padding:10px; box-sizing:border-box;"
-    ></textarea>
+      <p>
+        <label for="sujet">
+          Sujet
+        </label>
+      </p>
 
-    <p>
-      <button type="submit">
-        Envoyer le message
-      </button>
-    </p>
+      <input
+        type="text"
+        id="sujet"
+        required
+      >
 
-    <div id="messageFormulaire"></div>
+      <p>
+        <label for="contenu">
+          Message
+        </label>
+      </p>
 
-  </form>
-</div>
-  <div id="messages">
-    Chargement de vos messages...
+      <textarea
+        id="contenu"
+        rows="6"
+        required
+      ></textarea>
+
+      <p>
+        <button
+          type="submit"
+          id="boutonEnvoyer">
+          Envoyer le message
+        </button>
+      </p>
+
+      <div id="messageFormulaire"></div>
+
+    </form>
+
   </div>
+
+
+  <!-- HISTORIQUE -->
+
+  <h2>
+    Mes conversations
+  </h2>
+
+  <div id="messages">
+
+    <div class="chargement">
+      Chargement de vos messages...
+    </div>
+
+  </div>
+
 
   <p>
     <a href="index.html">
@@ -99,36 +232,101 @@
 
 </main>
 
+
 <script>
 
 const SUPABASE_URL =
   "https://zqgoeskiwkyelsgzebyl.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+  "TA_PUBLISHABLE_KEY";
 
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
-```js
+
+
+/*
+ * Échappe le contenu avant de l'afficher
+ * dans du HTML.
+ */
+
+function echapperHTML(texte) {
+
+  if (texte === null || texte === undefined) {
+    return "";
+  }
+
+  return String(texte)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/*
+ * Formate une date.
+ */
+
+function formaterDate(date) {
+
+  if (!date) {
+    return "";
+  }
+
+  const resultat =
+    new Date(date).toLocaleString(
+      "fr-FR"
+    );
+
+  return resultat;
+}
+
+
+/*
+ * Charge les messages de l'utilisateur
+ * actuellement connecté.
+ */
+
 async function chargerMessages() {
 
   const zone =
-    document.getElementById("messages");
+    document.getElementById(
+      "messages"
+    );
 
+
+  zone.innerHTML = `
+    <div class="chargement">
+      Chargement de vos messages...
+    </div>
+  `;
+
+
+  /*
+   * Vérification de la connexion.
+   */
 
   const {
-    data: { user }
-  } = await supabaseClient.auth.getUser();
+    data: { user },
+    error: erreurUtilisateur
+  } =
+    await supabaseClient.auth.getUser();
 
 
-  if (!user) {
+  if (
+    erreurUtilisateur ||
+    !user
+  ) {
 
     zone.innerHTML = `
       <div class="message">
-        Vous devez être connecté pour voir vos messages.
+        Vous devez être connecté
+        pour voir vos messages.
       </div>
     `;
 
@@ -136,15 +334,34 @@ async function chargerMessages() {
   }
 
 
-  const { data: profil, error: profilError } =
+  /*
+   * Recherche du profil correspondant
+   * à l'utilisateur connecté.
+   */
+
+  const {
+    data: profil,
+    error: erreurProfil
+  } =
     await supabaseClient
       .from("Profils")
       .select("id")
-      .eq("user_id", user.id)
+      .eq(
+        "user_id",
+        user.id
+      )
       .single();
 
 
-  if (profilError || !profil) {
+  if (
+    erreurProfil ||
+    !profil
+  ) {
+
+    console.error(
+      "Erreur profil :",
+      erreurProfil
+    );
 
     zone.innerHTML = `
       <div class="message">
@@ -156,7 +373,15 @@ async function chargerMessages() {
   }
 
 
-  const { data, error } =
+  /*
+   * Récupération des messages
+   * appartenant à cet utilisateur.
+   */
+
+  const {
+    data: messages,
+    error: erreurMessages
+  } =
     await supabaseClient
       .from("Messages")
       .select(`
@@ -165,27 +390,34 @@ async function chargerMessages() {
         contenu,
         date_envoi,
         lu,
-        repondu,
-        ReponsesMessages (
-          id,
-          contenu,
-          date_reponse,
-          gestionnaire_id
-        )
+        repondu
       `)
-      .eq("utilisateur_id", profil.id)
-      .order("date_envoi", {
-        ascending: false
-      });
+      .eq(
+        "utilisateur_id",
+        profil.id
+      )
+      .order(
+        "date_envoi",
+        {
+          ascending: false
+        }
+      );
 
 
-  if (error) {
+  if (erreurMessages) {
 
-    console.error(error);
+    console.error(
+      "Erreur chargement messages :",
+      erreurMessages
+    );
 
     zone.innerHTML = `
       <div class="message">
         Impossible de charger vos messages.
+        <br><br>
+        <small>
+          ${echapperHTML(erreurMessages.message)}
+        </small>
       </div>
     `;
 
@@ -193,10 +425,17 @@ async function chargerMessages() {
   }
 
 
-  if (!data || data.length === 0) {
+  /*
+   * Aucun message.
+   */
+
+  if (
+    !messages ||
+    messages.length === 0
+  ) {
 
     zone.innerHTML = `
-      <div class="message">
+      <div class="aucun-message">
         Vous n'avez encore envoyé aucun message.
       </div>
     `;
@@ -205,51 +444,146 @@ async function chargerMessages() {
   }
 
 
+  /*
+   * On prépare l'affichage.
+   */
+
   zone.innerHTML = "";
 
 
-  data.forEach(function(message) {
+  /*
+   * Chaque message devient une conversation.
+   */
+
+  for (
+    const message
+    of messages
+  ) {
+
+
+    /*
+     * Récupération des réponses
+     * liées à ce message.
+     */
+
+    const {
+      data: reponses,
+      error: erreurReponses
+    } =
+      await supabaseClient
+        .from("ReponsesMessages")
+        .select(`
+          id,
+          contenu,
+          date_reponse,
+          gestionnaire_id
+        `)
+        .eq(
+          "message_id",
+          message.id
+        )
+        .order(
+          "date_reponse",
+          {
+            ascending: true
+          }
+        );
+
+
+    if (erreurReponses) {
+
+      console.error(
+        "Erreur chargement réponses :",
+        erreurReponses
+      );
+
+    }
+
+
+    const listeReponses =
+      reponses || [];
+
+
+    /*
+     * Détermination du statut.
+     */
+
+    let texteStatut =
+      "Non lu";
+
+    let classeStatut =
+      "statut-non-lu";
+
+
+    if (message.repondu) {
+
+      texteStatut =
+        "Répondu";
+
+      classeStatut =
+        "statut-repondu";
+
+    }
+    else if (message.lu) {
+
+      texteStatut =
+        "Lu";
+
+      classeStatut =
+        "statut-lu";
+
+    }
+
+
+    /*
+     * Création de la carte.
+     */
 
     const card =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     card.className =
       "message";
 
 
-    let statut = "Non lu";
-
-    if (message.repondu) {
-
-      statut = "Répondu";
-
-    } else if (message.lu) {
-
-      statut = "Lu";
-
-    }
-
-
     let html = `
 
       <h3>
-        ${message.sujet}
+        ${echapperHTML(message.sujet)}
       </h3>
 
-      <p>
-        ${message.contenu}
-      </p>
+      <div class="message-original">
 
-      <p>
-        <strong>Date :</strong>
-        ${new Date(
-          message.date_envoi
-        ).toLocaleString("fr-FR")}
-      </p>
+        <p>
+          <strong>
+            Votre message
+          </strong>
+        </p>
 
-      <p>
-        <strong>Statut :</strong>
-        ${statut}
+        <p>
+          ${echapperHTML(message.contenu)}
+        </p>
+
+        <p>
+          <strong>
+            Date :
+          </strong>
+
+          ${formaterDate(message.date_envoi)}
+        </p>
+
+      </div>
+
+      <p class="statut ${classeStatut}">
+
+        <strong>
+          Statut :
+        </strong>
+
+        ${texteStatut}
+
       </p>
 
     `;
@@ -260,19 +594,9 @@ async function chargerMessages() {
      * du gestionnaire.
      */
 
-    const reponses =
-      message.ReponsesMessages || [];
-
-
-    reponses.sort(function(a, b) {
-
-      return new Date(a.date_reponse) -
-             new Date(b.date_reponse);
-
-    });
-
-
-    if (reponses.length > 0) {
+    if (
+      listeReponses.length > 0
+    ) {
 
       html += `
 
@@ -285,33 +609,56 @@ async function chargerMessages() {
       `;
 
 
-      reponses.forEach(function(reponse) {
+      listeReponses.forEach(
+        function(reponse) {
 
-        html += `
+          html += `
 
-          <div style="
-            background:#f3f4f6;
-            padding:15px;
-            margin-top:10px;
-            border-radius:6px;
-          ">
+            <div class="reponse">
 
-            <p>
-              ${reponse.contenu}
-            </p>
+              <p>
+                <strong>
+                  Gestionnaire
+                </strong>
+              </p>
 
-            <p>
-              <strong>Date :</strong>
-              ${new Date(
-                reponse.date_reponse
-              ).toLocaleString("fr-FR")}
-            </p>
+              <p>
+                ${echapperHTML(
+                  reponse.contenu
+                )}
+              </p>
 
-          </div>
+              <p>
 
-        `;
+                <strong>
+                  Date :
+                </strong>
 
-      });
+                ${formaterDate(
+                  reponse.date_reponse
+                )}
+
+              </p>
+
+            </div>
+
+          `;
+
+        }
+      );
+
+    }
+    else {
+
+      html += `
+
+        <p>
+          <em>
+            Aucune réponse du gestionnaire pour le moment.
+          </em>
+        </p>
+
+      `;
 
     }
 
@@ -320,109 +667,281 @@ async function chargerMessages() {
       html;
 
 
-    zone.appendChild(card);
+    zone.appendChild(
+      card
+    );
 
-  });
+  }
 
 }
-```
 
 
+/*
+ * Envoi d'un nouveau message.
+ */
 
-chargerMessages();
 document
   .getElementById("formMessage")
-  .addEventListener("submit", async function(event) {
+  .addEventListener(
+    "submit",
+    async function(event) {
 
-    event.preventDefault();
-
-    const sujet =
-      document.getElementById("sujet").value.trim();
-
-    const contenu =
-      document.getElementById("contenu").value.trim();
-
-    const zoneMessage =
-      document.getElementById("messageFormulaire");
+      event.preventDefault();
 
 
-    if (!sujet || !contenu) {
+      const sujet =
+        document
+          .getElementById("sujet")
+          .value
+          .trim();
 
-      zoneMessage.textContent =
-        "Veuillez remplir tous les champs.";
 
-      return;
+      const contenu =
+        document
+          .getElementById("contenu")
+          .value
+          .trim();
+
+
+      const zoneMessage =
+        document.getElementById(
+          "messageFormulaire"
+        );
+
+
+      const bouton =
+        document.getElementById(
+          "boutonEnvoyer"
+        );
+
+
+      zoneMessage.className =
+        "";
+
+
+      /*
+       * Vérification des champs.
+       */
+
+      if (
+        !sujet ||
+        !contenu
+      ) {
+
+        zoneMessage.className =
+          "erreur";
+
+        zoneMessage.textContent =
+          "Veuillez remplir tous les champs.";
+
+        return;
+      }
+
+
+      /*
+       * Désactivation du bouton
+       * pendant l'envoi.
+       */
+
+      bouton.disabled =
+        true;
+
+      bouton.textContent =
+        "Envoi en cours...";
+
+
+      try {
+
+
+        /*
+         * Vérification de l'utilisateur.
+         */
+
+        const {
+          data: { user },
+          error: erreurUtilisateur
+        } =
+          await supabaseClient.auth.getUser();
+
+
+        if (
+          erreurUtilisateur ||
+          !user
+        ) {
+
+          zoneMessage.className =
+            "erreur";
+
+          zoneMessage.textContent =
+            "Vous devez être connecté pour envoyer un message.";
+
+          return;
+        }
+
+
+        /*
+         * Recherche du profil.
+         */
+
+        const {
+          data: profil,
+          error: erreurProfil
+        } =
+          await supabaseClient
+            .from("Profils")
+            .select("id")
+            .eq(
+              "user_id",
+              user.id
+            )
+            .single();
+
+
+        if (
+          erreurProfil ||
+          !profil
+        ) {
+
+          console.error(
+            "Erreur profil :",
+            erreurProfil
+          );
+
+          zoneMessage.className =
+            "erreur";
+
+          zoneMessage.textContent =
+            "Impossible de trouver votre profil.";
+
+          return;
+        }
+
+
+        /*
+         * Création du message.
+         */
+
+        const {
+          data: nouveauMessage,
+          error: erreurInsertion
+        } =
+          await supabaseClient
+            .from("Messages")
+            .insert({
+
+              utilisateur_id:
+                profil.id,
+
+              sujet:
+                sujet,
+
+              contenu:
+                contenu,
+
+              lu:
+                false,
+
+              repondu:
+                false
+
+            })
+            .select()
+            .single();
+
+
+        if (
+          erreurInsertion
+        ) {
+
+          console.error(
+            "Erreur insertion message :",
+            erreurInsertion
+          );
+
+          zoneMessage.className =
+            "erreur";
+
+          zoneMessage.textContent =
+            "Impossible d'envoyer le message : " +
+            erreurInsertion.message;
+
+          return;
+        }
+
+
+        /*
+         * Message envoyé avec succès.
+         */
+
+        console.log(
+          "Message créé :",
+          nouveauMessage
+        );
+
+
+        zoneMessage.className =
+          "succes";
+
+        zoneMessage.textContent =
+          "Votre message a bien été envoyé.";
+
+
+        /*
+         * Nettoyage du formulaire.
+         */
+
+        document
+          .getElementById("sujet")
+          .value = "";
+
+
+        document
+          .getElementById("contenu")
+          .value = "";
+
+
+        /*
+         * Rechargement de l'historique.
+         */
+
+        await chargerMessages();
+
+
+      }
+      catch (erreur) {
+
+        console.error(
+          "Erreur inattendue :",
+          erreur
+        );
+
+        zoneMessage.className =
+          "erreur";
+
+        zoneMessage.textContent =
+          "Une erreur est survenue pendant l'envoi.";
+
+      }
+      finally {
+
+        bouton.disabled =
+          false;
+
+        bouton.textContent =
+          "Envoyer le message";
+
+      }
+
     }
+  );
 
 
-    const {
-      data: { user }
-    } = await supabaseClient.auth.getUser();
+/*
+ * Chargement initial.
+ */
 
+chargerMessages();
 
-    if (!user) {
-
-      zoneMessage.textContent =
-        "Vous devez être connecté pour envoyer un message.";
-
-      return;
-    }
-
-
-    const { data: profil, error: profilError } =
-      await supabaseClient
-        .from("Profils")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-
-    if (profilError || !profil) {
-
-      zoneMessage.textContent =
-        "Impossible de trouver votre profil.";
-
-      return;
-    }
-
-
-    const { error } =
-      await supabaseClient
-        .from("Messages")
-        .insert({
-          utilisateur_id: profil.id,
-          sujet: sujet,
-          contenu: contenu
-        });
-
-
-    if (error) {
-
-      console.error(error);
-
-      zoneMessage.textContent =
-        "Impossible d'envoyer le message.";
-
-      return;
-    }
-
-
-    zoneMessage.textContent =
-      "Votre message a bien été envoyé.";
-
-
-    document
-      .getElementById("sujet")
-      .value = "";
-
-    document
-      .getElementById("contenu")
-      .value = "";
-
-
-    chargerMessages();
-
-  });
 </script>
 
 </body>
