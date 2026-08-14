@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+
   <title>Gestion des consommables</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -22,11 +29,20 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #ddd;
+      gap: 20px;
+      flex-wrap: wrap;
     }
 
     header h1 {
       margin: 0;
       font-size: 22px;
+    }
+
+    #zone-utilisateur {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
     }
 
     button {
@@ -36,6 +52,10 @@
       border: 1px solid #2563eb;
       background: white;
       color: #2563eb;
+    }
+
+    button:hover {
+      opacity: 0.9;
     }
 
     main {
@@ -57,9 +77,14 @@
       color: #6b7280;
     }
 
+    .section {
+      margin-bottom: 40px;
+    }
+
     #consommables {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns:
+        repeat(auto-fit, minmax(260px, 1fr));
       gap: 20px;
     }
 
@@ -67,7 +92,9 @@
       background: white;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 15px;
     }
 
     .card img {
@@ -97,55 +124,364 @@
       margin-top: 10px;
     }
 
+    .proposer {
+      background: #16a34a;
+      color: white;
+      border: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+
     .message {
       background: white;
       padding: 25px;
       text-align: center;
       border-radius: 8px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
     }
+
+    .form-card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .success {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+
+    .statut {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .statut-attente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .statut-acceptee {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .statut-refusee {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .statut-collectee {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .proposition-card {
+      padding: 20px;
+    }
+
+    .proposition-card h3 {
+      margin-top: 0;
+    }
+
+    .proposition-date {
+      color: #6b7280;
+      font-size: 14px;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
-<header>
-  <h1>Gestion des consommables</h1>
 
-<div id="zone-utilisateur">
-  <a href="connexion.html">Se connecter</a>
-  <a href="inscription.html">Créer un compte</a>
-  <a href="mes-reservations.html">Mes réservations</a>
-</div>
+<header>
+
+  <h1>
+    Gestion des consommables
+  </h1>
+
+
+  <div id="zone-utilisateur">
+
+    <a href="connexion.html">
+      Se connecter
+    </a>
+
+    <a href="inscription.html">
+      Créer un compte
+    </a>
+
+    <a href="mes-reservations.html">
+      Mes réservations
+    </a>
+
+  </div>
+
 </header>
+
 
 <main>
 
+
   <section class="hero">
-    <h2>Bienvenue</h2>
+
+    <h2>
+      Bienvenue
+    </h2>
 
     <p>
       Consultez les consommables disponibles
       et effectuez une demande de réservation.
     </p>
+
   </section>
 
-  <h2>Consommables disponibles</h2>
 
-  <div id="consommables">
-    <div class="message">
-      Chargement des consommables...
+  <!-- CONSOMMABLES DISPONIBLES -->
+
+  <section class="section">
+
+    <h2>
+      Consommables disponibles
+    </h2>
+
+
+    <div id="consommables">
+
+      <div class="message">
+        Chargement des consommables...
+      </div>
+
     </div>
-  </div>
+
+  </section>
+
+
+
+  <!-- PROPOSER UN CONSOMMABLE -->
+
+  <section
+    id="section-proposition"
+    class="section"
+    style="display:none;">
+
+    <h2>
+      Proposer un consommable
+    </h2>
+
+
+    <div class="form-card">
+
+      <div class="info">
+
+        Vous pouvez proposer un consommable
+        disponible dans votre laboratoire/service.
+
+        <br><br>
+
+        Votre laboratoire/service sera récupéré
+        automatiquement depuis votre profil.
+
+        <br><br>
+
+        <strong>
+          Laboratoire/service :
+        </strong>
+
+        <span id="serviceUtilisateur">
+          Chargement...
+        </span>
+
+      </div>
+
+
+      <form id="formProposition">
+
+
+        <div class="form-group">
+
+          <label for="nomProposition">
+            Nom du consommable
+          </label>
+
+          <input
+            type="text"
+            id="nomProposition"
+            required
+            placeholder="Exemple : Bécher 500 ml"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="categorieProposition">
+            Catégorie
+          </label>
+
+          <input
+            type="text"
+            id="categorieProposition"
+            required
+            placeholder="Exemple : Verrerie"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="descriptionProposition">
+            Description
+          </label>
+
+          <textarea
+            id="descriptionProposition"
+            placeholder="Décrivez le consommable..."
+          ></textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="quantiteProposition">
+            Quantité
+          </label>
+
+          <input
+            type="number"
+            id="quantiteProposition"
+            min="1"
+            value="1"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="photoProposition">
+            Photo (URL facultative)
+          </label>
+
+          <input
+            type="url"
+            id="photoProposition"
+            placeholder="https://..."
+          >
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="proposer">
+
+          Envoyer la proposition
+
+        </button>
+
+
+        <div id="messageProposition"></div>
+
+
+      </form>
+
+    </div>
+
+
+    <!-- MES PROPOSITIONS -->
+
+    <h2>
+      Mes propositions
+    </h2>
+
+
+    <div id="mesPropositions">
+
+      <div class="message">
+        Chargement de vos propositions...
+      </div>
+
+    </div>
+
+  </section>
+
 
 </main>
 
+
 <script>
+
 
 const SUPABASE_URL =
   "https://zqgoeskiwkyelsgzebyl.supabase.co";
 
+
 const SUPABASE_KEY =
   "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
 
 const supabaseClient =
   window.supabase.createClient(
@@ -153,17 +489,106 @@ const supabaseClient =
     SUPABASE_KEY
   );
 
-async function afficherUtilisateur() {
 
-  const { data: { user } } =
+
+/* =========================================================
+   UTILISATEUR CONNECTÉ
+   ========================================================= */
+
+
+async function obtenirUtilisateurEtProfil() {
+
+  const {
+    data: { user },
+    error: erreurUtilisateur
+  } =
     await supabaseClient.auth.getUser();
 
+
+  if (
+    erreurUtilisateur ||
+    !user
+  ) {
+
+    return {
+      user: null,
+      profil: null
+    };
+
+  }
+
+
+  const {
+    data: profil,
+    error: erreurProfil
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select(`
+        id,
+        prenom,
+        nom,
+        role,
+        service
+      `)
+      .eq(
+        "user_id",
+        user.id
+      )
+      .single();
+
+
+  if (
+    erreurProfil ||
+    !profil
+  ) {
+
+    console.error(
+      "Erreur profil :",
+      erreurProfil
+    );
+
+    return {
+      user,
+      profil: null
+    };
+
+  }
+
+
+  return {
+    user,
+    profil
+  };
+
+}
+
+
+
+/* =========================================================
+   AFFICHAGE UTILISATEUR
+   ========================================================= */
+
+
+async function afficherUtilisateur() {
+
+  const {
+    user,
+    profil
+  } =
+    await obtenirUtilisateurEtProfil();
+
+
   const zone =
-    document.getElementById("zone-utilisateur");
+    document.getElementById(
+      "zone-utilisateur"
+    );
+
 
   if (!user) {
 
     zone.innerHTML = `
+
       <a href="connexion.html">
         Se connecter
       </a>
@@ -171,88 +596,134 @@ async function afficherUtilisateur() {
       <a href="inscription.html">
         Créer un compte
       </a>
+
     `;
 
     return;
+
   }
 
 
-  const { data: profil, error } =
-    await supabaseClient
-      .from("Profils")
-      .select("prenom, nom, role")
-      .eq("user_id", user.id)
-      .single();
-
-
-  if (error || !profil) {
-
-    console.error(
-      "Erreur lors du chargement du profil :",
-      error
-    );
+  if (!profil) {
 
     zone.innerHTML = `
+
       <span>
         Bonjour
       </span>
 
-      <button onclick="deconnexion()">
+      <button
+        onclick="deconnexion()">
+
         Se déconnecter
+
       </button>
+
     `;
 
     return;
+
   }
 
 
-  // Gestionnaire ou administrateur
+  /*
+   * Gestionnaire ou administrateur
+   */
+
   if (
-  profil.role === "gestionnaire" ||
-  profil.role === "administrateur"
-) {
+    profil.role === "gestionnaire" ||
+    profil.role === "administrateur"
+  ) {
+
+    zone.innerHTML = `
+
+      <span>
+        Bonjour
+        ${profil.prenom || ""}
+        ${profil.nom || ""}
+      </span>
+
+      <a href="gestionnaire.html">
+        Espace gestionnaire
+      </a>
+
+      <button
+        onclick="deconnexion()">
+
+        Se déconnecter
+
+      </button>
+
+    `;
+
+    return;
+
+  }
+
+
+  /*
+   * Utilisateur classique
+   */
 
   zone.innerHTML = `
+
     <span>
-      Bonjour ${profil.prenom} ${profil.nom}
+      Bonjour
+      ${profil.prenom || ""}
+      ${profil.nom || ""}
     </span>
 
-    <a href="gestionnaire.html">
-      Espace gestionnaire
+    <a href="mes-reservations.html">
+      Mes réservations
     </a>
 
-    <button onclick="deconnexion()">
-      Se déconnecter
+    <a href="messages.html">
+      Mes messages
+    </a>
+
+    <button
+      onclick="supprimerCompte()">
+
+      Supprimer mon compte
+
     </button>
+
+    <button
+      onclick="deconnexion()">
+
+      Se déconnecter
+
+    </button>
+
   `;
 
-  return;
+
+  /*
+   * Affichage de la zone
+   * de proposition
+   */
+
+  document.getElementById(
+    "section-proposition"
+  ).style.display = "block";
+
+
+  document.getElementById(
+    "serviceUtilisateur"
+  ).textContent =
+    profil.service ||
+    "Non renseigné";
+
+
+  chargerMesPropositions();
+
 }
 
 
-  // Utilisateur classique
-zone.innerHTML = `
-  <span>
-    Bonjour ${profil.prenom} ${profil.nom}
-  </span>
 
-  <a href="mes-reservations.html">
-    Mes réservations
-  </a>
-
-  <a href="messages.html">
-    Mes messages
-  </a>
-
-  <button onclick="supprimerCompte()">
-    Supprimer mon compte
-  </button>
-
-  <button onclick="deconnexion()">
-    Se déconnecter
-  </button>
-`;
-}
+/* =========================================================
+   DECONNEXION
+   ========================================================= */
 
 
 async function deconnexion() {
@@ -264,6 +735,12 @@ async function deconnexion() {
 }
 
 
+
+/* =========================================================
+   SUPPRESSION DU COMPTE
+   ========================================================= */
+
+
 async function supprimerCompte() {
 
   const confirmation =
@@ -271,8 +748,11 @@ async function supprimerCompte() {
       "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est définitive."
     );
 
+
   if (!confirmation) {
+
     return;
+
   }
 
 
@@ -290,6 +770,7 @@ async function supprimerCompte() {
     );
 
     return;
+
   }
 
 
@@ -300,159 +781,875 @@ async function supprimerCompte() {
 
   await supabaseClient.auth.signOut();
 
+
   window.location.href =
     "index.html";
+
 }
 
 
-afficherUtilisateur();
-  
+
+/* =========================================================
+   CHARGEMENT DES CONSOMMABLES
+   ========================================================= */
+
+
 async function chargerConsommables() {
 
   const zone =
-    document.getElementById("consommables");
+    document.getElementById(
+      "consommables"
+    );
 
 
- let user;
+  let user;
 
-try {
 
-  const resultatUtilisateur =
-    await supabaseClient.auth.getUser();
+  try {
 
-  user = resultatUtilisateur.data.user;
+    const resultatUtilisateur =
+      await supabaseClient.auth.getUser();
 
-} catch (error) {
+    user =
+      resultatUtilisateur.data.user;
 
-  console.error("Erreur utilisateur :", error);
+  }
+  catch (error) {
 
-  zone.innerHTML = `
-    <div class="message">
-      Erreur de connexion à Supabase.
-    </div>
-  `;
+    console.error(
+      "Erreur utilisateur :",
+      error
+    );
 
-  return;
-}
+
+    zone.innerHTML = `
+
+      <div class="message">
+        Erreur de connexion à Supabase.
+      </div>
+
+    `;
+
+    return;
+
+  }
 
 
   if (!user) {
 
     zone.innerHTML = `
+
       <div class="message">
-        Vous devez être connecté pour voir les consommables disponibles.
+
+        Vous devez être connecté
+        pour voir les consommables disponibles.
+
       </div>
+
     `;
 
     return;
+
   }
-console.log("Utilisateur connecté :", user);
-console.log("Tentative de chargement des consommables...");
+
+
   const resultat =
     await supabaseClient
       .from("Consommables")
       .select("*")
       .eq("Actif", true)
       .eq("disponible", true)
-      .order("Date_ajout", {
-        ascending: false
-      });
-console.log("Résultat consommables :", resultat);
+      .order(
+        "Date_ajout",
+        {
+          ascending: false
+        }
+      );
+
+
   if (resultat.error) {
 
-    console.error(resultat.error);
+    console.error(
+      resultat.error
+    );
+
 
     zone.innerHTML = `
+
       <div class="message">
-        Impossible de charger les consommables.
+
+        Impossible de charger
+        les consommables.
+
       </div>
+
     `;
 
     return;
+
   }
 
-  const consommables = resultat.data;
 
-  if (!consommables || consommables.length === 0) {
+  const consommables =
+    resultat.data;
+
+
+  if (
+    !consommables ||
+    consommables.length === 0
+  ) {
 
     zone.innerHTML = `
+
       <div class="message">
-        Aucun consommable disponible actuellement.
+
+        Aucun consommable disponible
+        actuellement.
+
       </div>
+
     `;
 
     return;
+
   }
+
 
   zone.innerHTML = "";
 
-  consommables.forEach(function(consommable) {
 
-    const card =
-      document.createElement("div");
+  consommables.forEach(
+    function(consommable) {
 
-    card.className = "card";
 
-    let photoHTML = "";
+      const card =
+        document.createElement(
+          "div"
+        );
 
-    if (consommable.photo) {
 
-      photoHTML = `
-        <img
-          src="${consommable.photo}"
-          alt="Photo du consommable"
-        >
+      card.className =
+        "card";
+
+
+      let photoHTML = "";
+
+
+      if (
+        consommable.photo
+      ) {
+
+        photoHTML = `
+
+          <img
+            src="${consommable.photo}"
+            alt="Photo du consommable"
+          >
+
+        `;
+
+      }
+
+
+      card.innerHTML = `
+
+        ${photoHTML}
+
+        <div class="card-content">
+
+          <h3>
+            ${
+              consommable[
+                "Nom du sortant"
+              ]
+              || ""
+            }
+          </h3>
+
+
+          <p>
+
+            <strong>
+              Catégorie :
+            </strong>
+
+            ${
+              consommable.Categorie
+              || ""
+            }
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Laboratoire :
+            </strong>
+
+            ${
+              consommable.Laboratoire
+              || ""
+            }
+
+          </p>
+
+
+          <p>
+
+            ${
+              consommable.Description
+              || ""
+            }
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              État :
+            </strong>
+
+            ${
+              consommable.Etat
+              || ""
+            }
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Quantité :
+            </strong>
+
+            ${
+              consommable.Quantite
+              ?? 0
+            }
+
+          </p>
+
+
+          <button
+            class="reserve"
+            onclick="
+              reserver(
+                '${consommable.id}'
+              )
+            ">
+
+            Réserver
+
+          </button>
+
+        </div>
+
       `;
 
+
+      zone.appendChild(
+        card
+      );
+
     }
+  );
 
-    card.innerHTML = `
+}
 
-      ${photoHTML}
 
-      <div class="card-content">
 
-        <h3>
-          ${consommable["Nom du sortant"]}
-        </h3>
+/* =========================================================
+   PROPOSER UN CONSOMMABLE
+   ========================================================= */
 
-        <p>
-          <strong>Catégorie :</strong>
-          ${consommable.Categorie}
-        </p>
 
-        <p>
-          <strong>Laboratoire :</strong>
-          ${consommable.Laboratoire}
-        </p>
+document
+  .getElementById(
+    "formProposition"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
 
-        <p>
-          ${consommable.Description || ""}
-        </p>
 
-        <p>
-          <strong>État :</strong>
-          ${consommable.Etat}
-        </p>
+      event.preventDefault();
 
-        <p>
-          <strong>Quantité :</strong>
-          ${consommable.Quantite}
-        </p>
 
-        <button
-          class="reserve"
-          onclick="reserver('${consommable.id}')">
-          Réserver
-        </button>
+      const zone =
+        document.getElementById(
+          "messageProposition"
+        );
+
+
+      zone.innerHTML = "";
+
+
+      const nom =
+        document
+          .getElementById(
+            "nomProposition"
+          )
+          .value
+          .trim();
+
+
+      const categorie =
+        document
+          .getElementById(
+            "categorieProposition"
+          )
+          .value
+          .trim();
+
+
+      const description =
+        document
+          .getElementById(
+            "descriptionProposition"
+          )
+          .value
+          .trim();
+
+
+      const quantite =
+        parseInt(
+          document
+            .getElementById(
+              "quantiteProposition"
+            )
+            .value,
+          10
+        );
+
+
+      const photo =
+        document
+          .getElementById(
+            "photoProposition"
+          )
+          .value
+          .trim();
+
+
+      if (
+        !nom ||
+        !categorie ||
+        !quantite ||
+        quantite < 1
+      ) {
+
+        zone.innerHTML = `
+
+          <div class="error">
+
+            Veuillez remplir les champs
+            obligatoires correctement.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      const {
+        user,
+        profil
+      } =
+        await obtenirUtilisateurEtProfil();
+
+
+      if (!user) {
+
+        zone.innerHTML = `
+
+          <div class="error">
+
+            Vous devez être connecté
+            pour proposer un consommable.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      if (!profil) {
+
+        zone.innerHTML = `
+
+          <div class="error">
+
+            Impossible de trouver
+            votre profil.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      if (
+        profil.role === "gestionnaire" ||
+        profil.role === "administrateur"
+      ) {
+
+        zone.innerHTML = `
+
+          <div class="error">
+
+            Cette fonction est destinée
+            aux utilisateurs.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from(
+            "Propositions_consommables"
+          )
+          .insert({
+
+            utilisateur_id:
+              profil.id,
+
+            nom_consommable:
+              nom,
+
+            description:
+              description || null,
+
+            categorie:
+              categorie,
+
+            quantite:
+              quantite,
+
+            photo:
+              photo || null,
+
+            date_proposition:
+              new Date()
+                .toISOString()
+                .split("T")[0],
+
+            statut:
+              "en_attente"
+
+          });
+
+
+      if (error) {
+
+        console.error(
+          "Erreur proposition :",
+          error
+        );
+
+
+        zone.innerHTML = `
+
+          <div class="error">
+
+            Impossible d'envoyer
+            votre proposition.
+
+            <br><br>
+
+            ${error.message}
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      zone.innerHTML = `
+
+        <div class="success">
+
+          Votre proposition a bien été envoyée
+          au gestionnaire.
+
+        </div>
+
+      `;
+
+
+      document
+        .getElementById(
+          "nomProposition"
+        )
+        .value = "";
+
+
+      document
+        .getElementById(
+          "categorieProposition"
+        )
+        .value = "";
+
+
+      document
+        .getElementById(
+          "descriptionProposition"
+        )
+        .value = "";
+
+
+      document
+        .getElementById(
+          "quantiteProposition"
+        )
+        .value = "1";
+
+
+      document
+        .getElementById(
+          "photoProposition"
+        )
+        .value = "";
+
+
+      chargerMesPropositions();
+
+    }
+  );
+
+
+
+/* =========================================================
+   MES PROPOSITIONS
+   ========================================================= */
+
+
+async function chargerMesPropositions() {
+
+  const zone =
+    document.getElementById(
+      "mesPropositions"
+    );
+
+
+  const {
+    user,
+    profil
+  } =
+    await obtenirUtilisateurEtProfil();
+
+
+  if (
+    !user ||
+    !profil
+  ) {
+
+    zone.innerHTML = "";
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "Propositions_consommables"
+      )
+      .select(`
+        id,
+        nom_consommable,
+        description,
+        categorie,
+        quantite,
+        photo,
+        date_proposition,
+        statut
+      `)
+      .eq(
+        "utilisateur_id",
+        profil.id
+      )
+      .order(
+        "date_proposition",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur chargement propositions :",
+      error
+    );
+
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Impossible de charger
+        vos propositions.
 
       </div>
+
     `;
 
-    zone.appendChild(card);
+    return;
 
-  });
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Vous n'avez encore proposé
+        aucun consommable.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = "";
+
+
+  data.forEach(
+    function(proposition) {
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "card proposition-card";
+
+
+      let classeStatut =
+        "statut-attente";
+
+
+      let texteStatut =
+        "En attente";
+
+
+      if (
+        proposition.statut ===
+        "acceptee"
+      ) {
+
+        classeStatut =
+          "statut-acceptee";
+
+        texteStatut =
+          "Acceptée";
+
+      }
+
+
+      else if (
+        proposition.statut ===
+        "refusee"
+      ) {
+
+        classeStatut =
+          "statut-refusee";
+
+        texteStatut =
+          "Refusée";
+
+      }
+
+
+      else if (
+        proposition.statut ===
+        "collectee"
+      ) {
+
+        classeStatut =
+          "statut-collectee";
+
+        texteStatut =
+          "Collectée";
+
+      }
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${
+            proposition.nom_consommable
+            || ""
+          }
+
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Catégorie :
+          </strong>
+
+          ${
+            proposition.categorie
+            || ""
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Quantité :
+          </strong>
+
+          ${
+            proposition.quantite
+            ?? 0
+          }
+
+        </p>
+
+
+        ${
+          proposition.description
+          ?
+
+          `
+
+            <p>
+
+              <strong>
+                Description :
+              </strong>
+
+              ${
+                proposition.description
+              }
+
+            </p>
+
+          `
+
+          :
+
+          ""
+
+        }
+
+
+        <p class="proposition-date">
+
+          <strong>
+            Date de proposition :
+          </strong>
+
+          ${
+            new Date(
+              proposition.date_proposition
+            ).toLocaleDateString(
+              "fr-FR"
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Statut :
+          </strong>
+
+          <span
+            class="statut ${classeStatut}">
+
+            ${texteStatut}
+
+          </span>
+
+        </p>
+
+      `;
+
+
+      zone.appendChild(
+        card
+      );
+
+    }
+  );
+
 }
+
+
+
+/* =========================================================
+   RESERVATION
+   ========================================================= */
+
+
+function reserver(
+  consommableId
+) {
+
+  window.location.href =
+    "reservation.html?id=" +
+    encodeURIComponent(
+      consommableId
+    );
+
+}
+
+
+
+/* =========================================================
+   ANCIENNES FONCTIONS CONSERVEES
+   ========================================================= */
 
 
 function connexion() {
@@ -473,18 +1670,19 @@ function inscription() {
 }
 
 
-function reserver(consommableId) {
 
-  window.location.href =
-    "reservation.html?id=" +
-    encodeURIComponent(consommableId);
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
 
-}
 
+afficherUtilisateur();
 
 chargerConsommables();
 
 </script>
 
+
 </body>
+
 </html>
