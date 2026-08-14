@@ -52,6 +52,11 @@
       font-size: 14px;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .nav-button {
       background: #e5e7eb;
       color: #111827;
@@ -90,9 +95,7 @@
       display: grid;
       grid-template-columns:
         repeat(auto-fit, minmax(200px, 1fr));
-
       gap: 15px;
-
       margin-bottom: 30px;
     }
 
@@ -162,13 +165,84 @@
 
     .reply-item {
       margin-top: 12px;
-      padding: 12px;
+      padding: 15px;
       background: #f3f4f6;
       border-radius: 6px;
+      border-left: 4px solid #2563eb;
     }
 
     .reply-item p {
       margin: 5px 0;
+    }
+
+    .conversation {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .conversation-header {
+      background: #f3f4f6;
+      padding: 15px;
+    }
+
+    .conversation-header h4 {
+      margin: 0 0 8px 0;
+    }
+
+    .conversation-body {
+      padding: 15px;
+    }
+
+    .message-original {
+      background: white;
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 6px;
+    }
+
+    .message-reponse {
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+
+    .statut {
+      font-weight: bold;
+    }
+
+    .statut-non-lu {
+      color: #dc2626;
+    }
+
+    .statut-lu {
+      color: #2563eb;
+    }
+
+    .statut-repondu {
+      color: #16a34a;
+    }
+
+    .message {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .succes {
+      color: #16a34a;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .erreur {
+      color: #dc2626;
+      font-weight: bold;
+      margin-top: 10px;
     }
 
     table {
@@ -192,17 +266,6 @@
 
     .table-container {
       overflow-x: auto;
-    }
-
-    .message {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .statut {
-      font-weight: bold;
     }
 
   </style>
@@ -284,71 +347,31 @@
     <div class="dashboard">
 
       <div class="stat">
-
-        <h3>
-          Réservations en attente
-        </h3>
-
-        <strong id="statAttente">
-          0
-        </strong>
-
+        <h3>Réservations en attente</h3>
+        <strong id="statAttente">0</strong>
       </div>
 
-
       <div class="stat">
-
-        <h3>
-          Réservations acceptées
-        </h3>
-
-        <strong id="statAcceptee">
-          0
-        </strong>
-
+        <h3>Réservations acceptées</h3>
+        <strong id="statAcceptee">0</strong>
       </div>
 
-
       <div class="stat">
-
-        <h3>
-          Retours à traiter
-        </h3>
-
-        <strong id="statRetour">
-          0
-        </strong>
-
+        <h3>Retours à traiter</h3>
+        <strong id="statRetour">0</strong>
       </div>
 
-
       <div class="stat">
-
-        <h3>
-          Consommables disponibles
-        </h3>
-
-        <strong id="statConsommables">
-          0
-        </strong>
-
+        <h3>Consommables disponibles</h3>
+        <strong id="statConsommables">0</strong>
       </div>
 
-
       <div class="stat">
-
-        <h3>
-          Utilisateurs
-        </h3>
-
-        <strong id="statUtilisateurs">
-          0
-        </strong>
-
+        <h3>Utilisateurs</h3>
+        <strong id="statUtilisateurs">0</strong>
       </div>
 
     </div>
-
 
     <div class="card">
 
@@ -365,7 +388,6 @@
     </div>
 
   </section>
-
 
 
   <!-- RESERVATIONS -->
@@ -389,7 +411,6 @@
   </section>
 
 
-
   <!-- CONSOMMABLES -->
 
   <section
@@ -411,7 +432,6 @@
   </section>
 
 
-
   <!-- UTILISATEURS -->
 
   <section
@@ -431,7 +451,6 @@
     </div>
 
   </section>
-
 
 
   <!-- MESSAGES -->
@@ -476,58 +495,105 @@ const supabaseClient =
   );
 
 
+/*
+ * Sécurisation de l'affichage HTML.
+ */
+
+function echapperHTML(texte) {
+
+  if (
+    texte === null ||
+    texte === undefined
+  ) {
+    return "";
+  }
+
+  return String(texte)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/*
+ * Formatage des dates.
+ */
+
+function formaterDate(date) {
+
+  if (!date) {
+    return "";
+  }
+
+  return new Date(date)
+    .toLocaleString("fr-FR");
+}
+
+
+/*
+ * Navigation.
+ */
 
 function afficherSection(sectionId) {
 
   document
     .querySelectorAll(".section")
-    .forEach(section => {
-
-      section.classList.remove("active");
-
-    });
+    .forEach(
+      section => {
+        section.classList.remove(
+          "active"
+        );
+      }
+    );
 
 
   const section =
-    document.getElementById(sectionId);
+    document.getElementById(
+      sectionId
+    );
 
 
   if (section) {
-
-    section.classList.add("active");
-
+    section.classList.add(
+      "active"
+    );
   }
 
 
-  if (sectionId === "reservations") {
-
+  if (
+    sectionId ===
+    "reservations"
+  ) {
     chargerReservations();
-
   }
 
 
-  if (sectionId === "consommables") {
-
+  if (
+    sectionId ===
+    "consommables"
+  ) {
     chargerConsommables();
-
   }
 
 
-  if (sectionId === "utilisateurs") {
-
+  if (
+    sectionId ===
+    "utilisateurs"
+  ) {
     chargerUtilisateurs();
-
   }
 
 
-  if (sectionId === "messages") {
-
+  if (
+    sectionId ===
+    "messages"
+  ) {
     chargerMessages();
-
   }
 
 }
-
 
 
 function retourPage() {
@@ -535,7 +601,6 @@ function retourPage() {
   window.history.back();
 
 }
-
 
 
 async function deconnexion() {
@@ -548,6 +613,9 @@ async function deconnexion() {
 }
 
 
+/*
+ * RESERVATIONS
+ */
 
 async function chargerReservations() {
 
@@ -557,7 +625,10 @@ async function chargerReservations() {
     );
 
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .from("Réservations")
       .select(`
@@ -599,11 +670,13 @@ async function chargerReservations() {
     `;
 
     return;
-
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     zone.innerHTML = `
       <div class="message">
@@ -612,185 +685,220 @@ async function chargerReservations() {
     `;
 
     return;
-
   }
 
 
   zone.innerHTML = "";
 
 
-  data.forEach(reservation => {
+  data.forEach(
+    reservation => {
 
-    const card =
-      document.createElement("div");
+      const card =
+        document.createElement(
+          "div"
+        );
 
 
-    card.className =
-      "card";
+      card.className =
+        "card";
 
 
-    card.innerHTML = `
+      card.innerHTML = `
 
-      <h3>
+        <h3>
+          ${
+            echapperHTML(
+              reservation
+                .Consommables
+                ?.["Nom du sortant"]
+              ||
+              "Consommable"
+            )
+          }
+        </h3>
+
+        <p>
+          <strong>Demandeur :</strong>
+          ${
+            echapperHTML(
+              reservation
+                .Profils
+                ?.prenom
+              || ""
+            )
+          }
+          ${
+            echapperHTML(
+              reservation
+                .Profils
+                ?.nom
+              || ""
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Service :</strong>
+          ${
+            echapperHTML(
+              reservation
+                .Profils
+                ?.service
+              ||
+              "Non renseigné"
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Catégorie :</strong>
+          ${
+            echapperHTML(
+              reservation
+                .Consommables
+                ?.Categorie
+              ||
+              "Non renseignée"
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Laboratoire :</strong>
+          ${
+            echapperHTML(
+              reservation
+                .Consommables
+                ?.Laboratoire
+              ||
+              "Non renseigné"
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Date de demande :</strong>
+          ${
+            echapperHTML(
+              reservation.date_demande
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Date de début :</strong>
+          ${
+            echapperHTML(
+              reservation.date_debut
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Date de retour :</strong>
+          ${
+            echapperHTML(
+              reservation.date_retour
+            )
+          }
+        </p>
+
+        <p>
+          <strong>Commentaire :</strong>
+          ${
+            echapperHTML(
+              reservation.commentaire
+              ||
+              "Aucun"
+            )
+          }
+        </p>
+
+        <p class="statut">
+          <strong>Statut :</strong>
+          ${
+            echapperHTML(
+              reservation.statut
+            )
+          }
+        </p>
+
+
         ${
-          reservation
-            .Consommables
-            ?.["Nom du sortant"]
-          ||
-          "Consommable"
-        }
-      </h3>
+          reservation.statut ===
+          "en_attente"
 
-      <p>
-        <strong>Demandeur :</strong>
-        ${
-          reservation.Profils?.prenom
-          || ""
-        }
-        ${
-          reservation.Profils?.nom
-          || ""
-        }
-      </p>
+          ? `
 
-      <p>
-        <strong>Service :</strong>
-        ${
-          reservation.Profils?.service
-          || "Non renseigné"
+            <div class="actions">
+
+              <button
+                class="accept"
+                onclick="
+                  modifierStatut(
+                    '${reservation.id}',
+                    'acceptee'
+                  )
+                ">
+                Accepter
+              </button>
+
+              <button
+                class="refuse"
+                onclick="
+                  modifierStatut(
+                    '${reservation.id}',
+                    'refusee'
+                  )
+                ">
+                Refuser
+              </button>
+
+            </div>
+
+          `
+
+          : ""
         }
-      </p>
 
-      <p>
-        <strong>Catégorie :</strong>
-        ${
-          reservation.Consommables?.Categorie
-          || "Non renseignée"
-        }
-      </p>
-
-      <p>
-        <strong>Laboratoire :</strong>
-        ${
-          reservation.Consommables?.Laboratoire
-          || "Non renseigné"
-        }
-      </p>
-
-      <p>
-        <strong>Date de demande :</strong>
-        ${
-          reservation.date_demande
-        }
-      </p>
-
-      <p>
-        <strong>Date de début :</strong>
-        ${
-          reservation.date_debut
-        }
-      </p>
-
-      <p>
-        <strong>Date de retour :</strong>
-        ${
-          reservation.date_retour
-        }
-      </p>
-
-      <p>
-        <strong>Commentaire :</strong>
-        ${
-          reservation.commentaire
-          || "Aucun"
-        }
-      </p>
-
-      <p class="statut">
-
-        <strong>Statut :</strong>
 
         ${
-          reservation.statut
+          reservation.statut ===
+          "retour_signale"
+
+          ? `
+
+            <div class="actions">
+
+              <button
+                class="confirm-button"
+                onclick="
+                  confirmerRetour(
+                    '${reservation.id}'
+                  )
+                ">
+                Confirmer le retour
+              </button>
+
+            </div>
+
+          `
+
+          : ""
         }
 
-      </p>
+      `;
 
 
-      ${
-        reservation.statut ===
-        "en_attente"
+      zone.appendChild(
+        card
+      );
 
-        ? `
-
-          <div class="actions">
-
-            <button
-              class="accept"
-              onclick="
-                modifierStatut(
-                  '${reservation.id}',
-                  'acceptee'
-                )
-              ">
-              Accepter
-            </button>
-
-            <button
-              class="refuse"
-              onclick="
-                modifierStatut(
-                  '${reservation.id}',
-                  'refusee'
-                )
-              ">
-              Refuser
-            </button>
-
-          </div>
-
-        `
-
-        : ""
-
-      }
-
-
-      ${
-        reservation.statut ===
-        "retour_signale"
-
-        ? `
-
-          <div class="actions">
-
-            <button
-              class="confirm-button"
-              onclick="
-                confirmerRetour(
-                  '${reservation.id}'
-                )
-              ">
-              Confirmer le retour
-            </button>
-
-          </div>
-
-        `
-
-        : ""
-
-      }
-
-    `;
-
-
-    zone.appendChild(card);
-
-  });
+    }
+  );
 
 }
-
 
 
 async function modifierStatut(
@@ -815,12 +923,10 @@ async function modifierStatut(
         }
       );
 
-
     error =
       resultat.error;
 
   }
-
 
   else {
 
@@ -836,10 +942,8 @@ async function modifierStatut(
           reservationId
         );
 
-
     error =
       resultat.error;
-
   }
 
 
@@ -851,23 +955,23 @@ async function modifierStatut(
     );
 
     return;
-
   }
 
 
-  chargerReservations();
+  await chargerReservations();
 
-  chargerStatistiques();
+  await chargerStatistiques();
 
 }
-
 
 
 async function confirmerRetour(
   reservationId
 ) {
 
-  const { error } =
+  const {
+    error
+  } =
     await supabaseClient.rpc(
       "confirmer_retour_reservation",
       {
@@ -885,7 +989,6 @@ async function confirmerRetour(
     );
 
     return;
-
   }
 
 
@@ -894,13 +997,16 @@ async function confirmerRetour(
   );
 
 
-  chargerReservations();
+  await chargerReservations();
 
-  chargerStatistiques();
+  await chargerStatistiques();
 
 }
 
 
+/*
+ * CONSOMMABLES
+ */
 
 async function chargerConsommables() {
 
@@ -910,7 +1016,10 @@ async function chargerConsommables() {
     );
 
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .from("Consommables")
       .select("*")
@@ -933,11 +1042,13 @@ async function chargerConsommables() {
     `;
 
     return;
-
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     zone.innerHTML = `
       <div class="message">
@@ -946,7 +1057,6 @@ async function chargerConsommables() {
     `;
 
     return;
-
   }
 
 
@@ -960,29 +1070,12 @@ async function chargerConsommables() {
 
           <tr>
 
-            <th>
-              Nom
-            </th>
-
-            <th>
-              Catégorie
-            </th>
-
-            <th>
-              Laboratoire
-            </th>
-
-            <th>
-              Quantité
-            </th>
-
-            <th>
-              État
-            </th>
-
-            <th>
-              Disponible
-            </th>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>Laboratoire</th>
+            <th>Quantité</th>
+            <th>État</th>
+            <th>Disponible</th>
 
           </tr>
 
@@ -994,56 +1087,64 @@ async function chargerConsommables() {
             data.map(
               consommable => `
 
-              <tr>
+                <tr>
 
-                <td>
-                  ${
-                    consommable[
-                      "Nom du sortant"
-                    ]
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        consommable[
+                          "Nom du sortant"
+                        ]
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    consommable.Categorie
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        consommable.Categorie
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    consommable.Laboratoire
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        consommable.Laboratoire
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    consommable.Quantite
-                    ?? 0
-                  }
-                </td>
+                  <td>
+                    ${
+                      consommable.Quantite
+                      ?? 0
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    consommable.Etat
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        consommable.Etat
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    consommable.disponible
-                    ? "Oui"
-                    : "Non"
-                  }
-                </td>
+                  <td>
+                    ${
+                      consommable.disponible
+                      ? "Oui"
+                      : "Non"
+                    }
+                  </td>
 
-              </tr>
+                </tr>
 
-            `
+              `
             ).join("")
           }
 
@@ -1058,6 +1159,9 @@ async function chargerConsommables() {
 }
 
 
+/*
+ * UTILISATEURS
+ */
 
 async function chargerUtilisateurs() {
 
@@ -1067,7 +1171,10 @@ async function chargerUtilisateurs() {
     );
 
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .from("Profils")
       .select(
@@ -1092,11 +1199,13 @@ async function chargerUtilisateurs() {
     `;
 
     return;
-
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     zone.innerHTML = `
       <div class="message">
@@ -1105,7 +1214,6 @@ async function chargerUtilisateurs() {
     `;
 
     return;
-
   }
 
 
@@ -1119,21 +1227,10 @@ async function chargerUtilisateurs() {
 
           <tr>
 
-            <th>
-              Nom
-            </th>
-
-            <th>
-              Prénom
-            </th>
-
-            <th>
-              Service
-            </th>
-
-            <th>
-              Rôle
-            </th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Service</th>
+            <th>Rôle</th>
 
           </tr>
 
@@ -1145,39 +1242,47 @@ async function chargerUtilisateurs() {
             data.map(
               profil => `
 
-              <tr>
+                <tr>
 
-                <td>
-                  ${
-                    profil.nom
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        profil.nom
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    profil.prenom
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        profil.prenom
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    profil.service
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        profil.service
+                        || ""
+                      )
+                    }
+                  </td>
 
-                <td>
-                  ${
-                    profil.role
-                    || ""
-                  }
-                </td>
+                  <td>
+                    ${
+                      echapperHTML(
+                        profil.role
+                        || ""
+                      )
+                    }
+                  </td>
 
-              </tr>
+                </tr>
 
-            `
+              `
             ).join("")
           }
 
@@ -1192,6 +1297,12 @@ async function chargerUtilisateurs() {
 }
 
 
+/*
+ * MESSAGES
+ *
+ * On récupère d'abord les messages,
+ * puis séparément toutes leurs réponses.
+ */
 
 async function chargerMessages() {
 
@@ -1208,7 +1319,10 @@ async function chargerMessages() {
   `;
 
 
-  const { data, error } =
+  const {
+    data: messages,
+    error: erreurMessages
+  } =
     await supabaseClient
       .from("Messages")
       .select(`
@@ -1218,13 +1332,7 @@ async function chargerMessages() {
         date_envoi,
         lu,
         repondu,
-        utilisateur_id,
-
-        Profils!messages_utilisateur_id_fkey (
-          nom,
-          prenom,
-          service
-        )
+        utilisateur_id
       `)
       .order(
         "date_envoi",
@@ -1234,27 +1342,33 @@ async function chargerMessages() {
       );
 
 
-  if (error) {
+  if (erreurMessages) {
 
     console.error(
       "Erreur chargement messages :",
-      error
+      erreurMessages
     );
-
 
     zone.innerHTML = `
       <div class="message">
         Impossible de charger les messages.
+        <br><br>
+        <small>
+          ${echapperHTML(
+            erreurMessages.message
+          )}
+        </small>
       </div>
     `;
 
-
     return;
-
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !messages ||
+    messages.length === 0
+  ) {
 
     zone.innerHTML = `
       <div class="message">
@@ -1262,27 +1376,120 @@ async function chargerMessages() {
       </div>
     `;
 
-
     return;
+  }
+
+
+  /*
+   * Récupération des profils
+   * des utilisateurs concernés.
+   */
+
+  const idsUtilisateurs =
+    [
+      ...new Set(
+        messages.map(
+          message =>
+            message.utilisateur_id
+        )
+      )
+    ];
+
+
+  let profils = [];
+
+
+  if (
+    idsUtilisateurs.length > 0
+  ) {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(`
+          id,
+          nom,
+          prenom,
+          service
+        `)
+        .in(
+          "id",
+          idsUtilisateurs
+        );
+
+
+    if (error) {
+
+      console.error(
+        "Erreur chargement profils :",
+        error
+      );
+
+    }
+    else {
+
+      profils =
+        data || [];
+
+    }
 
   }
+
+
+  const profilsParId =
+    {};
+
+
+  profils.forEach(
+    profil => {
+
+      profilsParId[
+        profil.id
+      ] =
+        profil;
+
+    }
+  );
 
 
   zone.innerHTML = "";
 
 
-  for (const message of data) {
+  /*
+   * Affichage de chaque message.
+   */
+
+  for (
+    const message
+    of messages
+  ) {
 
 
     /*
-     * Le message est marqué comme lu
-     * lorsqu'il est consulté.
+     * Récupération du profil.
      */
 
-    if (!message.lu) {
+    const profil =
+      profilsParId[
+        message.utilisateur_id
+      ];
+
+
+    /*
+     * Lorsqu'un gestionnaire consulte
+     * le message, on le marque comme lu.
+     */
+
+    if (
+      !message.lu
+    ) {
 
       const {
-        error: erreurLecture
+        error:
+          erreurLecture
       } =
         await supabaseClient
           .from("Messages")
@@ -1295,7 +1502,9 @@ async function chargerMessages() {
           );
 
 
-      if (erreurLecture) {
+      if (
+        erreurLecture
+      ) {
 
         console.error(
           "Erreur marquage comme lu :",
@@ -1305,7 +1514,8 @@ async function chargerMessages() {
       }
       else {
 
-        message.lu = true;
+        message.lu =
+          true;
 
       }
 
@@ -1313,8 +1523,7 @@ async function chargerMessages() {
 
 
     /*
-     * Récupération de toutes les réponses
-     * liées à ce message.
+     * Récupération des réponses.
      */
 
     const {
@@ -1325,23 +1534,26 @@ async function chargerMessages() {
         .from("ReponsesMessages")
         .select(`
           id,
+          message_id,
+          gestionnaire_id,
           contenu,
-          date_envoi,
-          gestionnaire_id
+          date_reponse
         `)
         .eq(
           "message_id",
           message.id
         )
         .order(
-          "date_envoi",
+          "date_reponse",
           {
             ascending: true
           }
         );
 
 
-    if (erreurReponses) {
+    if (
+      erreurReponses
+    ) {
 
       console.error(
         "Erreur chargement réponses :",
@@ -1354,6 +1566,45 @@ async function chargerMessages() {
     const listeReponses =
       reponses || [];
 
+
+    /*
+     * Statut affiché.
+     */
+
+    let texteStatut =
+      "Non lu";
+
+    let classeStatut =
+      "statut-non-lu";
+
+
+    if (
+      message.repondu
+    ) {
+
+      texteStatut =
+        "Répondu";
+
+      classeStatut =
+        "statut-repondu";
+
+    }
+    else if (
+      message.lu
+    ) {
+
+      texteStatut =
+        "Lu";
+
+      classeStatut =
+        "statut-lu";
+
+    }
+
+
+    /*
+     * Construction de l'historique.
+     */
 
     let historiqueHTML =
       "";
@@ -1368,14 +1619,57 @@ async function chargerMessages() {
         <div class="reply-box">
 
           <h4>
-            Historique des réponses
+            Historique de la conversation
           </h4>
 
           ${
-            await construireHistoriqueReponses(
-              listeReponses
-            )
+            listeReponses.map(
+              reponse => `
+
+                <div class="reply-item">
+
+                  <p>
+                    <strong>
+                      Gestionnaire
+                    </strong>
+                  </p>
+
+                  <p>
+                    ${echapperHTML(
+                      reponse.contenu
+                    )}
+                  </p>
+
+                  <p>
+                    <small>
+                      ${formaterDate(
+                        reponse.date_reponse
+                      )}
+                    </small>
+                  </p>
+
+                </div>
+
+              `
+            ).join("")
           }
+
+        </div>
+
+      `;
+
+    }
+    else {
+
+      historiqueHTML = `
+
+        <div class="reply-box">
+
+          <p>
+            <em>
+              Aucune réponse envoyée pour le moment.
+            </em>
+          </p>
 
         </div>
 
@@ -1384,16 +1678,14 @@ async function chargerMessages() {
     }
 
 
-    const statut =
-      message.repondu
-        ? "Répondu"
-        : message.lu
-          ? "Lu"
-          : "Non lu";
-
+    /*
+     * Création de la carte.
+     */
 
     const card =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
 
     card.className =
@@ -1402,92 +1694,131 @@ async function chargerMessages() {
 
     card.innerHTML = `
 
-      <h3>
-        ${message.sujet}
-      </h3>
+      <div class="conversation">
 
+        <div class="conversation-header">
 
-      <p>
-        <strong>De :</strong>
-
-        ${
-          message.Profils?.prenom
-          || ""
-        }
-
-        ${
-          message.Profils?.nom
-          || ""
-        }
-      </p>
-
-
-      <p>
-        <strong>Service :</strong>
-
-        ${
-          message.Profils?.service
-          || "Non renseigné"
-        }
-      </p>
-
-
-      <p>
-        <strong>Date :</strong>
-
-        ${
-          new Date(
-            message.date_envoi
-          ).toLocaleString(
-            "fr-FR"
-          )
-        }
-      </p>
-
-
-      <p>
-        <strong>Message :</strong>
-
-        ${message.contenu}
-      </p>
-
-
-      <p class="statut">
-
-        <strong>Statut :</strong>
-
-        ${statut}
-
-      </p>
-
-
-      ${historiqueHTML}
-
-
-      <div class="reply-box">
-
-        <h4>
-          Répondre
-        </h4>
-
-
-        <textarea
-          id="reponse-${message.id}"
-          placeholder="Écrivez votre réponse..."
-        ></textarea>
-
-
-        <div class="actions">
-
-          <button
-            class="reply-button"
-            onclick="
-              repondreMessage(
-                '${message.id}'
+          <h4>
+            ${
+              echapperHTML(
+                profil?.prenom
+                || ""
               )
-            ">
-            Envoyer la réponse
-          </button>
+            }
+            ${
+              echapperHTML(
+                profil?.nom
+                || ""
+              )
+            }
+          </h4>
+
+          <div>
+
+            <strong>
+              Service :
+            </strong>
+
+            ${
+              echapperHTML(
+                profil?.service
+                ||
+                "Non renseigné"
+              )
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="conversation-body">
+
+          <h3>
+            ${echapperHTML(
+              message.sujet
+            )}
+          </h3>
+
+
+          <div class="message-original">
+
+            <p>
+
+              <strong>
+                Message de l'utilisateur
+              </strong>
+
+            </p>
+
+            <p>
+              ${echapperHTML(
+                message.contenu
+              )}
+            </p>
+
+            <p>
+
+              <strong>
+                Date :
+              </strong>
+
+              ${formaterDate(
+                message.date_envoi
+              )}
+
+            </p>
+
+          </div>
+
+
+          <p class="statut ${classeStatut}">
+
+            <strong>
+              Statut :
+            </strong>
+
+            ${texteStatut}
+
+          </p>
+
+
+          ${historiqueHTML}
+
+
+          <div class="reply-box">
+
+            <h4>
+              Répondre à cet utilisateur
+            </h4>
+
+            <textarea
+              id="reponse-${message.id}"
+              placeholder="Écrivez votre réponse..."
+            ></textarea>
+
+
+            <div class="actions">
+
+              <button
+                class="reply-button"
+                id="bouton-reponse-${message.id}"
+                onclick="
+                  repondreMessage(
+                    '${message.id}'
+                  )
+                ">
+                Envoyer la réponse
+              </button>
+
+            </div>
+
+
+            <div
+              id="resultat-reponse-${message.id}">
+            </div>
+
+          </div>
 
         </div>
 
@@ -1496,112 +1827,22 @@ async function chargerMessages() {
     `;
 
 
-    zone.appendChild(card);
+    zone.appendChild(
+      card
+    );
 
   }
 
 }
 
 
-
-async function construireHistoriqueReponses(
-  reponses
-) {
-
-  let html = "";
-
-
-  for (
-    const reponse
-    of reponses
-  ) {
-
-
-    let nomGestionnaire =
-      "Gestionnaire";
-
-
-    const {
-      data: profil,
-      error
-    } =
-      await supabaseClient
-        .from("Profils")
-        .select(
-          "prenom, nom"
-        )
-        .eq(
-          "id",
-          reponse.gestionnaire_id
-        )
-        .single();
-
-
-    if (
-      !error &&
-      profil
-    ) {
-
-      nomGestionnaire =
-        `${profil.prenom || ""} ${profil.nom || ""}`
-          .trim()
-        ||
-        "Gestionnaire";
-
-    }
-
-
-    html += `
-
-      <div class="reply-item">
-
-        <p>
-
-          <strong>
-            ${nomGestionnaire}
-          </strong>
-
-        </p>
-
-
-        <p>
-
-          <small>
-
-            ${
-              new Date(
-                reponse.date_envoi
-              ).toLocaleString(
-                "fr-FR"
-              )
-            }
-
-          </small>
-
-        </p>
-
-
-        <p>
-          ${reponse.contenu}
-        </p>
-
-      </div>
-
-    `;
-
-  }
-
-
-  return html;
-
-}
-
-
+/*
+ * ENVOYER UNE RÉPONSE
+ */
 
 async function repondreMessage(
   messageId
 ) {
-
 
   const zoneReponse =
     document.getElementById(
@@ -1609,14 +1850,27 @@ async function repondreMessage(
     );
 
 
-  if (!zoneReponse) {
+  const bouton =
+    document.getElementById(
+      `bouton-reponse-${messageId}`
+    );
+
+
+  const resultat =
+    document.getElementById(
+      `resultat-reponse-${messageId}`
+    );
+
+
+  if (
+    !zoneReponse
+  ) {
 
     alert(
       "Impossible de trouver le champ de réponse."
     );
 
     return;
-
   }
 
 
@@ -1626,182 +1880,307 @@ async function repondreMessage(
 
   if (!contenu) {
 
-    alert(
-      "Veuillez écrire une réponse."
-    );
+    resultat.className =
+      "erreur";
+
+    resultat.textContent =
+      "Veuillez écrire une réponse.";
 
     return;
-
   }
 
 
-  /*
-   * Utilisateur actuellement connecté.
-   */
+  bouton.disabled =
+    true;
 
-  const {
-    data: { user },
-    error: erreurUtilisateur
-  } =
-    await supabaseClient.auth.getUser();
+  bouton.textContent =
+    "Envoi en cours...";
 
 
-  if (
-    erreurUtilisateur ||
-    !user
-  ) {
-
-    alert(
-      "Vous devez être connecté pour répondre."
-    );
-
-    return;
-
-  }
+  try {
 
 
-  /*
-   * Recherche du profil du gestionnaire.
-   */
+    /*
+     * Utilisateur connecté.
+     */
 
-  const {
-    data: profil,
-    error: erreurProfil
-  } =
-    await supabaseClient
-      .from("Profils")
-      .select(
-        "id, role"
+    const {
+      data: {
+        user
+      },
+      error: erreurUtilisateur
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (
+      erreurUtilisateur ||
+      !user
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Vous devez être connecté.";
+
+      return;
+    }
+
+
+    /*
+     * Profil du gestionnaire.
+     */
+
+    const {
+      data: profil,
+      error: erreurProfil
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(
+          "id, role"
+        )
+        .eq(
+          "user_id",
+          user.id
+        )
+        .single();
+
+
+    if (
+      erreurProfil ||
+      !profil
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Impossible de trouver votre profil.";
+
+      return;
+    }
+
+
+    if (
+      ![
+        "gestionnaire",
+        "administrateur"
+      ].includes(
+        profil.role
       )
-      .eq(
-        "user_id",
-        user.id
-      )
-      .single();
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Votre profil ne permet pas d'envoyer une réponse.";
+
+      return;
+    }
 
 
-  if (
-    erreurProfil ||
-    !profil ||
-    ![
-      "gestionnaire",
-      "administrateur"
-    ].includes(
-      profil.role
-    )
-  ) {
+    /*
+     * Vérification que le message
+     * existe bien.
+     */
 
-    alert(
-      "Votre profil ne permet pas d'envoyer une réponse."
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * Enregistrement de la réponse
-   * dans ReponsesMessages.
-   */
-
-  const {
-    error: erreurInsertion
-  } =
-    await supabaseClient
-      .from("ReponsesMessages")
-      .insert({
-
-        message_id:
-          messageId,
-
-        gestionnaire_id:
-          profil.id,
-
-        contenu:
-          contenu
-
-      });
+    const {
+      data: message,
+      error: erreurMessage
+    } =
+      await supabaseClient
+        .from("Messages")
+        .select(
+          "id, utilisateur_id"
+        )
+        .eq(
+          "id",
+          messageId
+        )
+        .single();
 
 
-  if (erreurInsertion) {
+    if (
+      erreurMessage ||
+      !message
+    ) {
 
-    console.error(
-      "Erreur insertion réponse :",
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Impossible de retrouver ce message.";
+
+      return;
+    }
+
+
+    /*
+     * Insertion de la réponse.
+     *
+     * IMPORTANT :
+     * la date est gérée par la base
+     * si elle possède une valeur par défaut.
+     */
+
+    const {
+      data: nouvelleReponse,
+      error: erreurInsertion
+    } =
+      await supabaseClient
+        .from("ReponsesMessages")
+        .insert({
+
+          message_id:
+            messageId,
+
+          gestionnaire_id:
+            profil.id,
+
+          contenu:
+            contenu
+
+        })
+        .select()
+        .single();
+
+
+    if (
       erreurInsertion
-    );
+    ) {
 
-
-    alert(
-      "Impossible d'envoyer la réponse : " +
-      erreurInsertion.message
-    );
-
-
-    return;
-
-  }
-
-
-  /*
-   * Passage du message à "Répondu".
-   */
-
-  const {
-    error: erreurStatut
-  } =
-    await supabaseClient
-      .from("Messages")
-      .update({
-
-        repondu:
-          true,
-
-        lu:
-          true
-
-      })
-      .eq(
-        "id",
-        messageId
+      console.error(
+        "Erreur insertion réponse :",
+        erreurInsertion
       );
 
+      resultat.className =
+        "erreur";
 
-  if (erreurStatut) {
+      resultat.textContent =
+        "Impossible d'envoyer la réponse : " +
+        erreurInsertion.message;
 
-    console.error(
-      "Erreur mise à jour du statut :",
+      return;
+    }
+
+
+    console.log(
+      "Réponse créée :",
+      nouvelleReponse
+    );
+
+
+    /*
+     * Le message devient répondu.
+     */
+
+    const {
+      error: erreurStatut
+    } =
+      await supabaseClient
+        .from("Messages")
+        .update({
+
+          repondu:
+            true,
+
+          lu:
+            true
+
+        })
+        .eq(
+          "id",
+          messageId
+        );
+
+
+    if (
       erreurStatut
-    );
+    ) {
+
+      console.error(
+        "Erreur mise à jour statut :",
+        erreurStatut
+      );
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "La réponse a été envoyée, mais le statut n'a pas pu être mis à jour.";
+
+      await chargerMessages();
+
+      return;
+    }
 
 
-    alert(
-      "La réponse a été enregistrée, mais le statut n'a pas pu être mis à jour."
-    );
+    /*
+     * Nettoyage du champ.
+     */
+
+    zoneReponse.value =
+      "";
 
 
-    chargerMessages();
+    resultat.className =
+      "succes";
+
+    resultat.textContent =
+      "Réponse envoyée.";
 
 
-    return;
+    /*
+     * Recharge toute la messagerie.
+     * La nouvelle réponse doit maintenant
+     * apparaître dans l'historique.
+     */
+
+    await chargerMessages();
+
 
   }
+  catch (erreur) {
 
+    console.error(
+      "Erreur inattendue :",
+      erreur
+    );
 
-  alert(
-    "Réponse envoyée."
-  );
+    resultat.className =
+      "erreur";
 
+    resultat.textContent =
+      "Une erreur est survenue.";
 
-  chargerMessages();
+  }
+  finally {
+
+    bouton.disabled =
+      false;
+
+    bouton.textContent =
+      "Envoyer la réponse";
+
+  }
 
 }
 
 
+/*
+ * STATISTIQUES
+ */
 
 async function chargerStatistiques() {
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .from("Réservations")
       .select(
@@ -1896,11 +2275,16 @@ async function chargerStatistiques() {
 }
 
 
+/*
+ * VÉRIFICATION GESTIONNAIRE
+ */
 
 async function verifierGestionnaire() {
 
   const {
-    data: { user }
+    data: {
+      user
+    }
   } =
     await supabaseClient.auth.getUser();
 
@@ -1929,7 +2313,6 @@ async function verifierGestionnaire() {
     `;
 
     return;
-
   }
 
 
@@ -1987,7 +2370,6 @@ async function verifierGestionnaire() {
     `;
 
     return;
-
   }
 
 
@@ -1996,9 +2378,11 @@ async function verifierGestionnaire() {
 }
 
 
+/*
+ * Démarrage.
+ */
 
 verifierGestionnaire();
-
 
 </script>
 
