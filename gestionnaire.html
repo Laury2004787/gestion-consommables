@@ -1988,18 +1988,14 @@ async function chargerPropositions() {
             <div class="actions">
 
               <button
-                class="accept"
-                onclick="
-                  accepterProposition(
-  '${proposition.id}',
-  '${echapperHTML(profil?.service || "")}'
-)
-                ">
+  class="accept"
+  onclick="
+    accepterProposition('${proposition.id}')
+  ">
 
-                Accepter
+  Accepter
 
-              </button>
-
+</button>
 
               <button
                 class="refuse"
@@ -2041,8 +2037,7 @@ async function chargerPropositions() {
 
 
 async function accepterProposition(
-  propositionId,
-  serviceProposant
+  propositionId
 ) {
 
   const confirmation = confirm(
@@ -2115,19 +2110,58 @@ async function accepterProposition(
        3. Vérifier le laboratoire/service
        ================================= */
 
-    const laboratoire =
-      serviceProposant
-        ? serviceProposant.trim()
-        : "";
+    const {
+  data: profil,
+  error: erreurProfil
+} = await supabaseClient
+  .from("Profils")
+  .select(`
+    id,
+    nom,
+    prenom,
+    service
+  `)
+  .eq(
+    "id",
+    proposition.utilisateur_id
+  )
+  .single();
 
-    if (!laboratoire) {
 
-      alert(
-        "Le service du proposant n'est pas renseigné."
-      );
+if (
+  erreurProfil ||
+  !profil
+) {
 
-      return;
-    }
+  console.error(
+    "Erreur récupération profil :",
+    erreurProfil
+  );
+
+  alert(
+    "Impossible de récupérer le profil du proposant."
+  );
+
+  return;
+
+}
+
+
+const laboratoire =
+  profil.service
+  ? profil.service.trim()
+  : "";
+
+
+if (!laboratoire) {
+
+  alert(
+    "Le service du proposant n'est pas renseigné dans son profil."
+  );
+
+  return;
+
+}
 
     /* ================================
        4. Ajouter le consommable
