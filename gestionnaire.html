@@ -2106,23 +2106,24 @@ async function accepterProposition(
       return;
     }
 
-    /* ================================
-       3. Vérifier le laboratoire/service
-       ================================= */
+   /* ================================
+   3. Vérifier le laboratoire/service
+   ================================= */
 
-    const {
+const {
   data: profil,
   error: erreurProfil
 } = await supabaseClient
   .from("Profils")
   .select(`
     id,
+    user_id,
     nom,
     prenom,
     service
   `)
   .eq(
-    "id",
+    "user_id",
     proposition.utilisateur_id
   )
   .single();
@@ -2134,12 +2135,16 @@ if (
 ) {
 
   console.error(
-    "Erreur récupération profil :",
+    "ERREUR PROFIL :",
     erreurProfil
   );
 
   alert(
-    "Impossible de récupérer le profil du proposant."
+    "Impossible de récupérer le profil du proposant.\n\n" +
+    (
+      erreurProfil?.message ||
+      "Profil introuvable."
+    )
   );
 
   return;
