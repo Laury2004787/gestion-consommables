@@ -293,7 +293,21 @@
     </p>
 
   </section>
+<section class="section">
 
+  <h2>
+    Informations
+  </h2>
+
+  <div id="informations">
+
+    <div class="message">
+      Chargement des informations...
+    </div>
+
+  </div>
+
+</section>
 
   <!-- CONSOMMABLES DISPONIBLES -->
 
@@ -1682,7 +1696,91 @@ async function chargerMesPropositions() {
 
 }
 
+/* =========================================================
+   CHARGEMENT DES INFORMATIONS
+   ========================================================= */
 
+async function chargerInformations() {
+
+  const zone =
+    document.getElementById(
+      "informations"
+    );
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Informations")
+      .select("*")
+      .eq("publie", true)
+      .order("id", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    console.error(
+      "Erreur chargement informations :",
+      error
+    );
+
+    zone.innerHTML = `
+      <div class="error">
+        Impossible de charger les informations.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucune information actuellement.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  zone.innerHTML = "";
+
+
+  data.forEach(function(information) {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "card";
+
+    card.innerHTML = `
+
+      <div class="card-content">
+
+        <h3>
+          ${information.titre || ""}
+        </h3>
+
+        <p>
+          ${information.contenu || ""}
+        </p>
+
+      </div>
+
+    `;
+
+    zone.appendChild(card);
+
+  });
+
+}
 
 /* =========================================================
    RESERVATION
@@ -1735,6 +1833,8 @@ function inscription() {
 afficherUtilisateur();
 
 chargerConsommables();
+
+chargerInformations();
 
 </script>
 
