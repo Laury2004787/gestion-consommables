@@ -1991,8 +1991,9 @@ async function chargerPropositions() {
                 class="accept"
                 onclick="
                   accepterProposition(
-                    '${proposition.id}'
-                  )
+  '${proposition.id}',
+  '${echapperHTML(profil?.service || "")}'
+)
                 ">
 
                 Accepter
@@ -2039,12 +2040,9 @@ async function chargerPropositions() {
 
 
 
-/* =========================================================
-   ACCEPTER UNE PROPOSITION
-   ========================================================= */
-
 async function accepterProposition(
-  propositionId
+  propositionId,
+  serviceProposant
 ) {
 
   const confirmation =
@@ -2125,36 +2123,19 @@ async function accepterProposition(
 
 
   /*
-   * Récupération du profil
-   * de l'utilisateur qui propose.
-   *
-   * Cela permet de récupérer son service
-   * comme laboratoire d'origine.
+   * Vérification du service.
    */
 
-  const {
-    data: profilProposant,
-    error: erreurProfil
-  } =
-    await supabaseClient
-      .from("Profils")
-      .select(`
-        service
-      `)
-      .eq(
-        "id",
-        proposition.utilisateur_id
-      )
-      .single();
+  const laboratoire =
+    serviceProposant
+    ? serviceProposant.trim()
+    : "";
 
 
-  if (
-    erreurProfil ||
-    !profilProposant
-  ) {
+  if (!laboratoire) {
 
     alert(
-      "Impossible de récupérer le service du proposant."
+      "Le service du proposant n'est pas renseigné dans son profil."
     );
 
     return;
@@ -2186,9 +2167,7 @@ async function accepterProposition(
           null,
 
         Laboratoire:
-          profilProposant.service
-          ||
-          null,
+          laboratoire,
 
         Etat:
           proposition.Etat
@@ -2260,12 +2239,6 @@ async function accepterProposition(
   if (
     erreurStatut
   ) {
-
-    /*
-     * Le consommable a été créé mais
-     * le statut de la proposition n'a pas
-     * pu être modifié.
-     */
 
     console.error(
       "Erreur mise à jour proposition :",
