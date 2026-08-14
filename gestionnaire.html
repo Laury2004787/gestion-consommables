@@ -1,2219 +1,4290 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tableau de bord gestionnaire</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
 
-<style>
-*{box-sizing:border-box}
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f5f7fa;
-  color:#1f2937;
-}
+  <title>Tableau de bord gestionnaire</title>
 
-header{
-  background:white;
-  padding:20px 30px;
-  border-bottom:1px solid #e5e7eb;
-  position:sticky;
-  top:0;
-  z-index:20;
-}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-header h1{margin:0 0 15px}
+  <style>
 
-.header-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
 
-main{
-  max-width:1250px;
-  margin:30px auto;
-  padding:0 20px;
-}
+    header {
+      background: white;
+      padding: 20px 30px;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-button{
-  border:none;
-  padding:10px 15px;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:14px;
-}
+    header h1 {
+      margin: 0 0 15px 0;
+    }
 
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-input,textarea,select{
-  width:100%;
-  padding:11px;
-  border:1px solid #d1d5db;
-  border-radius:6px;
-  font-family:Arial,sans-serif;
-  font-size:14px;
-}
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
 
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
+    button {
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-.nav-button{background:#e5e7eb;color:#111827}
-.nav-button:hover{background:#d1d5db}
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-.danger{background:#dc2626;color:white}
-.accept{background:#16a34a;color:white}
-.refuse{background:#dc2626;color:white}
-.confirm-button{background:#16a34a;color:white}
-.reply-button{background:#2563eb;color:white}
-.add-button{background:#2563eb;color:white}
-.edit-button{background:#f59e0b;color:white}
-.secondary{background:#6b7280;color:white}
+    .nav-button {
+      background: #e5e7eb;
+      color: #111827;
+    }
 
-.dashboard{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  gap:15px;
-  margin-bottom:30px;
-}
+    .nav-button:hover {
+      background: #d1d5db;
+    }
 
-.stat{
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
+    .danger {
+      background: #dc2626;
+      color: white;
+    }
 
-.stat h3{
-  margin:0 0 10px;
-  font-size:14px;
-  color:#6b7280;
-}
+    .accept {
+      background: #16a34a;
+      color: white;
+    }
 
-.stat strong{font-size:30px}
+    .refuse {
+      background: #dc2626;
+      color: white;
+    }
 
-.section{display:none}
-.section.active{display:block}
+    .confirm-button {
+      background: #16a34a;
+      color: white;
+    }
 
-.card,.form-card,.message{
-  background:white;
-  padding:20px;
-  margin-bottom:15px;
-  border-radius:8px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
+    .reply-button {
+      background: #2563eb;
+      color: white;
+    }
 
-.card h3{margin-top:0}
+    .add-button {
+      background: #2563eb;
+      color: white;
+      margin-bottom: 20px;
+    }
 
-.actions{
-  margin-top:15px;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
+    .edit-button {
+      background: #f59e0b;
+      color: white;
+    }
 
-.form-group{margin-bottom:18px}
-.form-group label{
-  display:block;
-  margin-bottom:7px;
-  font-weight:bold;
-}
+    .dashboard {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
 
-.info{
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
-  padding:15px;
-  border-radius:6px;
-  margin-bottom:20px;
-}
+    .stat {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+    }
 
-.success-box{
-  background:#f0fdf4;
-  border:1px solid #bbf7d0;
-  color:#166534;
-  padding:15px;
-  border-radius:6px;
-  margin-bottom:20px;
-}
+    .stat h3 {
+      margin: 0 0 10px 0;
+      font-size: 15px;
+      color: #6b7280;
+    }
 
-.error-box{
-  background:#fef2f2;
-  border:1px solid #fecaca;
-  color:#991b1b;
-  padding:15px;
-  border-radius:6px;
-  margin-bottom:20px;
-}
+    .stat strong {
+      font-size: 30px;
+    }
 
-.badge{
-  display:inline-block;
-  padding:5px 10px;
-  border-radius:20px;
-  font-size:13px;
-  font-weight:bold;
-}
+    .section {
+      display: none;
+    }
 
-.badge-attente{background:#fef3c7;color:#92400e}
-.badge-acceptee{background:#dcfce7;color:#166534}
-.badge-refusee{background:#fee2e2;color:#991b1b}
-.badge-disponible{background:#dcfce7;color:#166534}
-.badge-indisponible{background:#fee2e2;color:#991b1b}
+    .section.active {
+      display: block;
+    }
 
-.proposition-en-attente{border-left:5px solid #f59e0b}
-.proposition-acceptee{border-left:5px solid #16a34a}
-.proposition-refusee{border-left:5px solid #dc2626}
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+    }
 
-.reply-box{
-  margin-top:18px;
-  padding-top:15px;
-  border-top:1px solid #e5e7eb;
-}
+    .card h3 {
+      margin-top: 0;
+    }
 
-.reply-item{
-  margin-top:12px;
-  padding:15px;
-  background:#f3f4f6;
-  border-radius:6px;
-  border-left:4px solid #2563eb;
-}
+    .actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-.statut{font-weight:bold}
-.statut-non-lu{color:#dc2626}
-.statut-lu{color:#2563eb}
-.statut-repondu{color:#16a34a}
+    .reply-box {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e7eb;
+    }
 
-.table-container{
-  overflow-x:auto;
-  background:white;
-  border-radius:8px;
-}
+    .reply-box textarea {
+      width: 100%;
+      min-height: 100px;
+      box-sizing: border-box;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-}
+    .reply-item {
+      margin-top: 12px;
+      padding: 15px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      border-left: 4px solid #2563eb;
+    }
 
-th,td{
-  padding:12px;
-  text-align:left;
-  border-bottom:1px solid #e5e7eb;
-  vertical-align:top;
-}
+    .reply-item p {
+      margin: 5px 0;
+    }
 
-th{background:#f3f4f6}
+    .conversation {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
 
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.55);
-  z-index:100;
-  padding:20px;
-  overflow:auto;
-}
+    .conversation-header {
+      background: #f3f4f6;
+      padding: 15px;
+    }
 
-.modal.active{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+    .conversation-header h4 {
+      margin: 0 0 8px 0;
+    }
 
-.modal-content{
-  background:white;
-  width:min(700px,100%);
-  max-height:90vh;
-  overflow:auto;
-  border-radius:10px;
-  padding:25px;
-}
+    .conversation-body {
+      padding: 15px;
+    }
 
-.modal-header{
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  align-items:center;
-  margin-bottom:20px;
-}
+    .message-original {
+      background: white;
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 6px;
+    }
 
-.close-button{
-  background:#e5e7eb;
-  font-size:20px;
-}
+    .message-reponse {
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
 
-.danger-zone{
-  border:2px solid #fecaca;
-  background:#fff5f5;
-  padding:20px;
-  border-radius:8px;
-}
+    .statut {
+      font-weight: bold;
+    }
 
-.stat-grid-small{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-}
+    .statut-non-lu {
+      color: #dc2626;
+    }
 
-.small-stat{
-  padding:15px;
-  background:#f9fafb;
-  border:1px solid #e5e7eb;
-  border-radius:8px;
-}
+    .statut-lu {
+      color: #2563eb;
+    }
 
-.small-stat strong{
-  display:block;
-  font-size:24px;
-  margin-top:5px;
-}
-</style>
+    .statut-repondu {
+      color: #16a34a;
+    }
+
+    .message {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .succes {
+      color: #16a34a;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .erreur {
+      color: #dc2626;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .form-card {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px;
+      box-sizing: border-box;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .success-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .proposition-en-attente {
+      border-left: 5px solid #f59e0b;
+    }
+
+    .proposition-acceptee {
+      border-left: 5px solid #16a34a;
+    }
+
+    .proposition-refusee {
+      border-left: 5px solid #dc2626;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .badge-attente {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-acceptee {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-refusee {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f3f4f6;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
-<header>
-<h1>Tableau de bord gestionnaire</h1>
 
-<div class="header-actions">
-<button class="nav-button" onclick="afficherSection('dashboard')">Tableau de bord</button>
-<button class="nav-button" onclick="afficherSection('reservations')">Réservations</button>
-<button class="nav-button" onclick="afficherSection('propositions')">Propositions</button>
-<button class="nav-button" onclick="afficherSection('consommables')">Consommables</button>
-<button class="nav-button" onclick="afficherSection('utilisateurs')">Utilisateurs</button>
-<button class="nav-button" onclick="afficherSection('messages')">Messages</button>
-<button class="nav-button" onclick="afficherSection('informations')">Informations</button>
-<button class="nav-button" onclick="afficherSection('profil')">Mon profil</button>
-<button class="nav-button" onclick="retourPage()">← Retour</button>
-<button class="danger" onclick="deconnexion()">Se déconnecter</button>
-</div>
+<header>
+
+  <h1>
+    Tableau de bord gestionnaire
+  </h1>
+
+  <div class="header-actions">
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('dashboard')">
+      Tableau de bord
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('reservations')">
+      Réservations
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('propositions')">
+      Propositions
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('consommables')">
+      Consommables
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('utilisateurs')">
+      Utilisateurs
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="afficherSection('messages')">
+      Messages
+    </button>
+
+    <button
+      class="nav-button"
+      onclick="retourPage()">
+      ← Retour
+    </button>
+
+    <button
+      class="danger"
+      onclick="deconnexion()">
+      Se déconnecter
+    </button>
+
+  </div>
+
 </header>
+
 
 <main>
 
-<!-- DASHBOARD -->
-<section id="dashboard" class="section active">
-<h2>Vue d'ensemble</h2>
-
-<div class="dashboard">
-
-<div class="stat">
-<h3>Réservations en attente</h3>
-<strong id="statAttente">0</strong>
-</div>
-
-<div class="stat">
-<h3>Réservations acceptées</h3>
-<strong id="statAcceptee">0</strong>
-</div>
-
-<div class="stat">
-<h3>Retours à traiter</h3>
-<strong id="statRetour">0</strong>
-</div>
-
-<div class="stat">
-<h3>Consommables disponibles</h3>
-<strong id="statConsommables">0</strong>
-</div>
-
-<div class="stat">
-<h3>Consommables indisponibles</h3>
-<strong id="statIndisponibles">0</strong>
-</div>
-
-<div class="stat">
-<h3>Quantité totale</h3>
-<strong id="statQuantite">0</strong>
-</div>
-
-<div class="stat">
-<h3>Consommables collectés</h3>
-<strong id="statCollectes">0</strong>
-</div>
-
-<div class="stat">
-<h3>Propositions en attente</h3>
-<strong id="statPropositions">0</strong>
-</div>
-
-<div class="stat">
-<h3>Utilisateurs</h3>
-<strong id="statUtilisateurs">0</strong>
-</div>
-
-</div>
-
-<div class="card">
-<h3>Statistiques détaillées des consommables</h3>
-<div id="detailsStatistiques" class="stat-grid-small"></div>
-</div>
-
-<div class="card">
-<h3>Activité</h3>
-<p>
-Depuis cet espace, vous pouvez gérer les consommables,
-les réservations, les propositions, les utilisateurs,
-les messages et communiquer avec tous les utilisateurs.
-</p>
-</div>
-</section>
-
-
-<!-- RESERVATIONS -->
-<section id="reservations" class="section">
-<h2>Toutes les réservations</h2>
-<div id="listeReservations">
-<div class="message">Chargement des réservations...</div>
-</div>
-</section>
-
-
-<!-- PROPOSITIONS -->
-<section id="propositions" class="section">
-<h2>Propositions de consommables</h2>
-
-<div class="info">
-Les utilisateurs peuvent proposer des consommables.
-Vous pouvez accepter ou refuser chaque proposition.
-</div>
-
-<div id="listePropositions">
-<div class="message">Chargement des propositions...</div>
-</div>
-</section>
-
-
-<!-- CONSOMMABLES -->
-<section id="consommables" class="section">
-<h2>Tous les consommables</h2>
-
-<button class="add-button" onclick="afficherFormulaireAjout()">
-+ Ajouter un consommable
-</button>
-
-<div id="formulaireAjout" style="display:none">
-<div class="form-card">
 
-<h3>Ajouter un consommable</h3>
+  <!-- =====================================================
+       TABLEAU DE BORD
+       ===================================================== -->
 
-<div class="info">
-Laboratoire/service :
-<strong id="serviceGestionnaire">Chargement...</strong>
-</div>
+  <section
+    id="dashboard"
+    class="section active">
 
-<form id="formAjoutConsommable">
+    <h2>
+      Vue d'ensemble
+    </h2>
 
-<div class="form-group">
-<label>Nom du consommable</label>
-<input type="text" id="nomConsommable" required>
-</div>
+    <div class="dashboard">
 
-<div class="form-group">
-<label>Catégorie</label>
-<input type="text" id="categorieConsommable" required>
-</div>
+      <div class="stat">
 
-<div class="form-group">
-<label>Description</label>
-<textarea id="descriptionConsommable"></textarea>
-</div>
+        <h3>
+          Réservations en attente
+        </h3>
 
-<div class="form-group">
-<label>État</label>
-<select id="etatConsommable" required>
-<option value="">Sélectionnez l'état</option>
-<option value="Bon état">Bon état</option>
-<option value="État correct">État correct</option>
-<option value="Usé">Usé</option>
-<option value="Endommagé">Endommagé</option>
-</select>
-</div>
+        <strong id="statAttente">
+          0
+        </strong>
 
-<div class="form-group">
-<label>Quantité</label>
-<input type="number" id="quantiteConsommable" min="1" value="1" required>
-</div>
+      </div>
 
-<div class="form-group">
-<label>Photo (URL facultative)</label>
-<input type="url" id="photoConsommable">
-</div>
 
-<div class="actions">
-<button type="submit" class="accept">Ajouter</button>
-<button type="button" class="nav-button" onclick="fermerFormulaireAjout()">Annuler</button>
-</div>
+      <div class="stat">
 
-<div id="messageAjoutConsommable"></div>
+        <h3>
+          Réservations acceptées
+        </h3>
 
-</form>
-</div>
-</div>
+        <strong id="statAcceptee">
+          0
+        </strong>
 
-<div id="listeConsommables">
-<div class="message">Chargement des consommables...</div>
-</div>
-</section>
+      </div>
 
 
-<!-- UTILISATEURS -->
-<section id="utilisateurs" class="section">
-<h2>Utilisateurs</h2>
+      <div class="stat">
 
-<div id="listeUtilisateurs">
-<div class="message">Chargement des utilisateurs...</div>
-</div>
-</section>
+        <h3>
+          Retours à traiter
+        </h3>
 
+        <strong id="statRetour">
+          0
+        </strong>
 
-<!-- MESSAGES -->
-<section id="messages" class="section">
-<h2>Messages reçus</h2>
+      </div>
 
-<div id="listeMessages">
-<div class="message">Chargement des messages...</div>
-</div>
-</section>
 
+      <div class="stat">
 
-<!-- INFORMATIONS -->
-<section id="informations" class="section">
-<h2>Informations destinées à tous les utilisateurs</h2>
+        <h3>
+          Consommables disponibles
+        </h3>
 
-<div class="form-card">
-<h3>Publier une information</h3>
+        <strong id="statConsommables">
+          0
+        </strong>
 
-<div class="info">
-Cette information sera enregistrée dans la table
-<strong>Messages</strong> avec une destination générale.
-</div>
+      </div>
 
-<form id="formInformation">
 
-<div class="form-group">
-<label>Sujet</label>
-<input type="text" id="informationSujet" required>
-</div>
+      <div class="stat">
 
-<div class="form-group">
-<label>Contenu</label>
-<textarea id="informationContenu" required></textarea>
-</div>
+        <h3>
+          Propositions en attente
+        </h3>
 
-<button class="accept" type="submit">
-Publier l'information
-</button>
+        <strong id="statPropositions">
+          0
+        </strong>
 
-<div id="resultatInformation"></div>
+      </div>
 
-</form>
-</div>
 
-<div id="listeInformations">
-<div class="message">Chargement...</div>
-</div>
-</section>
+      <div class="stat">
 
+        <h3>
+          Utilisateurs
+        </h3>
 
-<!-- PROFIL -->
-<section id="profil" class="section">
-<h2>Mon profil</h2>
+        <strong id="statUtilisateurs">
+          0
+        </strong>
 
-<div class="form-card">
+      </div>
 
-<h3>Modifier mes informations</h3>
+    </div>
 
-<form id="formProfil">
 
-<div class="form-group">
-<label>Nom</label>
-<input type="text" id="profilNom" required>
-</div>
+    <div class="card">
 
-<div class="form-group">
-<label>Prénom</label>
-<input type="text" id="profilPrenom" required>
-</div>
+      <h3>
+        Activité
+      </h3>
 
-<div class="form-group">
-<label>Service / laboratoire</label>
-<input type="text" id="profilService">
-</div>
+      <p>
+        Utilisez les boutons ci-dessus pour gérer
+        les réservations, les propositions,
+        les consommables, les utilisateurs
+        et les messages.
+      </p>
 
-<div class="form-group">
-<label>Rôle</label>
-<input type="text" id="profilRole" disabled>
-</div>
+    </div>
 
-<button class="accept" type="submit">
-Enregistrer les modifications
-</button>
+  </section>
 
-<div id="resultatProfil"></div>
 
-</form>
-</div>
 
-<div class="form-card danger-zone">
-<h3>Zone dangereuse</h3>
+  <!-- =====================================================
+       RESERVATIONS
+       ===================================================== -->
 
-<p>
-La suppression du compte est définitive.
-Vos données personnelles pourront être supprimées
-selon les règles définies dans votre base Supabase.
-</p>
+  <section
+    id="reservations"
+    class="section">
 
-<button class="danger" onclick="supprimerMonCompte()">
-Supprimer définitivement mon compte
-</button>
-</div>
-</section>
+    <h2>
+      Toutes les réservations
+    </h2>
+
+    <div id="listeReservations">
+
+      <div class="message">
+        Chargement des réservations...
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       PROPOSITIONS
+       ===================================================== -->
+
+  <section
+    id="propositions"
+    class="section">
+
+    <h2>
+      Propositions de consommables
+    </h2>
+
+    <div class="info">
+
+      Les utilisateurs peuvent proposer
+      des consommables disponibles dans
+      leur laboratoire ou service.
+
+      <br><br>
+
+      Vous pouvez accepter une proposition
+      pour l'ajouter aux consommables disponibles,
+      ou la refuser.
+
+    </div>
+
+
+    <div id="listePropositions">
+
+      <div class="message">
+        Chargement des propositions...
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       CONSOMMABLES
+       ===================================================== -->
+
+  <section
+    id="consommables"
+    class="section">
+
+    <h2>
+      Tous les consommables
+    </h2>
+
+
+    <button
+      class="add-button"
+      onclick="afficherFormulaireAjout()">
+
+      + Ajouter un consommable
+
+    </button>
+
+
+    <div
+      id="formulaireAjout"
+      style="display:none;">
+
+      <div class="form-card">
+
+        <h3>
+          Ajouter directement un consommable
+        </h3>
+
+
+        <div class="info">
+
+          Vous pouvez ajouter un consommable
+          directement, même s'il n'a pas été
+          proposé par un utilisateur.
+
+          <br><br>
+
+          <strong>
+            Laboratoire/service :
+          </strong>
+
+          <span id="serviceGestionnaire">
+            Chargement...
+          </span>
+
+        </div>
+
+
+        <form id="formAjoutConsommable">
+
+
+          <div class="form-group">
+
+            <label for="nomConsommable">
+
+              Nom du consommable
+
+            </label>
+
+            <input
+              type="text"
+              id="nomConsommable"
+              required
+              placeholder="Exemple : Bécher 500 ml">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="categorieConsommable">
+
+              Catégorie
+
+            </label>
+
+            <input
+              type="text"
+              id="categorieConsommable"
+              required
+              placeholder="Exemple : Verrerie">
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="descriptionConsommable">
+
+              Description
+
+            </label>
+
+            <textarea
+              id="descriptionConsommable"
+              placeholder="Description du consommable...">
+            </textarea>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="etatConsommable">
+
+              État
+
+            </label>
+
+            <select
+              id="etatConsommable"
+              required>
+
+              <option value="">
+                Sélectionnez l'état
+              </option>
+
+              <option value="Bon état">
+                Bon état
+              </option>
+
+              <option value="État correct">
+                État correct
+              </option>
+
+              <option value="Usé">
+                Usé
+              </option>
+
+              <option value="Endommagé">
+                Endommagé
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="quantiteConsommable">
+
+              Quantité
+
+            </label>
+
+            <input
+              type="number"
+              id="quantiteConsommable"
+              min="1"
+              value="1"
+              required>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="photoConsommable">
+
+              Photo (URL facultative)
+
+            </label>
+
+            <input
+              type="url"
+              id="photoConsommable"
+              placeholder="https://...">
+
+          </div>
+
+
+          <div class="actions">
+
+            <button
+              type="submit"
+              class="accept">
+
+              Ajouter le consommable
+
+            </button>
+
+
+            <button
+              type="button"
+              class="nav-button"
+              onclick="fermerFormulaireAjout()">
+
+              Annuler
+
+            </button>
+
+          </div>
+
+
+          <div id="messageAjoutConsommable"></div>
+
+
+        </form>
+
+      </div>
+
+    </div>
+
+
+    <div id="listeConsommables">
+
+      <div class="message">
+        Chargement des consommables...
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       UTILISATEURS
+       ===================================================== -->
+
+  <section
+    id="utilisateurs"
+    class="section">
+
+    <h2>
+      Utilisateurs
+    </h2>
+
+    <div id="listeUtilisateurs">
+
+      <div class="message">
+        Chargement des utilisateurs...
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       MESSAGES
+       ===================================================== -->
+
+  <section
+    id="messages"
+    class="section">
+
+    <h2>
+      Messages reçus
+    </h2>
+
+    <div id="listeMessages">
+
+      <div class="message">
+        Chargement des messages...
+      </div>
+
+    </div>
+
+  </section>
+
 
 </main>
-
-
-<!-- MODAL MODIFICATION CONSOMMABLE -->
-<div id="modalConsommable" class="modal">
-
-<div class="modal-content">
-
-<div class="modal-header">
-<h2>Modifier le consommable</h2>
-<button class="close-button" onclick="fermerModalConsommable()">×</button>
-</div>
-
-<form id="formModificationConsommable">
-
-<input type="hidden" id="modificationId">
-
-<div class="form-group">
-<label>Nom du consommable</label>
-<input type="text" id="modificationNom" required>
-</div>
-
-<div class="form-group">
-<label>Catégorie</label>
-<input type="text" id="modificationCategorie" required>
-</div>
-
-<div class="form-group">
-<label>Description</label>
-<textarea id="modificationDescription"></textarea>
-</div>
-
-<div class="form-group">
-<label>Quantité</label>
-<input type="number" id="modificationQuantite" min="0" required>
-</div>
-
-<div class="form-group">
-<label>Laboratoire / service</label>
-<input type="text" id="modificationLaboratoire" required>
-</div>
-
-<div class="form-group">
-<label>Date d'ajout</label>
-<input type="date" id="modificationDateAjout" required>
-</div>
-
-<div class="form-group">
-<label>État</label>
-<select id="modificationEtat" required>
-<option value="Bon état">Bon état</option>
-<option value="État correct">État correct</option>
-<option value="Usé">Usé</option>
-<option value="Endommagé">Endommagé</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Photo</label>
-<input type="url" id="modificationPhoto">
-</div>
-
-<div class="form-group">
-<label>Consommable actif</label>
-<select id="modificationActif">
-<option value="true">Oui</option>
-<option value="false">Non</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Disponible</label>
-<select id="modificationDisponible">
-<option value="true">Oui</option>
-<option value="false">Non</option>
-</select>
-</div>
-
-<div class="actions">
-<button type="submit" class="accept">Enregistrer</button>
-<button type="button" class="nav-button" onclick="fermerModalConsommable()">Annuler</button>
-</div>
-
-<div id="resultatModification"></div>
-
-</form>
-</div>
-</div>
 
 
 <script>
 
+
 /* =========================================================
-SUPABASE
-========================================================= */
+   SUPABASE
+   ========================================================= */
 
 const SUPABASE_URL =
-"https://zqgoeskiwkyelsgzebyl.supabase.co";
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
 
-/*
-IMPORTANT :
-Remplace cette valeur par ta clé publishable/anon Supabase.
-*/
 
 const SUPABASE_KEY =
-"sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
 
 const supabaseClient =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
 
 
 /* =========================================================
-VARIABLES
-========================================================= */
+   VARIABLES
+   ========================================================= */
 
 let profilGestionnaire = null;
 
 
-/* =========================================================
-SECURITE HTML
-========================================================= */
-
-function echapperHTML(texte){
-if(texte===null || texte===undefined) return "";
-return String(texte)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-}
-
 
 /* =========================================================
-DATE
-========================================================= */
+   SECURISATION HTML
+   ========================================================= */
 
-function formaterDate(date){
-if(!date) return "";
-return new Date(date).toLocaleString("fr-FR");
+function echapperHTML(texte) {
+
+  if (
+    texte === null ||
+    texte === undefined
+  ) {
+
+    return "";
+
+  }
+
+  return String(texte)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
 }
 
-function formaterDateInput(date){
-if(!date) return "";
-return String(date).substring(0,10);
-}
-
-
-/* =========================================================
-NAVIGATION
-========================================================= */
-
-function afficherSection(sectionId){
-
-document.querySelectorAll(".section")
-.forEach(section=>{
-section.classList.remove("active");
-});
-
-const section=document.getElementById(sectionId);
-
-if(section){
-section.classList.add("active");
-}
-
-if(sectionId==="dashboard") chargerStatistiques();
-if(sectionId==="reservations") chargerReservations();
-if(sectionId==="propositions") chargerPropositions();
-if(sectionId==="consommables") chargerConsommables();
-if(sectionId==="utilisateurs") chargerUtilisateurs();
-if(sectionId==="messages") chargerMessages();
-if(sectionId==="informations") chargerInformations();
-if(sectionId==="profil") chargerProfilGestionnaire();
-}
-
-function retourPage(){
-window.history.back();
-}
-
-async function deconnexion(){
-await supabaseClient.auth.signOut();
-window.location.href="index.html";
-}
 
 
 /* =========================================================
-PROFIL GESTIONNAIRE
-========================================================= */
+   FORMATAGE DATE
+   ========================================================= */
 
-async function chargerProfilGestionnaire(){
+function formaterDate(date) {
 
-const {data:{user}} =
-await supabaseClient.auth.getUser();
+  if (!date) {
 
-if(!user) return;
+    return "";
 
-const {data:profil,error} =
-await supabaseClient
-.from("Profils")
-.select("id,nom,prenom,role,service,user_id")
-.eq("user_id",user.id)
-.single();
+  }
 
-if(error || !profil){
-console.error(error);
-return;
+  return new Date(date)
+    .toLocaleString(
+      "fr-FR"
+    );
+
 }
 
-profilGestionnaire=profil;
-
-const service=document.getElementById("serviceGestionnaire");
-if(service) service.textContent=profil.service || "Non renseigné";
-
-document.getElementById("profilNom").value=profil.nom || "";
-document.getElementById("profilPrenom").value=profil.prenom || "";
-document.getElementById("profilService").value=profil.service || "";
-document.getElementById("profilRole").value=profil.role || "";
-}
 
 
 /* =========================================================
-MODIFICATION PROFIL
-========================================================= */
+   NAVIGATION
+   ========================================================= */
 
-document.getElementById("formProfil")
-.addEventListener("submit",async event=>{
+function afficherSection(
+  sectionId
+) {
 
-event.preventDefault();
+  document
+    .querySelectorAll(
+      ".section"
+    )
+    .forEach(
+      section => {
 
-const resultat=document.getElementById("resultatProfil");
+        section.classList.remove(
+          "active"
+        );
 
-const nom=document.getElementById("profilNom").value.trim();
-const prenom=document.getElementById("profilPrenom").value.trim();
-const service=document.getElementById("profilService").value.trim();
+      }
+    );
 
-if(!nom || !prenom){
-resultat.className="error-box";
-resultat.textContent="Le nom et le prénom sont obligatoires.";
-return;
+
+  const section =
+    document.getElementById(
+      sectionId
+    );
+
+
+  if (section) {
+
+    section.classList.add(
+      "active"
+    );
+
+  }
+
+
+  if (
+    sectionId ===
+    "reservations"
+  ) {
+
+    chargerReservations();
+
+  }
+
+
+  if (
+    sectionId ===
+    "propositions"
+  ) {
+
+    chargerPropositions();
+
+  }
+
+
+  if (
+    sectionId ===
+    "consommables"
+  ) {
+
+    chargerConsommables();
+
+  }
+
+
+  if (
+    sectionId ===
+    "utilisateurs"
+  ) {
+
+    chargerUtilisateurs();
+
+  }
+
+
+  if (
+    sectionId ===
+    "messages"
+  ) {
+
+    chargerMessages();
+
+  }
+
 }
 
-const {error}=await supabaseClient
-.from("Profils")
-.update({
-nom,
-prenom,
-service:service || null
-})
-.eq("id",profilGestionnaire.id);
-
-if(error){
-console.error(error);
-resultat.className="error-box";
-resultat.textContent="Impossible de modifier le profil : "+error.message;
-return;
-}
-
-profilGestionnaire.nom=nom;
-profilGestionnaire.prenom=prenom;
-profilGestionnaire.service=service;
-
-resultat.className="success-box";
-resultat.textContent="Profil modifié avec succès.";
-
-document.getElementById("serviceGestionnaire").textContent=
-service || "Non renseigné";
-});
 
 
-/* =========================================================
-AJOUT CONSOMMABLE
-========================================================= */
+function retourPage() {
 
-function afficherFormulaireAjout(){
-document.getElementById("formulaireAjout").style.display="block";
-chargerProfilGestionnaire();
-}
+  window.history.back();
 
-function fermerFormulaireAjout(){
-
-document.getElementById("formulaireAjout").style.display="none";
-
-document.getElementById("formAjoutConsommable").reset();
-
-document.getElementById("quantiteConsommable").value="1";
-
-document.getElementById("messageAjoutConsommable").innerHTML="";
 }
 
 
-document.getElementById("formAjoutConsommable")
-.addEventListener("submit",async event=>{
 
-event.preventDefault();
+async function deconnexion() {
 
-const zone=document.getElementById("messageAjoutConsommable");
+  await supabaseClient.auth.signOut();
 
-const nom=document.getElementById("nomConsommable").value.trim();
-const categorie=document.getElementById("categorieConsommable").value.trim();
-const description=document.getElementById("descriptionConsommable").value.trim();
-const etat=document.getElementById("etatConsommable").value;
-const quantite=parseInt(document.getElementById("quantiteConsommable").value,10);
-const photo=document.getElementById("photoConsommable").value.trim();
+  window.location.href =
+    "index.html";
 
-if(!nom || !categorie || !etat || !quantite || quantite<1){
-zone.innerHTML=`<div class="error-box">Veuillez remplir correctement les champs obligatoires.</div>`;
-return;
 }
 
-await chargerProfilGestionnaire();
-
-const laboratoire=profilGestionnaire?.service || "";
-
-const {error}=await supabaseClient
-.from("Consommables")
-.insert({
-"Nom du sortant":nom,
-Categorie:categorie,
-Description:description || null,
-Laboratoire:laboratoire,
-Date_ajout:new Date().toISOString().substring(0,10),
-Etat:etat,
-Quantite:quantite,
-photo:photo || null,
-Actif:true,
-disponible:true
-});
-
-if(error){
-console.error(error);
-zone.innerHTML=`<div class="error-box">
-Impossible d'ajouter le consommable.<br><br>
-${echapperHTML(error.message)}
-</div>`;
-return;
-}
-
-zone.innerHTML=`<div class="success-box">Consommable ajouté avec succès.</div>`;
-
-document.getElementById("formAjoutConsommable").reset();
-document.getElementById("quantiteConsommable").value="1";
-
-await chargerConsommables();
-await chargerStatistiques();
-});
 
 
 /* =========================================================
-CHARGEMENT CONSOMMABLES
-========================================================= */
+   RESERVATIONS
+   ========================================================= */
 
-async function chargerConsommables(){
+async function chargerReservations() {
 
-const zone=document.getElementById("listeConsommables");
+  const zone =
+    document.getElementById(
+      "listeReservations"
+    );
 
-zone.innerHTML=`<div class="message">Chargement des consommables...</div>`;
 
-const {data,error}=await supabaseClient
-.from("Consommables")
-.select("*")
-.order("Date_ajout",{ascending:false});
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Réservations")
+      .select(`
+        id,
+        date_demande,
+        date_debut,
+        date_retour,
+        commentaire,
+        statut,
 
-if(error){
-console.error(error);
-zone.innerHTML=`<div class="error-box">
-Impossible de charger les consommables.<br><br>
-${echapperHTML(error.message)}
-</div>`;
-return;
+        Profils!Réservations_utilisateur_id_fkey (
+          nom,
+          prenom,
+          service
+        ),
+
+        Consommables!Réservations_consommable_id_fkey (
+          "Nom du sortant",
+          Categorie,
+          Laboratoire
+        )
+      `)
+      .order(
+        "date_demande",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Impossible de charger
+        les réservations.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Aucune réservation.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = "";
+
+
+  data.forEach(
+    reservation => {
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "card";
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${
+            echapperHTML(
+              reservation
+                .Consommables
+                ?.["Nom du sortant"]
+              ||
+              "Consommable"
+            )
+          }
+
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Demandeur :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation
+                .Profils
+                ?.prenom
+              || ""
+            )
+          }
+
+          ${
+            echapperHTML(
+              reservation
+                .Profils
+                ?.nom
+              || ""
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Service :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation
+                .Profils
+                ?.service
+              ||
+              "Non renseigné"
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Catégorie :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation
+                .Consommables
+                ?.Categorie
+              ||
+              "Non renseignée"
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Laboratoire :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation
+                .Consommables
+                ?.Laboratoire
+              ||
+              "Non renseigné"
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date de demande :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.date_demande
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date de début :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.date_debut
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date de retour :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.date_retour
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Commentaire :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.commentaire
+              ||
+              "Aucun"
+            )
+          }
+
+        </p>
+
+
+        <p class="statut">
+
+          <strong>
+            Statut :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.statut
+            )
+          }
+
+        </p>
+
+
+        ${
+          reservation.statut ===
+          "en_attente"
+
+          ?
+
+          `
+
+            <div class="actions">
+
+              <button
+                class="accept"
+                onclick="
+                  modifierStatut(
+                    '${reservation.id}',
+                    'acceptee'
+                  )
+                ">
+
+                Accepter
+
+              </button>
+
+
+              <button
+                class="refuse"
+                onclick="
+                  modifierStatut(
+                    '${reservation.id}',
+                    'refusee'
+                  )
+                ">
+
+                Refuser
+
+              </button>
+
+            </div>
+
+          `
+
+          :
+
+          ""
+
+        }
+
+
+        ${
+          reservation.statut ===
+          "retour_signale"
+
+          ?
+
+          `
+
+            <div class="actions">
+
+              <button
+                class="confirm-button"
+                onclick="
+                  confirmerRetour(
+                    '${reservation.id}'
+                  )
+                ">
+
+                Confirmer le retour
+
+              </button>
+
+            </div>
+
+          `
+
+          :
+
+          ""
+
+        }
+
+      `;
+
+
+      zone.appendChild(
+        card
+      );
+
+    }
+  );
+
 }
 
-if(!data || data.length===0){
-zone.innerHTML=`<div class="message">Aucun consommable.</div>`;
-return;
+
+
+async function modifierStatut(
+  reservationId,
+  nouveauStatut
+) {
+
+  let error;
+
+
+  if (
+    nouveauStatut ===
+    "acceptee"
+  ) {
+
+    const resultat =
+      await supabaseClient.rpc(
+        "accepter_reservation",
+        {
+          reservation_id:
+            reservationId
+        }
+      );
+
+    error =
+      resultat.error;
+
+  }
+
+  else {
+
+    const resultat =
+      await supabaseClient
+        .from("Réservations")
+        .update({
+          statut:
+            nouveauStatut
+        })
+        .eq(
+          "id",
+          reservationId
+        );
+
+    error =
+      resultat.error;
+
+  }
+
+
+  if (error) {
+
+    alert(
+      "Impossible de modifier la réservation : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await chargerReservations();
+
+  await chargerStatistiques();
+
 }
 
-zone.innerHTML=`
 
-<div class="table-container">
-<table>
 
-<thead>
-<tr>
-<th>Nom</th>
-<th>Catégorie</th>
-<th>Laboratoire</th>
-<th>Quantité</th>
-<th>État</th>
-<th>Actif</th>
-<th>Disponible</th>
-<th>Actions</th>
-</tr>
-</thead>
+async function confirmerRetour(
+  reservationId
+) {
 
-<tbody>
+  const {
+    error
+  } =
+    await supabaseClient.rpc(
+      "confirmer_retour_reservation",
+      {
+        reservation_id:
+          reservationId
+      }
+    );
 
-${data.map(c=>`
 
-<tr>
+  if (error) {
 
-<td>${echapperHTML(c["Nom du sortant"])}</td>
+    alert(
+      "Impossible de confirmer le retour : " +
+      error.message
+    );
 
-<td>${echapperHTML(c.Categorie)}</td>
+    return;
 
-<td>${echapperHTML(c.Laboratoire)}</td>
+  }
 
-<td>${c.Quantite ?? 0}</td>
 
-<td>${echapperHTML(c.Etat || "Non renseigné")}</td>
+  alert(
+    "Le retour a été confirmé."
+  );
 
-<td>${c.Actif ? "Oui" : "Non"}</td>
 
-<td>
-<span class="badge ${c.disponible ? "badge-disponible":"badge-indisponible"}">
-${c.disponible ? "Disponible":"Indisponible"}
-</span>
-</td>
+  await chargerReservations();
 
-<td>
+  await chargerStatistiques();
 
-<div class="actions">
-
-<button
-class="edit-button"
-onclick='ouvrirModificationConsommable(${JSON.stringify(c).replace(/'/g,"&#039;")})'>
-Modifier
-</button>
-
-<button
-class="${c.disponible ? "refuse":"accept"}"
-onclick="changerDisponibilite('${c.id}',${!!c.disponible})">
-${c.disponible ? "Indisponible":"Disponible"}
-</button>
-
-</div>
-
-</td>
-
-</tr>
-
-`).join("")}
-
-</tbody>
-</table>
-</div>
-`;
 }
+
 
 
 /* =========================================================
-MODIFIER CONSOMMABLE
-========================================================= */
-
-function ouvrirModificationConsommable(c){
-
-document.getElementById("modificationId").value=c.id;
-document.getElementById("modificationNom").value=c["Nom du sortant"] || "";
-document.getElementById("modificationCategorie").value=c.Categorie || "";
-document.getElementById("modificationDescription").value=c.Description || "";
-document.getElementById("modificationQuantite").value=c.Quantite ?? 0;
-document.getElementById("modificationLaboratoire").value=c.Laboratoire || "";
-document.getElementById("modificationDateAjout").value=formaterDateInput(c.Date_ajout);
-document.getElementById("modificationEtat").value=c.Etat || "Bon état";
-document.getElementById("modificationPhoto").value=c.photo || "";
-document.getElementById("modificationActif").value=String(c.Actif !== false);
-document.getElementById("modificationDisponible").value=String(c.disponible !== false);
-
-document.getElementById("resultatModification").innerHTML="";
-
-document.getElementById("modalConsommable").classList.add("active");
-}
-
-function fermerModalConsommable(){
-document.getElementById("modalConsommable").classList.remove("active");
-}
-
-
-document.getElementById("formModificationConsommable")
-.addEventListener("submit",async event=>{
-
-event.preventDefault();
-
-const resultat=document.getElementById("resultatModification");
-
-const id=document.getElementById("modificationId").value;
-
-const quantite=parseInt(
-document.getElementById("modificationQuantite").value,
-10
-);
-
-if(Number.isNaN(quantite) || quantite<0){
-resultat.className="error-box";
-resultat.textContent="La quantité doit être supérieure ou égale à 0.";
-return;
-}
-
-const modifications={
-"Nom du sortant":document.getElementById("modificationNom").value.trim(),
-Categorie:document.getElementById("modificationCategorie").value.trim(),
-Description:document.getElementById("modificationDescription").value.trim() || null,
-Quantite:quantite,
-Laboratoire:document.getElementById("modificationLaboratoire").value.trim(),
-Date_ajout:document.getElementById("modificationDateAjout").value,
-Etat:document.getElementById("modificationEtat").value,
-photo:document.getElementById("modificationPhoto").value.trim() || null,
-Actif:document.getElementById("modificationActif").value==="true",
-disponible:document.getElementById("modificationDisponible").value==="true"
-};
-
-if(
-!modifications["Nom du sortant"] ||
-!modifications.Categorie ||
-!modifications.Laboratoire ||
-!modifications.Date_ajout
-){
-resultat.className="error-box";
-resultat.textContent="Veuillez remplir les champs obligatoires.";
-return;
-}
-
-const {error}=await supabaseClient
-.from("Consommables")
-.update(modifications)
-.eq("id",id);
-
-if(error){
-console.error(error);
-resultat.className="error-box";
-resultat.textContent="Impossible de modifier le consommable : "+error.message;
-return;
-}
-
-resultat.className="success-box";
-resultat.textContent="Consommable modifié avec succès.";
-
-await chargerConsommables();
-await chargerStatistiques();
-
-setTimeout(fermerModalConsommable,700);
-});
-
-
-/* =========================================================
-DISPONIBILITE
-========================================================= */
-
-async function changerDisponibilite(id,actuelle){
-
-const {error}=await supabaseClient
-.from("Consommables")
-.update({disponible:!actuelle})
-.eq("id",id);
-
-if(error){
-alert("Impossible de modifier la disponibilité : "+error.message);
-return;
-}
-
-await chargerConsommables();
-await chargerStatistiques();
-}
-
-
-/* =========================================================
-RESERVATIONS
-========================================================= */
-
-async function chargerReservations(){
-
-const zone=document.getElementById("listeReservations");
-
-const {data,error}=await supabaseClient
-.from("Réservations")
-.select(`
-id,
-date_demande,
-date_debut,
-date_retour,
-commentaire,
-statut,
-utilisateur_id,
-consommable_id
-`)
-.order("date_demande",{ascending:false});
-
-if(error){
-zone.innerHTML=`<div class="error-box">${echapperHTML(error.message)}</div>`;
-return;
-}
-
-if(!data?.length){
-zone.innerHTML=`<div class="message">Aucune réservation.</div>`;
-return;
-}
-
-const utilisateurIds=[...new Set(data.map(r=>r.utilisateur_id).filter(Boolean))];
-const consommableIds=[...new Set(data.map(r=>r.consommable_id).filter(Boolean))];
-
-let profils=[];
-let consommables=[];
-
-if(utilisateurIds.length){
-const r=await supabaseClient
-.from("Profils")
-.select("id,nom,prenom,service")
-.in("id",utilisateurIds);
-profils=r.data || [];
-}
-
-if(consommableIds.length){
-const r=await supabaseClient
-.from("Consommables")
-.select('id,"Nom du sortant",Categorie,Laboratoire')
-.in("id",consommableIds);
-consommables=r.data || [];
-}
-
-const profilMap=Object.fromEntries(profils.map(p=>[p.id,p]));
-const consommableMap=Object.fromEntries(consommables.map(c=>[c.id,c]));
-
-zone.innerHTML="";
-
-data.forEach(r=>{
-
-const p=profilMap[r.utilisateur_id];
-const c=consommableMap[r.consommable_id];
-
-const card=document.createElement("div");
-card.className="card";
-
-card.innerHTML=`
-
-<h3>${echapperHTML(c?.["Nom du sortant"] || "Consommable")}</h3>
-
-<p><strong>Demandeur :</strong>
-${echapperHTML((p?.prenom || "")+" "+(p?.nom || ""))}
-</p>
-
-<p><strong>Service :</strong>
-${echapperHTML(p?.service || "Non renseigné")}
-</p>
-
-<p><strong>Catégorie :</strong>
-${echapperHTML(c?.Categorie || "")}
-</p>
-
-<p><strong>Laboratoire :</strong>
-${echapperHTML(c?.Laboratoire || "")}
-</p>
-
-<p><strong>Date de demande :</strong>
-${echapperHTML(r.date_demande || "")}
-</p>
-
-<p><strong>Date de début :</strong>
-${echapperHTML(r.date_debut || "")}
-</p>
-
-<p><strong>Date de retour :</strong>
-${echapperHTML(r.date_retour || "")}
-</p>
-
-<p><strong>Commentaire :</strong>
-${echapperHTML(r.commentaire || "Aucun")}
-</p>
-
-<p class="statut">
-<strong>Statut :</strong>
-${echapperHTML(r.statut)}
-</p>
-
-${
-r.statut==="en_attente"
-?
-`
-<div class="actions">
-<button class="accept" onclick="modifierStatut('${r.id}','acceptee')">
-Accepter
-</button>
-
-<button class="refuse" onclick="modifierStatut('${r.id}','refusee')">
-Refuser
-</button>
-</div>
-`
-:""
-}
-
-${
-r.statut==="retour_signale"
-?
-`
-<div class="actions">
-<button class="confirm-button" onclick="confirmerRetour('${r.id}')">
-Confirmer le retour
-</button>
-</div>
-`
-:""
-}
+   PROPOSITIONS
+   ========================================================= */
 
-`;
+async function chargerPropositions() {
 
-zone.appendChild(card);
-});
-}
+  const zone =
+    document.getElementById(
+      "listePropositions"
+    );
 
 
-async function modifierStatut(id,statut){
+  zone.innerHTML = `
 
-if(statut==="acceptee"){
+    <div class="message">
 
-const {error}=await supabaseClient.rpc(
-"accepter_reservation",
-{reservation_id:id}
-);
+      Chargement des propositions...
 
-if(error){
-alert("Impossible d'accepter : "+error.message);
-return;
-}
+    </div>
 
-}else{
+  `;
 
-const {error}=await supabaseClient
-.from("Réservations")
-.update({statut})
-.eq("id",id);
 
-if(error){
-alert("Impossible de modifier : "+error.message);
-return;
-}
-}
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "Propositions_consommables"
+      )
+      .select(`
+        id,
+        utilisateur_id,
+        nom_consommable,
+        description,
+        categorie,
+        photo,
+        date_proposition,
+        statut,
+        quantite,
+        Etat
+      `)
+      .order(
+        "date_proposition",
+        {
+          ascending: false
+        }
+      );
 
-await chargerReservations();
-await chargerStatistiques();
-}
 
+  if (error) {
 
-async function confirmerRetour(id){
+    console.error(
+      "Erreur propositions :",
+      error
+    );
 
-const {error}=await supabaseClient.rpc(
-"confirmer_retour_reservation",
-{reservation_id:id}
-);
 
-if(error){
-alert("Impossible de confirmer le retour : "+error.message);
-return;
-}
+    zone.innerHTML = `
 
-alert("Le retour a été confirmé.");
+      <div class="error-box">
 
-await chargerReservations();
-await chargerStatistiques();
-}
+        Impossible de charger
+        les propositions.
 
-
-/* =========================================================
-PROPOSITIONS
-========================================================= */
-
-async function chargerPropositions(){
-
-const zone=document.getElementById("listePropositions");
-
-const {data,error}=await supabaseClient
-.from("Propositions_consommables")
-.select("*")
-.order("date_proposition",{ascending:false});
-
-if(error){
-zone.innerHTML=`<div class="error-box">${echapperHTML(error.message)}</div>`;
-return;
-}
-
-if(!data?.length){
-zone.innerHTML=`<div class="message">Aucune proposition.</div>`;
-return;
-}
-
-const ids=[...new Set(data.map(p=>p.utilisateur_id).filter(Boolean))];
-
-let profils=[];
-
-if(ids.length){
-const r=await supabaseClient
-.from("Profils")
-.select("id,nom,prenom,service")
-.in("id",ids);
-
-profils=r.data || [];
-}
-
-const map=Object.fromEntries(profils.map(p=>[p.id,p]));
-
-zone.innerHTML="";
-
-data.forEach(p=>{
-
-const profil=map[p.utilisateur_id];
-
-let classe="proposition-en-attente";
-let badge="badge-attente";
-let texte="En attente";
-
-if(p.statut==="acceptee"){
-classe="proposition-acceptee";
-badge="badge-acceptee";
-texte="Acceptée";
-}
-
-if(p.statut==="refusee"){
-classe="proposition-refusee";
-badge="badge-refusee";
-texte="Refusée";
-}
-
-const card=document.createElement("div");
-card.className="card "+classe;
-
-card.innerHTML=`
-
-<h3>${echapperHTML(p.nom_consommable)}</h3>
-
-<p>
-<strong>Proposé par :</strong>
-${echapperHTML((profil?.prenom||"")+" "+(profil?.nom||""))}
-</p>
-
-<p>
-<strong>Service :</strong>
-${echapperHTML(profil?.service||"Non renseigné")}
-</p>
-
-<p>
-<strong>Catégorie :</strong>
-${echapperHTML(p.categorie)}
-</p>
-
-<p>
-<strong>État :</strong>
-${echapperHTML(p.Etat||"Non renseigné")}
-</p>
-
-<p>
-<strong>Quantité :</strong>
-${p.quantite ?? 0}
-</p>
-
-<p>
-<strong>Description :</strong>
-${echapperHTML(p.description||"Aucune")}
-</p>
-
-<p>
-<strong>Date :</strong>
-${formaterDate(p.date_proposition)}
-</p>
-
-<p>
-<strong>Statut :</strong>
-<span class="badge ${badge}">${texte}</span>
-</p>
-
-${
-p.statut==="en_attente"
-?
-`
-<div class="actions">
-<button class="accept" onclick="accepterProposition('${p.id}')">
-Accepter
-</button>
-
-<button class="refuse" onclick="refuserProposition('${p.id}')">
-Refuser
-</button>
-</div>
-`
-:""
-}
-
-`;
-
-zone.appendChild(card);
-});
-}
-
-
-async function accepterProposition(id){
-
-if(!confirm("Accepter cette proposition ?")) return;
-
-const {data:p,error}=await supabaseClient
-.from("Propositions_consommables")
-.select("*")
-.eq("id",id)
-.single();
-
-if(error || !p){
-alert("Impossible de récupérer la proposition.");
-return;
-}
-
-const profilResult=await supabaseClient
-.from("Profils")
-.select("service")
-.eq("id",p.utilisateur_id)
-.single();
-
-const laboratoire=profilResult.data?.service || "";
-
-if(!laboratoire){
-alert("Le service du proposant n'est pas renseigné.");
-return;
-}
-
-const insertion=await supabaseClient
-.from("Consommables")
-.insert({
-"Nom du sortant":p.nom_consommable,
-Categorie:p.categorie,
-Description:p.description || null,
-Laboratoire:laboratoire,
-Date_ajout:new Date().toISOString().substring(0,10),
-Etat:p.Etat || "Bon état",
-Quantite:p.quantite,
-photo:p.photo || null,
-Actif:true,
-disponible:true
-})
-.select()
-.single();
-
-if(insertion.error){
-alert("Impossible d'ajouter le consommable : "+insertion.error.message);
-return;
-}
-
-const maj=await supabaseClient
-.from("Propositions_consommables")
-.update({statut:"acceptee"})
-.eq("id",id);
-
-if(maj.error){
-alert("Consommable ajouté mais erreur de statut : "+maj.error.message);
-return;
-}
-
-alert("Proposition acceptée.");
-
-await chargerPropositions();
-await chargerConsommables();
-await chargerStatistiques();
-}
-
-
-async function refuserProposition(id){
-
-if(!confirm("Voulez-vous vraiment refuser cette proposition ?")) return;
-
-const {error}=await supabaseClient
-.from("Propositions_consommables")
-.update({statut:"refusee"})
-.eq("id",id);
-
-if(error){
-alert(error.message);
-return;
-}
-
-await chargerPropositions();
-await chargerStatistiques();
-}
-
-
-/* =========================================================
-UTILISATEURS
-========================================================= */
-
-async function chargerUtilisateurs(){
-
-const zone=document.getElementById("listeUtilisateurs");
-
-const {data,error}=await supabaseClient
-.from("Profils")
-.select("id,nom,prenom,service,role")
-.order("nom",{ascending:true});
+        <br><br>
 
-if(error){
-zone.innerHTML=`<div class="error-box">${echapperHTML(error.message)}</div>`;
-return;
-}
+        ${echapperHTML(
+          error.message
+        )}
 
-if(!data?.length){
-zone.innerHTML=`<div class="message">Aucun utilisateur.</div>`;
-return;
-}
+      </div>
 
-zone.innerHTML=`
+    `;
 
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>Nom</th>
-<th>Prénom</th>
-<th>Service</th>
-<th>Rôle</th>
-</tr>
-</thead>
+    return;
 
-<tbody>
+  }
 
-${data.map(p=>`
 
-<tr>
-<td>${echapperHTML(p.nom)}</td>
-<td>${echapperHTML(p.prenom)}</td>
-<td>${echapperHTML(p.service||"")}</td>
-<td>${echapperHTML(p.role)}</td>
-</tr>
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
-`).join("")}
+    zone.innerHTML = `
 
-</tbody>
-</table>
-</div>
-`;
-}
-
-
-/* =========================================================
-MESSAGES
-========================================================= */
+      <div class="message">
 
-async function chargerMessages(){
+        Aucune proposition
+        de consommable.
 
-const zone=document.getElementById("listeMessages");
+      </div>
 
-const {data:messages,error}=await supabaseClient
-.from("Messages")
-.select("*")
-.order("date_envoi",{ascending:false});
+    `;
 
-if(error){
-zone.innerHTML=`<div class="error-box">${echapperHTML(error.message)}</div>`;
-return;
-}
+    return;
 
-if(!messages?.length){
-zone.innerHTML=`<div class="message">Aucun message reçu.</div>`;
-return;
-}
+  }
 
-const ids=[...new Set(messages.map(m=>m.utilisateur_id).filter(Boolean))];
 
-let profils=[];
-
-if(ids.length){
-const r=await supabaseClient
-.from("Profils")
-.select("id,nom,prenom,service")
-.in("id",ids);
+  /*
+   * Récupération des profils.
+   */
 
-profils=r.data || [];
-}
+  const ids =
+    [
+      ...new Set(
+        data.map(
+          proposition =>
+            proposition.utilisateur_id
+        )
+      )
+    ];
 
-const map=Object.fromEntries(profils.map(p=>[p.id,p]));
 
-zone.innerHTML="";
+  let profils = [];
 
-for(const m of messages){
 
-const profil=map[m.utilisateur_id];
+  if (
+    ids.length > 0
+  ) {
 
-const rep=await supabaseClient
-.from("ReponsesMessages")
-.select("*")
-.eq("message_id",m.id)
-.order("date_reponse",{ascending:true});
+    const resultatProfils =
+      await supabaseClient
+        .from("Profils")
+        .select(`
+          id,
+          nom,
+          prenom,
+          service
+        `)
+        .in(
+          "id",
+          ids
+        );
 
-const reponses=rep.data || [];
 
-const card=document.createElement("div");
-card.className="card";
+    if (
+      !resultatProfils.error
+    ) {
 
-card.innerHTML=`
+      profils =
+        resultatProfils.data || [];
 
-<h3>${echapperHTML(m.sujet)}</h3>
+    }
 
-<p>
-<strong>Utilisateur :</strong>
-${echapperHTML((profil?.prenom||"")+" "+(profil?.nom||""))}
-</p>
+  }
 
-<p>
-<strong>Service :</strong>
-${echapperHTML(profil?.service||"Non renseigné")}
-</p>
 
-<p>${echapperHTML(m.contenu)}</p>
-
-<p>
-<strong>Date :</strong>
-${formaterDate(m.date_envoi)}
-</p>
-
-<p class="statut ${m.repondu?"statut-repondu":"statut-lu"}">
-<strong>Statut :</strong>
-${m.repondu?"Répondu":m.lu?"Lu":"Non lu"}
-</p>
-
-<div class="reply-box">
-
-<h4>Historique</h4>
-
-${
-reponses.length
-?
-reponses.map(r=>`
-<div class="reply-item">
-<strong>Gestionnaire</strong>
-<p>${echapperHTML(r.contenu)}</p>
-<small>${formaterDate(r.date_reponse)}</small>
-</div>
-`).join("")
-:
-"<p>Aucune réponse.</p>"
-}
-
-</div>
-
-<div class="reply-box">
-
-<h4>Répondre</h4>
-
-<textarea id="reponse-${m.id}" placeholder="Votre réponse..."></textarea>
-
-<div class="actions">
-<button class="reply-button" onclick="repondreMessage('${m.id}')">
-Envoyer la réponse
-</button>
-</div>
+  const profilsParId = {};
 
-<div id="resultat-reponse-${m.id}"></div>
 
-</div>
-`;
+  profils.forEach(
+    profil => {
 
-card.addEventListener("click",async()=>{
-if(!m.lu){
-await supabaseClient
-.from("Messages")
-.update({lu:true})
-.eq("id",m.id);
-}
-});
+      profilsParId[
+        profil.id
+      ] =
+        profil;
 
-zone.appendChild(card);
-}
-}
-
+    }
+  );
 
-async function repondreMessage(messageId){
-
-const textarea=document.getElementById(`reponse-${messageId}`);
-const resultat=document.getElementById(`resultat-reponse-${messageId}`);
-
-const contenu=textarea.value.trim();
-
-if(!contenu){
-resultat.className="error-box";
-resultat.textContent="Veuillez écrire une réponse.";
-return;
-}
-
-const {data:userData}=await supabaseClient.auth.getUser();
-const user=userData?.user;
-
-if(!user){
-resultat.className="error-box";
-resultat.textContent="Vous devez être connecté.";
-return;
-}
-
-const {data:profil,error:profilError}=await supabaseClient
-.from("Profils")
-.select("id,role")
-.eq("user_id",user.id)
-.single();
-
-if(profilError || !profil){
-resultat.className="error-box";
-resultat.textContent="Profil introuvable.";
-return;
-}
 
-if(!["gestionnaire","administrateur"].includes(profil.role)){
-resultat.className="error-box";
-resultat.textContent="Accès refusé.";
-return;
-}
+  zone.innerHTML = "";
 
-const {error}=await supabaseClient
-.from("ReponsesMessages")
-.insert({
-message_id:messageId,
-gestionnaire_id:profil.id,
-contenu
-});
 
-if(error){
-resultat.className="error-box";
-resultat.textContent="Erreur : "+error.message;
-return;
-}
+  data.forEach(
+    proposition => {
 
-await supabaseClient
-.from("Messages")
-.update({
-repondu:true,
-lu:true
-})
-.eq("id",messageId);
+      const profil =
+        profilsParId[
+          proposition.utilisateur_id
+        ];
 
-textarea.value="";
 
-resultat.className="success-box";
-resultat.textContent="Réponse envoyée.";
+      let classe =
+        "proposition-en-attente";
 
-await chargerMessages();
-}
 
+      let classeBadge =
+        "badge-attente";
 
-/* =========================================================
-INFORMATIONS POUR TOUS
-========================================================= */
 
-document.getElementById("formInformation")
-.addEventListener("submit",async event=>{
+      let texteStatut =
+        "En attente";
 
-event.preventDefault();
 
-const resultat=document.getElementById("resultatInformation");
+      if (
+        proposition.statut ===
+        "acceptee"
+      ) {
 
-const sujet=document.getElementById("informationSujet").value.trim();
-const contenu=document.getElementById("informationContenu").value.trim();
+        classe =
+          "proposition-acceptee";
 
-if(!sujet || !contenu){
-resultat.className="error-box";
-resultat.textContent="Veuillez remplir tous les champs.";
-return;
-}
+        classeBadge =
+          "badge-acceptee";
 
-const {data:userData}=await supabaseClient.auth.getUser();
+        texteStatut =
+          "Acceptée";
 
-if(!userData?.user){
-resultat.className="error-box";
-resultat.textContent="Vous devez être connecté.";
-return;
-}
+      }
 
-const {error}=await supabaseClient
-.from("Messages")
-.insert({
-utilisateur_id:userData.user.id,
-sujet:"[INFORMATION] "+sujet,
-contenu,
-lu:false,
-repondu:false
-});
 
-if(error){
+      else if (
+        proposition.statut ===
+        "refusee"
+      ) {
 
-/*
-Si ta politique RLS refuse cette insertion,
-il faudra utiliser la fonction SQL fournie plus bas.
-*/
+        classe =
+          "proposition-refusee";
 
-resultat.className="error-box";
-resultat.textContent=
-"Impossible de publier l'information : "+error.message;
+        classeBadge =
+          "badge-refusee";
 
-return;
-}
+        texteStatut =
+          "Refusée";
 
-resultat.className="success-box";
-resultat.textContent="Information publiée.";
+      }
 
-document.getElementById("formInformation").reset();
 
-await chargerInformations();
-});
+      const card =
+        document.createElement(
+          "div"
+        );
 
 
-async function chargerInformations(){
+      card.className =
+        "card " +
+        classe;
 
-const zone=document.getElementById("listeInformations");
 
-const {data,error}=await supabaseClient
-.from("Messages")
-.select("*")
-.like("sujet","[INFORMATION] %")
-.order("date_envoi",{ascending:false});
+      card.innerHTML = `
 
-if(error){
-zone.innerHTML=`<div class="error-box">${echapperHTML(error.message)}</div>`;
-return;
-}
+        <h3>
 
-if(!data?.length){
-zone.innerHTML=`<div class="message">Aucune information publiée.</div>`;
-return;
-}
+          ${
+            echapperHTML(
+              proposition.nom_consommable
+            )
+          }
 
-zone.innerHTML=data.map(m=>`
+        </h3>
 
-<div class="card">
 
-<h3>${echapperHTML(m.sujet)}</h3>
+        <p>
 
-<p>${echapperHTML(m.contenu)}</p>
+          <strong>
+            Proposé par :
+          </strong>
 
-<small>
-Publiée le ${formaterDate(m.date_envoi)}
-</small>
+          ${
+            echapperHTML(
+              profil?.prenom
+              || ""
+            )
+          }
 
-</div>
+          ${
+            echapperHTML(
+              profil?.nom
+              || ""
+            )
+          }
 
-`).join("");
-}
+        </p>
 
 
-/* =========================================================
-STATISTIQUES
-========================================================= */
+        <p>
 
-async function chargerStatistiques(){
+          <strong>
+            Service :
+          </strong>
 
-const reservations=await supabaseClient
-.from("Réservations")
-.select("statut");
+          ${
+            echapperHTML(
+              profil?.service
+              ||
+              "Non renseigné"
+            )
+          }
 
-const r=reservations.data || [];
+        </p>
 
-document.getElementById("statAttente").textContent=
-r.filter(x=>x.statut==="en_attente").length;
 
-document.getElementById("statAcceptee").textContent=
-r.filter(x=>x.statut==="acceptee").length;
+        <p>
 
-document.getElementById("statRetour").textContent=
-r.filter(x=>x.statut==="retour_signale").length;
+          <strong>
+            Catégorie :
+          </strong>
 
+          ${
+            echapperHTML(
+              proposition.categorie
+              || ""
+            )
+          }
 
-const consommablesResult=await supabaseClient
-.from("Consommables")
-.select("id,Quantite,disponible,Actif,Categorie,Etat");
+        </p>
 
-const consommables=consommablesResult.data || [];
 
-const actifs=consommables.filter(c=>c.Actif!==false);
+        <p>
 
-const disponibles=actifs.filter(c=>c.disponible===true);
+          <strong>
+            État :
+          </strong>
 
-const indisponibles=actifs.filter(c=>c.disponible!==true);
+          ${
+            echapperHTML(
+              proposition.Etat
+              ||
+              "Non renseigné"
+            )
+          }
 
-const quantiteTotale=actifs.reduce(
-(total,c)=>total+(Number(c.Quantite)||0),
-0
-);
+        </p>
 
-document.getElementById("statConsommables").textContent=
-disponibles.length;
 
-document.getElementById("statIndisponibles").textContent=
-indisponibles.length;
+        <p>
 
-document.getElementById("statQuantite").textContent=
-quantiteTotale;
+          <strong>
+            Quantité :
+          </strong>
 
+          ${
+            proposition.quantite
+            ??
+            0
+          }
 
-/*
-Emprunts = consommables sortis/collectés.
-*/
+        </p>
 
-const empruntsResult=await supabaseClient
-.from("Emprunts")
-.select("id,statut");
 
-const emprunts=empruntsResult.data || [];
+        ${
+          proposition.description
 
-const collectes=emprunts.filter(e=>
-["en_cours","termine","terminee","retourne","retournee"].includes(
-String(e.statut||"").toLowerCase()
+          ?
+
+          `
+
+            <p>
+
+              <strong>
+                Description :
+              </strong>
+
+              ${
+                echapperHTML(
+                  proposition.description
+                )
+              }
+
+            </p>
+
+          `
+
+          :
+
+          ""
+
+        }
+
+
+        <p>
+
+          <strong>
+            Date de proposition :
+          </strong>
+
+          ${
+            formaterDate(
+              proposition.date_proposition
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Statut :
+          </strong>
+
+          <span
+            class="badge ${classeBadge}">
+
+            ${texteStatut}
+
+          </span>
+
+        </p>
+
+
+        ${
+          proposition.statut ===
+          "en_attente"
+
+          ?
+
+          `
+
+            <div class="actions">
+
+              <button
+                class="accept"
+                onclick="
+                  accepterProposition(
+  '${proposition.id}',
+  '${echapperHTML(profil?.service || "")}'
 )
-);
+                ">
 
-document.getElementById("statCollectes").textContent=
-collectes.length;
+                Accepter
 
-
-const propositions=await supabaseClient
-.from("Propositions_consommables")
-.select("id")
-.eq("statut","en_attente");
-
-document.getElementById("statPropositions").textContent=
-propositions.data?.length || 0;
+              </button>
 
 
-const utilisateurs=await supabaseClient
-.from("Profils")
-.select("id");
+              <button
+                class="refuse"
+                onclick="
+                  refuserProposition(
+                    '${proposition.id}'
+                  )
+                ">
 
-document.getElementById("statUtilisateurs").textContent=
-utilisateurs.data?.length || 0;
+                Refuser
+
+              </button>
+
+            </div>
+
+          `
+
+          :
+
+          ""
+
+        }
+
+      `;
 
 
-/* statistiques par état */
+      zone.appendChild(
+        card
+      );
 
-const parEtat={};
+    }
+  );
 
-actifs.forEach(c=>{
-const etat=c.Etat || "Non renseigné";
-parEtat[etat]=(parEtat[etat]||0)+1;
-});
 
-const details=document.getElementById("detailsStatistiques");
-
-details.innerHTML=`
-
-<div class="small-stat">
-<strong>${disponibles.length}</strong>
-Disponibles
-</div>
-
-<div class="small-stat">
-<strong>${indisponibles.length}</strong>
-Indisponibles
-</div>
-
-<div class="small-stat">
-<strong>${quantiteTotale}</strong>
-Quantité totale
-</div>
-
-<div class="small-stat">
-<strong>${collectes.length}</strong>
-Emprunts / collectes
-</div>
-
-<div class="small-stat">
-<strong>${parEtat["Bon état"]||0}</strong>
-Bon état
-</div>
-
-<div class="small-stat">
-<strong>${parEtat["État correct"]||0}</strong>
-État correct
-</div>
-
-<div class="small-stat">
-<strong>${parEtat["Usé"]||0}</strong>
-Usé
-</div>
-
-<div class="small-stat">
-<strong>${parEtat["Endommagé"]||0}</strong>
-Endommagé
-</div>
-`;
+  await chargerStatistiques();
 
 }
+
+
+
+async function accepterProposition(
+  propositionId,
+  serviceProposant
+) {
+
+  const confirmation =
+    confirm(
+      "Accepter cette proposition et ajouter le consommable ?"
+    );
+
+
+  if (!confirmation) {
+
+    return;
+
+  }
+
+
+  /*
+   * Récupération de la proposition.
+   */
+
+  const {
+    data: proposition,
+    error: erreurProposition
+  } =
+    await supabaseClient
+      .from(
+        "Propositions_consommables"
+      )
+      .select(`
+        id,
+        nom_consommable,
+        description,
+        categorie,
+        photo,
+        date_proposition,
+        statut,
+        quantite,
+        Etat,
+        utilisateur_id
+      `)
+      .eq(
+        "id",
+        propositionId
+      )
+      .single();
+
+
+  if (
+    erreurProposition ||
+    !proposition
+  ) {
+
+    alert(
+      "Impossible de récupérer la proposition : " +
+      (
+        erreurProposition?.message
+        ||
+        ""
+      )
+    );
+
+    return;
+
+  }
+
+
+  if (
+    proposition.statut !==
+    "en_attente"
+  ) {
+
+    alert(
+      "Cette proposition a déjà été traitée."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Vérification du service.
+   */
+
+  const laboratoire =
+    serviceProposant
+    ? serviceProposant.trim()
+    : "";
+
+
+  if (!laboratoire) {
+
+    alert(
+      "Le service du proposant n'est pas renseigné dans son profil."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Ajout du consommable.
+   */
+
+  const {
+    data: nouveauConsommable,
+    error: erreurInsertion
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .insert({
+
+        "Nom du sortant":
+          proposition.nom_consommable,
+
+        Categorie:
+          proposition.categorie,
+
+        Description:
+          proposition.description
+          ||
+          null,
+
+        Laboratoire:
+          laboratoire,
+
+        Etat:
+          proposition.Etat
+          ||
+          null,
+
+        Quantite:
+          proposition.quantite,
+
+        photo:
+          proposition.photo
+          ||
+          null,
+
+        Actif:
+          true,
+
+        disponible:
+          true
+
+      })
+      .select()
+      .single();
+
+
+  if (
+    erreurInsertion
+  ) {
+
+    console.error(
+      "Erreur ajout consommable :",
+      erreurInsertion
+    );
+
+
+    alert(
+      "Impossible d'ajouter le consommable : " +
+      erreurInsertion.message
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Mise à jour de la proposition.
+   */
+
+  const {
+    error: erreurStatut
+  } =
+    await supabaseClient
+      .from(
+        "Propositions_consommables"
+      )
+      .update({
+
+        statut:
+          "acceptee"
+
+      })
+      .eq(
+        "id",
+        propositionId
+      );
+
+
+  if (
+    erreurStatut
+  ) {
+
+    console.error(
+      "Erreur mise à jour proposition :",
+      erreurStatut
+    );
+
+
+    alert(
+      "Le consommable a été ajouté, mais la proposition n'a pas pu être marquée comme acceptée."
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "Proposition acceptée. Le consommable a été ajouté."
+  );
+
+
+  await chargerPropositions();
+
+  await chargerConsommables();
+
+  await chargerStatistiques();
+
+}
+
 
 
 /* =========================================================
-SUPPRESSION COMPTE
-========================================================= */
+   REFUSER UNE PROPOSITION
+   ========================================================= */
 
-async function supprimerMonCompte(){
+async function refuserProposition(
+  propositionId
+) {
 
-const confirmation=confirm(
-"ATTENTION : la suppression du compte est définitive.\n\n"+
-"Voulez-vous vraiment supprimer votre compte ?"
-);
+  const confirmation =
+    confirm(
+      "Voulez-vous vraiment refuser cette proposition ?"
+    );
 
-if(!confirmation) return;
 
-const deuxiemeConfirmation=confirm(
-"Confirmez-vous une seconde fois la suppression définitive de votre compte ?"
-);
+  if (!confirmation) {
 
-if(!deuxiemeConfirmation) return;
+    return;
 
-const {data:userData}=await supabaseClient.auth.getUser();
+  }
 
-const user=userData?.user;
 
-if(!user){
-alert("Utilisateur non connecté.");
-return;
+  const {
+    error
+  } =
+    await supabaseClient
+      .from(
+        "Propositions_consommables"
+      )
+      .update({
+
+        statut:
+          "refusee"
+
+      })
+      .eq(
+        "id",
+        propositionId
+      );
+
+
+  if (error) {
+
+    alert(
+      "Impossible de refuser la proposition : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  alert(
+    "La proposition a été refusée."
+  );
+
+
+  await chargerPropositions();
+
+  await chargerStatistiques();
+
 }
 
-/*
-La suppression Auth doit être faite côté serveur.
-On appelle donc une RPC Supabase nommée supprimer_mon_compte.
-*/
-
-const {error}=await supabaseClient.rpc(
-"supprimer_mon_compte"
-);
-
-if(error){
-
-console.error(error);
-
-alert(
-"Impossible de supprimer le compte.\n\n"+
-error.message+
-"\n\n"+
-"Vérifie que la fonction SQL supprimer_mon_compte a bien été créée."
-);
-
-return;
-}
-
-await supabaseClient.auth.signOut();
-
-alert("Votre compte a été supprimé.");
-
-window.location.href="index.html";
-}
 
 
 /* =========================================================
-VERIFICATION GESTIONNAIRE
-========================================================= */
+   FORMULAIRE AJOUT DIRECT
+   ========================================================= */
 
-async function verifierGestionnaire(){
+function afficherFormulaireAjout() {
 
-const {data:{user}}=
-await supabaseClient.auth.getUser();
+  document.getElementById(
+    "formulaireAjout"
+  ).style.display =
+    "block";
 
-if(!user){
 
-document.body.innerHTML=`
+  chargerProfilGestionnaire();
 
-<main>
-<div class="message">
-
-Vous devez être connecté.
-
-<br><br>
-
-<a href="connexion.html">
-Se connecter
-</a>
-
-</div>
-</main>
-
-`;
-
-return;
 }
 
-const {data:profil,error}=
-await supabaseClient
-.from("Profils")
-.select("id,prenom,nom,role,service,user_id")
-.eq("user_id",user.id)
-.single();
 
-if(
-error ||
-!profil ||
-!["gestionnaire","administrateur"].includes(profil.role)
-){
 
-document.body.innerHTML=`
+function fermerFormulaireAjout() {
 
-<main>
-<div class="message">
+  document.getElementById(
+    "formulaireAjout"
+  ).style.display =
+    "none";
 
-<h2>Accès refusé</h2>
 
-<p>
-Cette page est réservée aux gestionnaires.
-</p>
+  document.getElementById(
+    "formAjoutConsommable"
+  ).reset();
 
-<button onclick="retourPage()">
-← Retour
-</button>
 
-</div>
-</main>
+  document.getElementById(
+    "quantiteConsommable"
+  ).value =
+    "1";
 
-`;
 
-return;
+  document.getElementById(
+    "messageAjoutConsommable"
+  ).innerHTML =
+    "";
+
 }
 
-profilGestionnaire=profil;
 
-document.getElementById("serviceGestionnaire").textContent=
-profil.service || "Non renseigné";
 
-document.getElementById("profilNom").value=
-profil.nom || "";
+async function chargerProfilGestionnaire() {
 
-document.getElementById("profilPrenom").value=
-profil.prenom || "";
+  if (
+    profilGestionnaire
+  ) {
 
-document.getElementById("profilService").value=
-profil.service || "";
+    document.getElementById(
+      "serviceGestionnaire"
+    ).textContent =
+      profilGestionnaire.service
+      ||
+      "Non renseigné";
 
-document.getElementById("profilRole").value=
-profil.role || "";
+    return;
 
-await chargerStatistiques();
+  }
+
+
+  const {
+    data: {
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    return;
+
+  }
+
+
+  const {
+    data: profil,
+    error
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select(`
+        id,
+        prenom,
+        nom,
+        role,
+        service
+      `)
+      .eq(
+        "user_id",
+        user.id
+      )
+      .single();
+
+
+  if (
+    error ||
+    !profil
+  ) {
+
+    console.error(
+      "Erreur profil gestionnaire :",
+      error
+    );
+
+    return;
+
+  }
+
+
+  profilGestionnaire =
+    profil;
+
+
+  document.getElementById(
+    "serviceGestionnaire"
+  ).textContent =
+    profil.service
+    ||
+    "Non renseigné";
+
 }
+
 
 
 /* =========================================================
-DEMARRAGE
-========================================================= */
+   AJOUT DIRECT D'UN CONSOMMABLE
+   ========================================================= */
+
+document
+  .getElementById(
+    "formAjoutConsommable"
+  )
+  .addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const zone =
+        document.getElementById(
+          "messageAjoutConsommable"
+        );
+
+
+      zone.innerHTML =
+        "";
+
+
+      const nom =
+        document
+          .getElementById(
+            "nomConsommable"
+          )
+          .value
+          .trim();
+
+
+      const categorie =
+        document
+          .getElementById(
+            "categorieConsommable"
+          )
+          .value
+          .trim();
+
+
+      const description =
+        document
+          .getElementById(
+            "descriptionConsommable"
+          )
+          .value
+          .trim();
+
+
+      const etat =
+        document
+          .getElementById(
+            "etatConsommable"
+          )
+          .value
+          .trim();
+
+
+      const quantite =
+        parseInt(
+          document
+            .getElementById(
+              "quantiteConsommable"
+            )
+            .value,
+          10
+        );
+
+
+      const photo =
+        document
+          .getElementById(
+            "photoConsommable"
+          )
+          .value
+          .trim();
+
+
+      if (
+        !nom ||
+        !categorie ||
+        !etat ||
+        !quantite ||
+        quantite < 1
+      ) {
+
+        zone.innerHTML = `
+
+          <div class="error-box">
+
+            Veuillez remplir correctement
+            tous les champs obligatoires.
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      await chargerProfilGestionnaire();
+
+
+      const laboratoire =
+        profilGestionnaire?.service
+        ||
+        "";
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("Consommables")
+          .insert({
+
+            "Nom du sortant":
+              nom,
+
+            Categorie:
+              categorie,
+
+            Description:
+              description
+              ||
+              null,
+
+            Laboratoire:
+              laboratoire
+              ||
+              null,
+
+            Etat:
+              etat,
+
+            Quantite:
+              quantite,
+
+            photo:
+              photo
+              ||
+              null,
+
+            Actif:
+              true,
+
+            disponible:
+              true
+
+          });
+
+
+      if (error) {
+
+        console.error(
+          "Erreur ajout consommable :",
+          error
+        );
+
+
+        zone.innerHTML = `
+
+          <div class="error-box">
+
+            Impossible d'ajouter
+            le consommable.
+
+            <br><br>
+
+            ${echapperHTML(
+              error.message
+            )}
+
+          </div>
+
+        `;
+
+        return;
+
+      }
+
+
+      zone.innerHTML = `
+
+        <div class="success-box">
+
+          Le consommable a été ajouté
+          avec succès.
+
+        </div>
+
+      `;
+
+
+      document
+        .getElementById(
+          "formAjoutConsommable"
+        )
+        .reset();
+
+
+      document.getElementById(
+        "quantiteConsommable"
+      ).value =
+        "1";
+
+
+      await chargerConsommables();
+
+      await chargerStatistiques();
+
+    }
+  );
+
+
+
+/* =========================================================
+   CONSOMMABLES
+   ========================================================= */
+
+async function chargerConsommables() {
+
+  const zone =
+    document.getElementById(
+      "listeConsommables"
+    );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .select("*")
+      .order(
+        "Date_ajout",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Impossible de charger
+        les consommables.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Aucun consommable.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = `
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Nom
+            </th>
+
+            <th>
+              Catégorie
+            </th>
+
+            <th>
+              Laboratoire
+            </th>
+
+            <th>
+              Quantité
+            </th>
+
+            <th>
+              État
+            </th>
+
+            <th>
+              Disponible
+            </th>
+
+            <th>
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            data.map(
+              consommable => `
+
+                <tr>
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        consommable[
+                          "Nom du sortant"
+                        ]
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        consommable.Categorie
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        consommable.Laboratoire
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      consommable.Quantite
+                      ??
+                      0
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        consommable.Etat
+                        ||
+                        "Non renseigné"
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      consommable.disponible
+                      ?
+                      "Oui"
+                      :
+                      "Non"
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      class="edit-button"
+                      onclick="
+                        changerDisponibilite(
+                          '${consommable.id}',
+                          ${consommable.disponible}
+                        )
+                      ">
+
+                      ${
+                        consommable.disponible
+                        ?
+                        "Rendre indisponible"
+                        :
+                        "Rendre disponible"
+                      }
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              `
+            ).join("")
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   DISPONIBILITE CONSOMMABLE
+   ========================================================= */
+
+async function changerDisponibilite(
+  consommableId,
+  disponibiliteActuelle
+) {
+
+  const nouvelleDisponibilite =
+    !disponibiliteActuelle;
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .update({
+
+        disponible:
+          nouvelleDisponibilite
+
+      })
+      .eq(
+        "id",
+        consommableId
+      );
+
+
+  if (error) {
+
+    alert(
+      "Impossible de modifier la disponibilité : " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await chargerConsommables();
+
+  await chargerStatistiques();
+
+}
+
+
+
+/* =========================================================
+   UTILISATEURS
+   ========================================================= */
+
+async function chargerUtilisateurs() {
+
+  const zone =
+    document.getElementById(
+      "listeUtilisateurs"
+    );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select(
+        "id, nom, prenom, service, role"
+      )
+      .order(
+        "nom",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Impossible de charger
+        les utilisateurs.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Aucun utilisateur.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = `
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Nom
+            </th>
+
+            <th>
+              Prénom
+            </th>
+
+            <th>
+              Service
+            </th>
+
+            <th>
+              Rôle
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            data.map(
+              profil => `
+
+                <tr>
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        profil.nom
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        profil.prenom
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        profil.service
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ${
+                      echapperHTML(
+                        profil.role
+                        ||
+                        ""
+                      )
+                    }
+
+                  </td>
+
+                </tr>
+
+              `
+            ).join("")
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+async function chargerMessages() {
+
+  const zone =
+    document.getElementById(
+      "listeMessages"
+    );
+
+
+  zone.innerHTML = `
+
+    <div class="message">
+
+      Chargement des messages...
+
+    </div>
+
+  `;
+
+
+  const {
+    data: messages,
+    error: erreurMessages
+  } =
+    await supabaseClient
+      .from("Messages")
+      .select(`
+        id,
+        sujet,
+        contenu,
+        date_envoi,
+        lu,
+        repondu,
+        utilisateur_id
+      `)
+      .order(
+        "date_envoi",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (erreurMessages) {
+
+    console.error(
+      "Erreur chargement messages :",
+      erreurMessages
+    );
+
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Impossible de charger les messages.
+
+        <br><br>
+
+        <small>
+
+          ${echapperHTML(
+            erreurMessages.message
+          )}
+
+        </small>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    !messages ||
+    messages.length === 0
+  ) {
+
+    zone.innerHTML = `
+
+      <div class="message">
+
+        Aucun message reçu.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const idsUtilisateurs =
+    [
+      ...new Set(
+        messages.map(
+          message =>
+            message.utilisateur_id
+        )
+      )
+    ];
+
+
+  let profils = [];
+
+
+  if (
+    idsUtilisateurs.length > 0
+  ) {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(`
+          id,
+          nom,
+          prenom,
+          service
+        `)
+        .in(
+          "id",
+          idsUtilisateurs
+        );
+
+
+    if (error) {
+
+      console.error(
+        "Erreur chargement profils :",
+        error
+      );
+
+    }
+    else {
+
+      profils =
+        data || [];
+
+    }
+
+  }
+
+
+  const profilsParId =
+    {};
+
+
+  profils.forEach(
+    profil => {
+
+      profilsParId[
+        profil.id
+      ] =
+        profil;
+
+    }
+  );
+
+
+  zone.innerHTML = "";
+
+
+  for (
+    const message
+    of messages
+  ) {
+
+    const profil =
+      profilsParId[
+        message.utilisateur_id
+      ];
+
+
+    if (
+      !message.lu
+    ) {
+
+      const {
+        error:
+          erreurLecture
+      } =
+        await supabaseClient
+          .from("Messages")
+          .update({
+            lu:
+              true
+          })
+          .eq(
+            "id",
+            message.id
+          );
+
+
+      if (
+        erreurLecture
+      ) {
+
+        console.error(
+          "Erreur marquage comme lu :",
+          erreurLecture
+        );
+
+      }
+      else {
+
+        message.lu =
+          true;
+
+      }
+
+    }
+
+
+    const {
+      data: reponses,
+      error: erreurReponses
+    } =
+      await supabaseClient
+        .from("ReponsesMessages")
+        .select(`
+          id,
+          message_id,
+          gestionnaire_id,
+          contenu,
+          date_reponse
+        `)
+        .eq(
+          "message_id",
+          message.id
+        )
+        .order(
+          "date_reponse",
+          {
+            ascending: true
+          }
+        );
+
+
+    if (
+      erreurReponses
+    ) {
+
+      console.error(
+        "Erreur chargement réponses :",
+        erreurReponses
+      );
+
+    }
+
+
+    const listeReponses =
+      reponses || [];
+
+
+    let texteStatut =
+      "Non lu";
+
+
+    let classeStatut =
+      "statut-non-lu";
+
+
+    if (
+      message.repondu
+    ) {
+
+      texteStatut =
+        "Répondu";
+
+      classeStatut =
+        "statut-repondu";
+
+    }
+
+    else if (
+      message.lu
+    ) {
+
+      texteStatut =
+        "Lu";
+
+      classeStatut =
+        "statut-lu";
+
+    }
+
+
+    let historiqueHTML =
+      "";
+
+
+    if (
+      listeReponses.length > 0
+    ) {
+
+      historiqueHTML = `
+
+        <div class="reply-box">
+
+          <h4>
+            Historique de la conversation
+          </h4>
+
+          ${
+            listeReponses.map(
+              reponse => `
+
+                <div class="reply-item">
+
+                  <p>
+
+                    <strong>
+                      Gestionnaire
+                    </strong>
+
+                  </p>
+
+                  <p>
+
+                    ${echapperHTML(
+                      reponse.contenu
+                    )}
+
+                  </p>
+
+                  <p>
+
+                    <small>
+
+                      ${formaterDate(
+                        reponse.date_reponse
+                      )}
+
+                    </small>
+
+                  </p>
+
+                </div>
+
+              `
+            ).join("")
+          }
+
+        </div>
+
+      `;
+
+    }
+
+    else {
+
+      historiqueHTML = `
+
+        <div class="reply-box">
+
+          <p>
+
+            <em>
+              Aucune réponse envoyée pour le moment.
+            </em>
+
+          </p>
+
+        </div>
+
+      `;
+
+    }
+
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+
+    card.className =
+      "card";
+
+
+    card.innerHTML = `
+
+      <div class="conversation">
+
+        <div class="conversation-header">
+
+          <h4>
+
+            ${
+              echapperHTML(
+                profil?.prenom
+                ||
+                ""
+              )
+            }
+
+            ${
+              echapperHTML(
+                profil?.nom
+                ||
+                ""
+              )
+            }
+
+          </h4>
+
+
+          <div>
+
+            <strong>
+              Service :
+            </strong>
+
+            ${
+              echapperHTML(
+                profil?.service
+                ||
+                "Non renseigné"
+              )
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="conversation-body">
+
+          <h3>
+
+            ${echapperHTML(
+              message.sujet
+            )}
+
+          </h3>
+
+
+          <div class="message-original">
+
+            <p>
+
+              <strong>
+                Message de l'utilisateur
+              </strong>
+
+            </p>
+
+
+            <p>
+
+              ${echapperHTML(
+                message.contenu
+              )}
+
+            </p>
+
+
+            <p>
+
+              <strong>
+                Date :
+              </strong>
+
+              ${formaterDate(
+                message.date_envoi
+              )}
+
+            </p>
+
+          </div>
+
+
+          <p
+            class="statut ${classeStatut}">
+
+            <strong>
+              Statut :
+            </strong>
+
+            ${texteStatut}
+
+          </p>
+
+
+          ${historiqueHTML}
+
+
+          <div class="reply-box">
+
+            <h4>
+              Répondre à cet utilisateur
+            </h4>
+
+
+            <textarea
+              id="reponse-${message.id}"
+              placeholder="Écrivez votre réponse...">
+            </textarea>
+
+
+            <div class="actions">
+
+              <button
+                class="reply-button"
+                id="bouton-reponse-${message.id}"
+                onclick="
+                  repondreMessage(
+                    '${message.id}'
+                  )
+                ">
+
+                Envoyer la réponse
+
+              </button>
+
+            </div>
+
+
+            <div
+              id="resultat-reponse-${message.id}">
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    zone.appendChild(
+      card
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   REPONSE MESSAGE
+   ========================================================= */
+
+async function repondreMessage(
+  messageId
+) {
+
+  const zoneReponse =
+    document.getElementById(
+      `reponse-${messageId}`
+    );
+
+
+  const bouton =
+    document.getElementById(
+      `bouton-reponse-${messageId}`
+    );
+
+
+  const resultat =
+    document.getElementById(
+      `resultat-reponse-${messageId}`
+    );
+
+
+  if (
+    !zoneReponse
+  ) {
+
+    alert(
+      "Impossible de trouver le champ de réponse."
+    );
+
+    return;
+
+  }
+
+
+  const contenu =
+    zoneReponse.value.trim();
+
+
+  if (!contenu) {
+
+    resultat.className =
+      "erreur";
+
+    resultat.textContent =
+      "Veuillez écrire une réponse.";
+
+    return;
+
+  }
+
+
+  bouton.disabled =
+    true;
+
+
+  bouton.textContent =
+    "Envoi en cours...";
+
+
+  try {
+
+    const {
+      data: {
+        user
+      },
+      error: erreurUtilisateur
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (
+      erreurUtilisateur ||
+      !user
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Vous devez être connecté.";
+
+      return;
+
+    }
+
+
+    const {
+      data: profil,
+      error: erreurProfil
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(
+          "id, role"
+        )
+        .eq(
+          "user_id",
+          user.id
+        )
+        .single();
+
+
+    if (
+      erreurProfil ||
+      !profil
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Impossible de trouver votre profil.";
+
+      return;
+
+    }
+
+
+    if (
+      ![
+        "gestionnaire",
+        "administrateur"
+      ].includes(
+        profil.role
+      )
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Votre profil ne permet pas d'envoyer une réponse.";
+
+      return;
+
+    }
+
+
+    const {
+      data: message,
+      error: erreurMessage
+    } =
+      await supabaseClient
+        .from("Messages")
+        .select(
+          "id, utilisateur_id"
+        )
+        .eq(
+          "id",
+          messageId
+        )
+        .single();
+
+
+    if (
+      erreurMessage ||
+      !message
+    ) {
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Impossible de retrouver ce message.";
+
+      return;
+
+    }
+
+
+    const {
+      data: nouvelleReponse,
+      error: erreurInsertion
+    } =
+      await supabaseClient
+        .from("ReponsesMessages")
+        .insert({
+
+          message_id:
+            messageId,
+
+          gestionnaire_id:
+            profil.id,
+
+          contenu:
+            contenu
+
+        })
+        .select()
+        .single();
+
+
+    if (
+      erreurInsertion
+    ) {
+
+      console.error(
+        "Erreur insertion réponse :",
+        erreurInsertion
+      );
+
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "Impossible d'envoyer la réponse : " +
+        erreurInsertion.message;
+
+      return;
+
+    }
+
+
+    console.log(
+      "Réponse créée :",
+      nouvelleReponse
+    );
+
+
+    const {
+      error: erreurStatut
+    } =
+      await supabaseClient
+        .from("Messages")
+        .update({
+
+          repondu:
+            true,
+
+          lu:
+            true
+
+        })
+        .eq(
+          "id",
+          messageId
+        );
+
+
+    if (
+      erreurStatut
+    ) {
+
+      console.error(
+        "Erreur mise à jour statut :",
+        erreurStatut
+      );
+
+
+      resultat.className =
+        "erreur";
+
+      resultat.textContent =
+        "La réponse a été envoyée, mais le statut n'a pas pu être mis à jour.";
+
+      await chargerMessages();
+
+      return;
+
+    }
+
+
+    zoneReponse.value =
+      "";
+
+
+    resultat.className =
+      "succes";
+
+
+    resultat.textContent =
+      "Réponse envoyée.";
+
+
+    await chargerMessages();
+
+  }
+
+
+  catch (erreur) {
+
+    console.error(
+      "Erreur inattendue :",
+      erreur
+    );
+
+
+    resultat.className =
+      "erreur";
+
+
+    resultat.textContent =
+      "Une erreur est survenue.";
+
+  }
+
+
+  finally {
+
+    bouton.disabled =
+      false;
+
+    bouton.textContent =
+      "Envoyer la réponse";
+
+  }
+
+}
+
+
+
+/* =========================================================
+   STATISTIQUES
+   ========================================================= */
+
+async function chargerStatistiques() {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Réservations")
+      .select(
+        "statut"
+      );
+
+
+  if (
+    !error &&
+    data
+  ) {
+
+    document.getElementById(
+      "statAttente"
+    ).textContent =
+      data.filter(
+        r =>
+          r.statut ===
+          "en_attente"
+      ).length;
+
+
+    document.getElementById(
+      "statAcceptee"
+    ).textContent =
+      data.filter(
+        r =>
+          r.statut ===
+          "acceptee"
+      ).length;
+
+
+    document.getElementById(
+      "statRetour"
+    ).textContent =
+      data.filter(
+        r =>
+          r.statut ===
+          "retour_signale"
+      ).length;
+
+  }
+
+
+  const consommables =
+    await supabaseClient
+      .from("Consommables")
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      )
+      .eq(
+        "Actif",
+        true
+      )
+      .eq(
+        "disponible",
+        true
+      );
+
+
+  document.getElementById(
+    "statConsommables"
+  ).textContent =
+    consommables.count
+    ??
+    0;
+
+
+  const propositions =
+    await supabaseClient
+      .from(
+        "Propositions_consommables"
+      )
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      )
+      .eq(
+        "statut",
+        "en_attente"
+      );
+
+
+  document.getElementById(
+    "statPropositions"
+  ).textContent =
+    propositions.count
+    ??
+    0;
+
+
+  const utilisateurs =
+    await supabaseClient
+      .from("Profils")
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+          head:
+            true
+        }
+      );
+
+
+  document.getElementById(
+    "statUtilisateurs"
+  ).textContent =
+    utilisateurs.count
+    ??
+    0;
+
+}
+
+
+
+/* =========================================================
+   VERIFICATION GESTIONNAIRE
+   ========================================================= */
+
+async function verifierGestionnaire() {
+
+  const {
+    data: {
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (!user) {
+
+    document.body.innerHTML = `
+
+      <main>
+
+        <div class="message">
+
+          Vous devez être connecté
+          pour accéder à cet espace.
+
+          <br><br>
+
+          <a href="connexion.html">
+            Se connecter
+          </a>
+
+        </div>
+
+      </main>
+
+    `;
+
+    return;
+
+  }
+
+
+  const {
+    data: profil,
+    error
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select(
+        "id, prenom, nom, role, service"
+      )
+      .eq(
+        "user_id",
+        user.id
+      )
+      .single();
+
+
+  if (
+    error ||
+    !profil ||
+    ![
+      "gestionnaire",
+      "administrateur"
+    ].includes(
+      profil.role
+    )
+  ) {
+
+    document.body.innerHTML = `
+
+      <main>
+
+        <div class="message">
+
+          Accès refusé.
+
+          <br><br>
+
+          Cette page est réservée
+          aux gestionnaires.
+
+          <br><br>
+
+          <button
+            onclick="retourPage()">
+
+            ← Retour
+
+          </button>
+
+        </div>
+
+      </main>
+
+    `;
+
+    return;
+
+  }
+
+
+  profilGestionnaire =
+    profil;
+
+
+  document.getElementById(
+    "serviceGestionnaire"
+  ).textContent =
+    profil.service
+    ||
+    "Non renseigné";
+
+
+  await chargerStatistiques();
+
+}
+
+
+
+/* =========================================================
+   DEMARRAGE
+   ========================================================= */
 
 verifierGestionnaire();
 
 </script>
 
+
 </body>
+
 </html>
