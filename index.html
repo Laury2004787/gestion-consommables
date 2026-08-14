@@ -402,6 +402,23 @@
         </div>
 
 
+        <!-- NOUVEAU : ÉTAT -->
+
+        <div class="form-group">
+
+          <label for="etatProposition">
+            État du consommable
+          </label>
+
+          <textarea
+            id="etatProposition"
+            required
+            placeholder="Décrivez l'état du consommable : neuf, bon état, usagé, légèrement abîmé, etc."
+          ></textarea>
+
+        </div>
+
+
         <div class="form-group">
 
           <label for="quantiteProposition">
@@ -480,7 +497,7 @@ const SUPABASE_URL =
 
 
 const SUPABASE_KEY =
-  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+  "TA_PUBLISHABLE_KEY";
 
 
 const supabaseClient =
@@ -1114,6 +1131,17 @@ document
           .trim();
 
 
+      /* NOUVEAU : récupération de l'état */
+
+      const etat =
+        document
+          .getElementById(
+            "etatProposition"
+          )
+          .value
+          .trim();
+
+
       const quantite =
         parseInt(
           document
@@ -1137,6 +1165,7 @@ document
       if (
         !nom ||
         !categorie ||
+        !etat ||
         !quantite ||
         quantite < 1
       ) {
@@ -1253,6 +1282,11 @@ document
                 .toISOString()
                 .split("T")[0],
 
+            /* NOUVEAU : état saisi par l'utilisateur */
+
+            Etat:
+              etat,
+
             statut:
               "en_attente"
 
@@ -1316,6 +1350,13 @@ document
       document
         .getElementById(
           "descriptionProposition"
+        )
+        .value = "";
+
+
+      document
+        .getElementById(
+          "etatProposition"
         )
         .value = "";
 
@@ -1389,7 +1430,8 @@ async function chargerMesPropositions() {
         quantite,
         photo,
         date_proposition,
-        statut
+        statut,
+        Etat
       `)
       .eq(
         "utilisateur_id",
@@ -1536,6 +1578,20 @@ async function chargerMesPropositions() {
           ${
             proposition.categorie
             || ""
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            État :
+          </strong>
+
+          ${
+            proposition.Etat
+            || "Non renseigné"
           }
 
         </p>
