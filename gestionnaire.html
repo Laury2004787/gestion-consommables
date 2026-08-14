@@ -2045,31 +2045,25 @@ async function accepterProposition(
   serviceProposant
 ) {
 
-  const confirmation =
-    confirm(
-      "Accepter cette proposition et ajouter le consommable ?"
-    );
-
+  const confirmation = confirm(
+    "Accepter cette proposition et ajouter le consommable ?"
+  );
 
   if (!confirmation) {
-
     return;
-
   }
 
+  try {
 
-  /*
-   * Récupération de la proposition.
-   */
+    /* ================================
+       1. Récupérer la proposition
+       ================================= */
 
-  const {
-    data: proposition,
-    error: erreurProposition
-  } =
-    await supabaseClient
-      .from(
-        "Propositions_consommables"
-      )
+    const {
+      data: proposition,
+      error: erreurProposition
+    } = await supabaseClient
+      .from("Propositions_consommables")
       .select(`
         id,
         nom_consommable,
@@ -2082,76 +2076,67 @@ async function accepterProposition(
         Etat,
         utilisateur_id
       `)
-      .eq(
-        "id",
-        propositionId
-      )
+      .eq("id", propositionId)
       .single();
 
+    if (erreurProposition) {
+      console.error(
+        "Erreur récupération proposition :",
+        erreurProposition
+      );
 
-  if (
-    erreurProposition ||
-    !proposition
-  ) {
+      alert(
+        "Erreur lors de la récupération de la proposition : " +
+        erreurProposition.message
+      );
 
-    alert(
-      "Impossible de récupérer la proposition : " +
-      (
-        erreurProposition?.message
-        ||
-        ""
-      )
-    );
+      return;
+    }
 
-    return;
+    if (!proposition) {
+      alert("Proposition introuvable.");
+      return;
+    }
 
-  }
+    /* ================================
+       2. Vérifier le statut
+       ================================= */
 
+    if (proposition.statut !== "en_attente") {
 
-  if (
-    proposition.statut !==
-    "en_attente"
-  ) {
+      alert(
+        "Cette proposition a déjà été traitée."
+      );
 
-    alert(
-      "Cette proposition a déjà été traitée."
-    );
+      return;
+    }
 
-    return;
+    /* ================================
+       3. Vérifier le laboratoire/service
+       ================================= */
 
-  }
+    const laboratoire =
+      serviceProposant
+        ? serviceProposant.trim()
+        : "";
 
+    if (!laboratoire) {
 
-  /*
-   * Vérification du service.
-   */
+      alert(
+        "Le service du proposant n'est pas renseigné."
+      );
 
-  const laboratoire =
-    serviceProposant
-    ? serviceProposant.trim()
-    : "";
+      return;
+    }
 
+    /* ================================
+       4. Ajouter le consommable
+       ================================= */
 
-  if (!laboratoire) {
-
-    alert(
-      "Le service du proposant n'est pas renseigné dans son profil."
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * Ajout du consommable.
-   */
-
-  const {
-    data: nouveauConsommable,
-    error: erreurInsertion
-  } =
-    await supabaseClient
+    const {
+      data: nouveauConsommable,
+      error: erreurInsertion
+    } = await supabaseClient
       .from("Consommables")
       .insert({
 
@@ -2159,28 +2144,22 @@ async function accepterProposition(
           proposition.nom_consommable,
 
         Categorie:
-          proposition.categorie,
+          proposition.categorie || null,
 
         Description:
-          proposition.description
-          ||
-          null,
+          proposition.description || null,
 
         Laboratoire:
           laboratoire,
 
         Etat:
-          proposition.Etat
-          ||
-          null,
+          proposition.Etat || null,
 
         Quantite:
-          proposition.quantite,
+          proposition.quantite || 1,
 
         photo:
-          proposition.photo
-          ||
-          null,
+          proposition.photo || null,
 
         Actif:
           true,
@@ -2192,82 +2171,85 @@ async function accepterProposition(
       .select()
       .single();
 
+    if (erreurInsertion) {
 
-  if (
-    erreurInsertion
-  ) {
-
-    console.error(
-      "Erreur ajout consommable :",
-      erreurInsertion
-    );
-
-
-    alert(
-      "Impossible d'ajouter le consommable : " +
-      erreurInsertion.message
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * Mise à jour de la proposition.
-   */
-
-  const {
-    error: erreurStatut
-  } =
-    await supabaseClient
-      .from(
-        "Propositions_consommables"
-      )
-      .update({
-
-        statut:
-          "acceptee"
-
-      })
-      .eq(
-        "id",
-        propositionId
+      console.error(
+        "ERREUR INSERTION CONSOMMABLE :",
+        erreurInsertion
       );
 
+      alert(
+        "Impossible d'ajouter le consommable.\n\n" +
+        erreurInsertion.message
+      );
 
-  if (
-    erreurStatut
-  ) {
+      return;
+    }
 
-    console.error(
-      "Erreur mise à jour proposition :",
-      erreurStatut
+    console.log(
+      "Consommable ajouté :",
+      nouveauConsommable
     );
 
+    /* ================================
+       5. Marquer la proposition acceptée
+       ================================= */
+
+    const {
+      error: erreurStatut
+    } = await supabaseClient
+      .from("Propositions_consommables")
+      .update({
+        statut: "acceptee"
+      })
+      .eq("id", propositionId);
+
+    if (erreurStatut) {
+
+      console.error(
+        "ERREUR MISE À JOUR PROPOSITION :",
+        erreurStatut
+      );
+
+      alert(
+        "Le consommable a été ajouté, " +
+        "mais la proposition n'a pas pu être marquée comme acceptée.\n\n" +
+        erreurStatut.message
+      );
+
+      return;
+    }
+
+    /* ================================
+       6. Succès
+       ================================= */
 
     alert(
-      "Le consommable a été ajouté, mais la proposition n'a pas pu être marquée comme acceptée."
+      "Proposition acceptée.\n\n" +
+      "Le consommable a été ajouté avec succès."
     );
 
-    return;
+    await chargerPropositions();
+    await chargerConsommables();
+    await chargerStatistiques();
 
   }
 
+  catch (erreur) {
 
-  alert(
-    "Proposition acceptée. Le consommable a été ajouté."
-  );
+    console.error(
+      "ERREUR INATTENDUE accepterProposition :",
+      erreur
+    );
 
+    alert(
+      "Une erreur inattendue est survenue :\n\n" +
+      erreur.message
+    );
 
-  await chargerPropositions();
-
-  await chargerConsommables();
-
-  await chargerStatistiques();
+  }
 
 }
-
 
 
 /* =========================================================
