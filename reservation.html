@@ -231,11 +231,29 @@ async function chargerConsommable() {
   }
 
 
+  if (data.Quantite <= 0) {
+
   info.innerHTML = `
     <strong>${data["Nom du sortant"]}</strong><br>
     Catégorie : ${data.Categorie}<br>
-    Quantité disponible : ${data.Quantite}
+    Quantité disponible : 0<br><br>
+
+    <strong>
+      Ce consommable n'est plus disponible à la réservation.
+    </strong>
   `;
+
+  form.style.display = "none";
+
+  return;
+}
+
+
+info.innerHTML = `
+  <strong>${data["Nom du sortant"]}</strong><br>
+  Catégorie : ${data.Categorie}<br>
+  Quantité disponible : ${data.Quantite}
+`;
 }
 
 
@@ -295,7 +313,47 @@ async function envoyerReservation(event) {
 
     return;
   }
+const { data: consommable, error: erreurConsommable } =
+  await supabaseClient
+    .from("Consommables")
+    .select("Quantite")
+    .eq("id", consommableId)
+    .single();
 
+
+if (
+  erreurConsommable ||
+  !consommable
+) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Impossible de vérifier la disponibilité du consommable.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
+
+
+if (
+  consommable.Quantite <= 0
+) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Ce consommable n'est plus disponible. Sa quantité est actuellement de 0.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
 
   const { error } =
     await supabaseClient
