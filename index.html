@@ -258,7 +258,6 @@
     Gestion des consommables
   </h1>
 
-
   <div id="zone-utilisateur">
 
     <a href="connexion.html">
@@ -272,6 +271,45 @@
     <a href="mes-reservations.html">
       Mes réservations
     </a>
+
+    <button
+      id="bouton-notifications"
+      type="button"
+      onclick="ouvrirNotifications()"
+      style="
+        position:relative;
+        border:none;
+        background:none;
+        cursor:pointer;
+        font-size:24px;
+        margin-left:10px;
+      "
+      title="Notifications"
+    >
+      🔔
+
+      <span
+        id="badge-notifications"
+        style="
+          display:none;
+          position:absolute;
+          top:-5px;
+          right:-5px;
+          background:red;
+          color:white;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          font-size:11px;
+          line-height:18px;
+          text-align:center;
+          font-weight:bold;
+        "
+      >
+        0
+      </span>
+
+    </button>
 
   </div>
 
