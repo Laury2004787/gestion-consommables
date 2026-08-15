@@ -1835,7 +1835,46 @@ async function chargerMesPropositions() {
   );
 
 }
+/* =========================================================
+   PHOTO INFORMATION EN GRAND
+   ========================================================= */
 
+function afficherPhotoInformationGrande(url) {
+
+  const fond =
+    document.createElement("div");
+
+  fond.style.position = "fixed";
+  fond.style.top = "0";
+  fond.style.left = "0";
+  fond.style.width = "100%";
+  fond.style.height = "100%";
+  fond.style.background = "rgba(0,0,0,0.85)";
+  fond.style.display = "flex";
+  fond.style.alignItems = "center";
+  fond.style.justifyContent = "center";
+  fond.style.zIndex = "9999";
+  fond.style.cursor = "pointer";
+
+  const image =
+    document.createElement("img");
+
+  image.src = url;
+  image.alt = "Image de l'information";
+
+  image.style.maxWidth = "90%";
+  image.style.maxHeight = "90%";
+  image.style.objectFit = "contain";
+
+  fond.appendChild(image);
+
+  fond.onclick =
+    function() {
+      fond.remove();
+    };
+
+  document.body.appendChild(fond);
+}
 /* =========================================================
    CHARGEMENT DES INFORMATIONS
    ========================================================= */
@@ -1900,21 +1939,66 @@ async function chargerInformations() {
     card.className =
       "card";
 
-    card.innerHTML = `
+    let imageHTML = "";
 
-      <div class="card-content">
+if (information.image) {
 
-        <h3>
-          ${information.titre || ""}
-        </h3>
+  imageHTML = `
 
-        <p>
-          ${information.contenu || ""}
-        </p>
+    <div style="margin-top:15px;">
 
-      </div>
+      <img
+        src="${information.image}"
+        alt="Image de l'information"
+        style="
+          max-width:100%;
+          max-height:300px;
+          border-radius:8px;
+          cursor:pointer;
+          object-fit:contain;
+        "
+        onclick="afficherPhotoInformationGrande('${information.image}')"
+      >
 
-    `;
+      <br>
+
+      <a
+        href="${information.image}"
+        download
+        target="_blank"
+        style="
+          display:inline-block;
+          margin-top:10px;
+          color:#2563eb;
+        "
+      >
+        📥 Télécharger l'image
+      </a>
+
+    </div>
+
+  `;
+
+}
+
+
+card.innerHTML = `
+
+  <div class="card-content">
+
+    <h3>
+      ${information.titre || ""}
+    </h3>
+
+    <p>
+      ${information.contenu || ""}
+    </p>
+
+    ${imageHTML}
+
+  </div>
+
+`;
 
     zone.appendChild(card);
 
