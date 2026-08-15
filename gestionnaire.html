@@ -1030,6 +1030,24 @@
       id="fichierExcel"
       accept=".xlsx,.xls"
     >
+    <div class="form-group">
+
+  <label for="photosExcel">
+    Photos des consommables
+  </label>
+
+  <input
+    type="file"
+    id="photosExcel"
+    accept="image/*"
+    multiple>
+
+  <small>
+    Sélectionnez les photos correspondant aux noms
+    indiqués dans la colonne « Photo » du fichier Excel.
+  </small>
+
+</div>
 
     <small>
       Sélectionnez votre fichier Excel depuis
@@ -3415,6 +3433,9 @@ async function chargerConsommables() {
 
             <th>
               Quantité
+            </th>
+            <th>
+            Photo
             </th>
 
             <th>
@@ -6129,6 +6150,7 @@ document
 
 verifierGestionnaire();
   let consommablesExcel = [];
+  let photosExcel = {};
 async function lireFichierExcel() {
 
   const input = document.getElementById("fichierExcel");
@@ -6170,6 +6192,23 @@ async function lireFichierExcel() {
       }
     );
 consommablesExcel = lignes;
+    photosExcel = {};
+
+const fichiersPhotos =
+  document.getElementById(
+    "photosExcel"
+  ).files;
+
+
+for (
+  const fichier of fichiersPhotos
+) {
+
+  photosExcel[
+    fichier.name.toLowerCase()
+  ] = fichier;
+
+}
     if (!lignes || lignes.length === 0) {
 
       message.innerHTML = `
@@ -6226,7 +6265,41 @@ consommablesExcel = lignes;
 
 
     lignes.forEach(function(ligne) {
+const nomPhoto =
+  String(
+    ligne["Photo"] || ""
+  ).trim().toLowerCase();
 
+const fichierPhoto =
+  nomPhoto
+    ? photosExcel[nomPhoto]
+    : null;
+
+let photoApercu = "";
+
+if (fichierPhoto) {
+
+  const urlPhoto =
+    URL.createObjectURL(
+      fichierPhoto
+    );
+
+  photoApercu = `
+
+    <img
+      src="${urlPhoto}"
+      alt="Photo"
+      style="
+        width:80px;
+        height:80px;
+        object-fit:cover;
+        border-radius:8px;
+      "
+    >
+
+  `;
+
+}
       html += `
         <tr>
 
@@ -6509,7 +6582,8 @@ consommablesExcel = lignes;
       "Laboratoire": "Chimie",
       "Description": "Bécher en verre",
       "État": "Bon état",
-      "Quantité": 20
+      "Quantité": 20,
+      "Photo": "becher500.jpg"
     },
 
     {
@@ -6518,7 +6592,8 @@ consommablesExcel = lignes;
       "Laboratoire": "Biologie",
       "Description": "Tube standard",
       "État": "Neuf",
-      "Quantité": 50
+      "Quantité": 50,
+      "Photo": "tube.jpg"
     }
 
   ];
@@ -6547,7 +6622,7 @@ consommablesExcel = lignes;
   );
 
 }
-</script>
+
 function afficherApercuExcel(
   lignes
 ) {
@@ -6640,7 +6715,15 @@ function afficherApercuExcel(
             >
               Quantité
             </th>
-
+<th
+  style="
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:left;
+  "
+>
+  Photo
+</th>
           </tr>
 
         </thead>
@@ -6702,15 +6785,54 @@ function afficherApercuExcel(
           </td>
 
           <td
-            style="
-              padding:10px;
-              border:1px solid #ddd;
-            "
-          >
-            ${ligne["Quantité"] || ""}
-          </td>
+  style="
+    padding:10px;
+    border:1px solid #ddd;
+  "
+>
+  ${ligne["Quantité"] || ""}
+</td>
 
-        </tr>
+<td
+  style="
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center;
+  "
+>
+  ${
+    ligne["Photo"]
+      ? (
+          photosExcel[
+            String(
+              ligne["Photo"]
+            ).trim().toLowerCase()
+          ]
+            ? `
+              <img
+                src="${URL.createObjectURL(
+                  photosExcel[
+                    String(
+                      ligne["Photo"]
+                    ).trim().toLowerCase()
+                  ]
+                )}"
+                alt="Photo"
+                style="
+                  width:80px;
+                  height:80px;
+                  object-fit:cover;
+                  border-radius:8px;
+                "
+              >
+            `
+            : "⚠️ Photo non trouvée"
+        )
+      : "Aucune photo"
+  }
+</td>
+
+</tr>
 
       `;
 
@@ -6733,7 +6855,8 @@ function afficherApercuExcel(
     html;
 
 }
-
+</script>
+  
 </body>
 
 </html>
