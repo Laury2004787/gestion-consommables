@@ -1050,7 +1050,14 @@
 
     </button>
 
+<button
+  type="button"
+  class="accept"
+  onclick="importerConsommablesExcel()">
 
+  ✅ Importer les consommables
+
+</button>
     <button
       type="button"
       class="nav-button"
@@ -6121,6 +6128,7 @@ document
    ========================================================= */
 
 verifierGestionnaire();
+  let consommablesExcel = [];
 async function lireFichierExcel() {
 
   const input = document.getElementById("fichierExcel");
@@ -6161,7 +6169,7 @@ async function lireFichierExcel() {
         defval: ""
       }
     );
-
+consommablesExcel = lignes;
     if (!lignes || lignes.length === 0) {
 
       message.innerHTML = `
@@ -6286,6 +6294,226 @@ async function lireFichierExcel() {
         ${erreur.message}
       </div>
     `;
+
+  }
+
+}
+  async function importerConsommablesExcel() {
+
+  const message =
+    document.getElementById("messageExcel");
+
+  if (
+    !consommablesExcel ||
+    consommablesExcel.length === 0
+  ) {
+
+    message.innerHTML = `
+      <div class="error">
+        Veuillez d'abord sélectionner
+        et lire un fichier Excel.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const {
+    profil
+  } =
+    await obtenirUtilisateurEtProfil();
+
+
+  if (!profil) {
+
+    message.innerHTML = `
+      <div class="error">
+        Impossible de récupérer votre profil.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const consommables =
+    consommablesExcel.map(
+      function(ligne) {
+
+        return {
+
+          "Nom du sortant":
+            String(
+              ligne["Nom du sortant"] || ""
+            ).trim(),
+
+          Categorie:
+            String(
+              ligne["Catégorie"] || ""
+            ).trim(),
+
+          Laboratoire:
+            String(
+              ligne["Laboratoire"] || ""
+            ).trim(),
+
+          Description:
+            String(
+              ligne["Description"] || ""
+            ).trim() || null,
+
+          Etat:
+            String(
+              ligne["État"] || ""
+            ).trim(),
+
+          Quantite:
+            parseInt(
+              ligne["Quantité"],
+              10
+            ),
+
+          Date_ajout:
+            new Date()
+              .toISOString()
+              .split("T")[0],
+
+          Actif:
+            true,
+
+          disponible:
+            true,
+
+          photo:
+            null
+
+        };
+
+      }
+    );
+
+
+  /* Vérification des lignes */
+
+  const lignesInvalides =
+    consommables.filter(
+      function(consommable) {
+
+        return (
+          !consommable["Nom du sortant"] ||
+          !consommable.Categorie ||
+          !consommable.Laboratoire ||
+          !consommable.Etat ||
+          !Number.isInteger(
+            consommable.Quantite
+          ) ||
+          consommable.Quantite < 1
+        );
+
+      }
+    );
+
+
+  if (
+    lignesInvalides.length > 0
+  ) {
+
+    message.innerHTML = `
+      <div class="error">
+
+        ${lignesInvalides.length}
+        ligne(s) sont incorrectes.
+
+        <br><br>
+
+        Vérifiez le nom, la catégorie,
+        le laboratoire, l'état et la quantité.
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  message.innerHTML = `
+    <div class="info">
+      Importation en cours...
+    </div>
+  `;
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .insert(
+        consommables
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur import Excel :",
+      error
+    );
+
+    message.innerHTML = `
+      <div class="error">
+
+        Impossible d'importer
+        les consommables.
+
+        <br><br>
+
+        ${echapperHTML(
+          error.message
+        )}
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  message.innerHTML = `
+    <div class="success">
+
+      ✅
+      ${consommables.length}
+      consommable(s) importé(s) avec succès.
+
+    </div>
+  `;
+
+
+  /* Nettoyage */
+
+  consommablesExcel = [];
+
+
+  document.getElementById(
+    "fichierExcel"
+  ).value = "";
+
+
+  document.getElementById(
+    "apercuExcel"
+  ).innerHTML = "";
+
+
+  /* Recharge la liste */
+
+  if (
+    typeof chargerConsommables ===
+    "function"
+  ) {
+
+    await chargerConsommables();
 
   }
 
