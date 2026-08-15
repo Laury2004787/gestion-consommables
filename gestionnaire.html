@@ -4725,27 +4725,22 @@ async function chargerMessages() {
    REPONSE MESSAGE
    ========================================================= */
 
-async function repondreMessage(
-  messageId
-) {
+async function repondreMessage(messageId) {
 
   const zoneReponse =
     document.getElementById(
       `reponse-${messageId}`
     );
 
-
   const bouton =
     document.getElementById(
       `bouton-reponse-${messageId}`
     );
 
-
   const resultat =
     document.getElementById(
       `resultat-reponse-${messageId}`
     );
-
 
   const contenu =
     zoneReponse?.value.trim();
@@ -4764,8 +4759,7 @@ async function repondreMessage(
   }
 
 
-  bouton.disabled =
-    true;
+  bouton.disabled = true;
 
 
   try {
@@ -4801,9 +4795,7 @@ async function repondreMessage(
     } =
       await supabaseClient
         .from("Profils")
-        .select(
-          "id, role"
-        )
+        .select("id, role")
         .eq(
           "user_id",
           user.id
@@ -4845,7 +4837,6 @@ async function repondreMessage(
 
     /*
      * Récupérer le message original
-     * et son propriétaire
      */
 
     const {
@@ -4856,7 +4847,8 @@ async function repondreMessage(
         .from("Messages")
         .select(`
           id,
-          utilisateur_id
+          utilisateur_id,
+          sujet
         `)
         .eq(
           "id",
@@ -4919,104 +4911,7 @@ async function repondreMessage(
 
     }
 
-/* =========================================================
-   NOTIFICATION DE L'UTILISATEUR
-   ========================================================= */
 
-const {
-  data: messageOriginal,
-  error: erreurMessage
-} =
-  await supabaseClient
-    .from("Messages")
-    .select(`
-      utilisateur_id,
-      sujet
-    `)
-    .eq("id", messageId)
-    .single();
-
-
-if (erreurMessage || !messageOriginal) {
-
-  console.error(
-    "Impossible de récupérer l'utilisateur du message :",
-    erreurMessage
-  );
-
-}
-else {
-
-  const {
-    data: utilisateur,
-    error: erreurUtilisateur
-  } =
-    await supabaseClient
-      .from("Profils")
-      .select("user_id")
-      .eq(
-        "id",
-        messageOriginal.utilisateur_id
-      )
-      .single();
-
-
-  if (
-    erreurUtilisateur ||
-    !utilisateur
-  ) {
-
-    console.error(
-      "Impossible de trouver l'utilisateur :",
-      erreurUtilisateur
-    );
-
-  }
-  else {
-
-    const {
-      error: erreurNotification
-    } =
-      await supabaseClient
-        .from("Notifications")
-        .insert({
-
-          user_id:
-            utilisateur.user_id,
-
-          titre:
-            "Réponse du gestionnaire",
-
-          message:
-            `Le gestionnaire a répondu à votre message "${messageOriginal.sujet}".\n\n${contenu}`,
-
-          type:
-            "message",
-
-          lu:
-            false,
-
-          date_creation:
-            new Date().toISOString(),
-
-          lien:
-            "messages"
-
-        });
-
-
-    if (erreurNotification) {
-
-      console.error(
-        "Erreur notification utilisateur :",
-        erreurNotification
-      );
-
-    }
-
-  }
-
-}
     /*
      * Marquer le message comme répondu
      */
@@ -5049,59 +4944,85 @@ else {
 
 
     /*
-     * Créer la notification chez l'utilisateur
+     * Récupérer le compte utilisateur
      */
 
     const {
-      error: erreurNotification
+      data: utilisateur,
+      error: erreurUtilisateur
     } =
       await supabaseClient
-        .from("Notifications")
-        .insert({
-
-          user_id:
-            utilisateurId,
-
-          titre:
-            "Réponse du gestionnaire",
-
-          message:
-            contenu,
-
-          type:
-            "message",
-
-          lu:
-            false,
-
-          date_creation:
-            new Date().toISOString(),
-
-          lien:
-            "messages"
-
-        });
+        .from("Profils")
+        .select("user_id")
+        .eq(
+          "id",
+          utilisateurId
+        )
+        .single();
 
 
-    if (erreurNotification) {
+    if (
+      erreurUtilisateur ||
+      !utilisateur
+    ) {
 
       console.error(
-        "Erreur notification :",
-        erreurNotification
+        "Impossible de trouver le compte utilisateur :",
+        erreurUtilisateur
       );
 
+    }
+    else {
+
       /*
-       * La réponse a bien été envoyée.
-       * On ne bloque donc pas la réponse
-       * uniquement parce que la notification
-       * a échoué.
+       * Notification de l'utilisateur
        */
+
+      const {
+        error: erreurNotification
+      } =
+        await supabaseClient
+          .from("Notifications")
+          .insert({
+
+            user_id:
+              utilisateur.user_id,
+
+            titre:
+              "Réponse du gestionnaire",
+
+            message:
+              `Le gestionnaire a répondu à votre message "${messageOriginal.sujet}".\n\n${contenu}`,
+
+            type:
+              "message",
+
+            lu:
+              false,
+
+            date_creation:
+              new Date().toISOString(),
+
+            lien:
+              "messages"
+
+          });
+
+
+      if (erreurNotification) {
+
+        console.error(
+          "Erreur notification utilisateur :",
+          erreurNotification
+        );
+
+      }
 
     }
 
 
     /*
-     * Message de confirmation
+     * Confirmation
      */
 
     resultat.className =
@@ -5111,8 +5032,7 @@ else {
       "Réponse envoyée et notification transmise à l'utilisateur.";
 
 
-    zoneReponse.value =
-      "";
+    zoneReponse.value = "";
 
 
     await chargerMessages();
@@ -5120,6 +5040,11 @@ else {
   }
 
   catch (erreur) {
+
+    console.error(
+      "Erreur réponse message :",
+      erreur
+    );
 
     resultat.className =
       "error-box";
@@ -5137,7 +5062,6 @@ else {
   }
 
 }
-
 
 /* =========================================================
    INFORMATIONS
