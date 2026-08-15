@@ -1,1 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Information</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 25px;
+    }
+
+    .contenu {
+      line-height: 1.7;
+      white-space: pre-wrap;
+      font-size: 17px;
+    }
+
+    .image-information {
+      display: block;
+      max-width: 100%;
+      max-height: 600px;
+      margin: 30px auto 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      object-fit: contain;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    button,
+    .download {
+      padding: 11px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .download {
+      background: #2563eb;
+      color: white;
+      display: inline-block;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 25px;
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .message {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .modal-photo {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      cursor: pointer;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-photo img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+  <div id="information">
+
+    <div class="message">
+      Chargement de l'information...
+    </div>
+
+  </div>
+
+  <a
+    href="index.html"
+    class="back"
+  >
+    ← Retour aux informations
+  </a>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://zqgoeskiwkyelsgzebyl.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_6JPYka0ENCs3GFPgBlPZgQ_bN9chpvP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+
+const informationId =
+  params.get("id");
+
+
+const zone =
+  document.getElementById(
+    "information"
+  );
+
+
+function afficherPhotoInformationGrande(url) {
+
+  const fond =
+    document.createElement("div");
+
+  fond.className =
+    "modal-photo";
+
+  const image =
+    document.createElement("img");
+
+  image.src =
+    url;
+
+  image.alt =
+    "Image de l'information";
+
+  fond.appendChild(
+    image
+  );
+
+  fond.onclick =
+    function() {
+      fond.remove();
+    };
+
+  document.body.appendChild(
+    fond
+  );
+
+}
+
+
+async function telechargerFichierInformation(url) {
+
+  try {
+
+    const reponse =
+      await fetch(url);
+
+    if (!reponse.ok) {
+
+      throw new Error(
+        "Impossible de récupérer le fichier."
+      );
+
+    }
+
+    const blob =
+      await reponse.blob();
+
+    const nomFichier =
+      url
+        .split("/")
+        .pop()
+        .split("?")[0]
+      || "fichier";
+
+    const urlBlob =
+      URL.createObjectURL(
+        blob
+      );
+
+    const lien =
+      document.createElement("a");
+
+    lien.href =
+      urlBlob;
+
+    lien.download =
+      nomFichier;
+
+    document.body.appendChild(
+      lien
+    );
+
+    lien.click();
+
+    lien.remove();
+
+    setTimeout(
+      function() {
+
+        URL.revokeObjectURL(
+          urlBlob
+        );
+
+      },
+      1000
+    );
+
+  }
+
+  catch (erreur) {
+
+    console.error(
+      "Erreur téléchargement :",
+      erreur
+    );
+
+    alert(
+      "Impossible de télécharger le fichier."
+    );
+
+  }
+
+}
+
+
+async function chargerInformation() {
+
+  if (!informationId) {
+
+    zone.innerHTML = `
+
+      <div class="error">
+
+        Information introuvable.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Informations")
+      .select("*")
+      .eq(
+        "id",
+        informationId
+      )
+      .eq(
+        "publie",
+        true
+      )
+      .single();
+
+
+  if (error || !data) {
+
+    console.error(
+      "Erreur information :",
+      error
+    );
+
+    zone.innerHTML = `
+
+      <div class="error">
+
+        Impossible de trouver cette information.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  let imageHTML = "";
+
+
+  if (data.image) {
+
+    imageHTML = `
+
+      <img
+        src="${data.image}"
+        alt="Image de l'information"
+        class="image-information"
+        onclick="afficherPhotoInformationGrande('${data.image}')"
+      >
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="download"
+          onclick="telechargerFichierInformation('${data.image}')"
+        >
+
+          📥 Télécharger l'image
+
+        </button>
+
+      </div>
+
+    `;
+
+  }
+
+
+  zone.innerHTML = `
+
+    <article class="card">
+
+      <h1>
+        ${data.titre || ""}
+      </h1>
+
+      <div class="contenu">
+
+        ${data.contenu || ""}
+
+      </div>
+
+      ${imageHTML}
+
+    </article>
+
+  `;
+
+}
+
+
+chargerInformation();
+
+</script>
+
+</body>
+
+</html>
