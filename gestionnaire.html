@@ -1541,15 +1541,18 @@
 
       <div class="form-group">
 
-        <label>
-          Image URL facultative
-        </label>
+        <div class="form-group">
 
-        <input
-          type="url"
-          id="informationImage">
+  <label for="informationFichier">
+    Ajouter une image ou un fichier
+  </label>
 
-      </div>
+  <input
+    type="file"
+    id="informationFichier"
+    accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+
+</div>
 
 
       <div class="form-group">
@@ -4855,9 +4858,9 @@ function ouvrirModalInformation() {
 
 
   document.getElementById(
-    "informationImage"
-  ).value =
-    "";
+  "informationFichier"
+).value =
+  "";
 
 
   document.getElementById(
@@ -4993,10 +4996,10 @@ document
         ).value.trim();
 
 
-      const image =
-        document.getElementById(
-          "informationImage"
-        ).value.trim();
+      const fichier =
+  document.getElementById(
+    "informationFichier"
+  ).files[0];
 
 
       const publie =
@@ -5025,7 +5028,70 @@ document
 
 
       let resultat;
+let fichierUrl = null;
 
+if (fichier) {
+
+  const extension =
+    fichier.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+  const nomFichier =
+    `${crypto.randomUUID()}.${extension}`;
+
+  const chemin =
+    `informations/${nomFichier}`;
+
+  const {
+    error: erreurUpload
+  } =
+    await supabaseClient
+      .storage
+      .from("photos-consommables")
+      .upload(
+        chemin,
+        fichier,
+        {
+          cacheControl: "3600",
+          upsert: false
+        }
+      );
+
+  if (erreurUpload) {
+
+    console.error(
+      "Erreur upload fichier :",
+      erreurUpload
+    );
+
+    message.innerHTML = `
+      <div class="error-box">
+        Impossible d'envoyer le fichier.
+        <br><br>
+        ${echapperHTML(
+          erreurUpload.message
+        )}
+      </div>
+    `;
+
+    return;
+  }
+
+  const {
+    data: urlData
+  } =
+    supabaseClient
+      .storage
+      .from("photos-consommables")
+      .getPublicUrl(
+        chemin
+      );
+
+  fichierUrl =
+    urlData.publicUrl;
+}
 
       if (id) {
 
@@ -5041,7 +5107,7 @@ document
                 contenu,
 
               image:
-                image || null,
+               fichierUrl || null,
 
               publie:
                 publie,
@@ -5074,7 +5140,7 @@ document
                 contenu,
 
               image:
-                image || null,
+                fichierUrl || null,
 
               publie:
                 publie,
