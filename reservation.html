@@ -101,7 +101,17 @@
   </p>
 
   <form id="reservationForm">
+<label for="quantite">
+  Quantité à réserver
+</label>
 
+<input
+  type="number"
+  id="quantite"
+  min="1"
+  value="1"
+  required
+>
     <label for="date_debut">
       Date de début
     </label>
@@ -254,6 +264,16 @@ info.innerHTML = `
   Catégorie : ${data.Categorie}<br>
   Quantité disponible : ${data.Quantite}
 `;
+const champQuantite =
+  document.getElementById("quantite");
+
+champQuantite.max =
+  data.Quantite;
+
+champQuantite.value =
+  data.Quantite > 0
+    ? 1
+    : 0;  
 }
 
 
@@ -289,7 +309,11 @@ async function envoyerReservation(event) {
     .select("id")
     .eq("user_id", user.id)
     .single();
-
+const quantite =
+  parseInt(
+    document.getElementById("quantite").value,
+    10
+  );
   const dateDebut =
     document.getElementById("date_debut").value;
 
@@ -299,7 +323,84 @@ async function envoyerReservation(event) {
   const commentaire =
     document.getElementById("commentaire").value.trim();
 
+if (
+  Number.isNaN(quantite) ||
+  quantite < 1
+) {
 
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Veuillez sélectionner une quantité valide.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
+  const {
+  data: consommableActuel,
+  error: erreurConsommable
+} =
+  await supabaseClient
+    .from("Consommables")
+    .select("Quantite, disponible, Actif")
+    .eq("id", consommableId)
+    .single();
+if (
+  erreurConsommable ||
+  !consommableActuel
+) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Impossible de vérifier la disponibilité du consommable.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
+
+
+if (
+  !consommableActuel.Actif ||
+  !consommableActuel.disponible ||
+  consommableActuel.Quantite <= 0
+) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Ce consommable n'est plus disponible.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
+
+
+if (
+  quantite >
+  consommableActuel.Quantite
+) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    `Vous ne pouvez pas réserver ${quantite} unité(s). Il n'en reste que ${consommableActuel.Quantite}.`;
+
+  message.style.display =
+    "block";
+
+  return;
+}
   if (dateRetour < dateDebut) {
 
     message.className =
