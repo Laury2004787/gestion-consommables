@@ -2995,7 +2995,53 @@ if (!profil) {
           "id",
           propositionId
         );
+/* =========================================================
+   NOTIFICATION ACCEPTATION PROPOSITION
+   ========================================================= */
 
+if (profil?.user_id) {
+
+  const {
+    error: erreurNotification
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .insert({
+
+        user_id:
+          profil.user_id,
+
+        titre:
+          "Proposition de consommable acceptée",
+
+        message:
+          `Votre proposition "${proposition.nom_consommable}" a été acceptée par le gestionnaire. Le consommable a été ajouté à la liste des consommables disponibles.`,
+
+        type:
+          "proposition",
+
+        lu:
+          false,
+
+        date_creation:
+          new Date().toISOString(),
+
+        lien:
+          "propositions"
+
+      });
+
+
+  if (erreurNotification) {
+
+    console.error(
+      "Erreur notification acceptation :",
+      erreurNotification
+    );
+
+  }
+
+}
 
     if (erreurStatut) {
 
