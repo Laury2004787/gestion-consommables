@@ -2140,17 +2140,16 @@ async function chargerReservations() {
 
 
             <button
-              class="refuse"
-              onclick="
-                modifierStatut(
-                  '${reservation.id}',
-                  'refusee'
-                )
-              ">
+  class="refuse"
+  onclick="
+    refuserReservation(
+      '${reservation.id}'
+    )
+  ">
 
-              Refuser
+  Refuser
 
-            </button>
+</button>
 
           </div>
         `
@@ -2280,7 +2279,53 @@ async function modifierStatut(
   await chargerStatistiques();
 
 }
+async function refuserReservation(reservationId) {
 
+  const commentaire = prompt(
+    "Veuillez indiquer la raison du refus de cette réservation :"
+  );
+
+  if (commentaire === null) {
+    return;
+  }
+
+  const motif = commentaire.trim();
+
+  if (!motif) {
+    alert(
+      "Veuillez indiquer une raison pour le refus."
+    );
+    return;
+  }
+
+  const { error } =
+    await supabaseClient.rpc(
+      "refuser_reservation",
+      {
+        reservation_id: reservationId,
+        commentaire_gestionnaire: motif
+      }
+    );
+
+  if (error) {
+
+    alert(
+      "Impossible de refuser la réservation : " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    "La réservation a été refusée."
+  );
+
+  await chargerReservations();
+
+  await chargerStatistiques();
+
+}
 
 /* =========================================================
    CONFIRMER RETOUR
