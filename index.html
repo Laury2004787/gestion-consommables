@@ -839,7 +839,10 @@ async function chargerNotifications() {
   if (!user) {
     return;
   }
-
+console.log(
+  "ID utilisateur connecté :",
+  user.id
+);
   const {
     data: notifications,
     error
