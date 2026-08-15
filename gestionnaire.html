@@ -6318,25 +6318,6 @@ consommablesExcel = lignes;
     return;
   }
 
-
-  const {
-    profil
-  } =
-    await obtenirUtilisateurEtProfil();
-
-
-  if (!profil) {
-
-    message.innerHTML = `
-      <div class="error">
-        Impossible de récupérer votre profil.
-      </div>
-    `;
-
-    return;
-  }
-
-
   const consommables =
     consommablesExcel.map(
       function(ligne) {
