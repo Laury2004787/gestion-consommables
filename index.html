@@ -918,7 +918,373 @@ console.log(
   }
 
 }
+/* =========================================================
+   OUVRIR LES NOTIFICATIONS
+   ========================================================= */
 
+async function ouvrirNotifications() {
+
+  const {
+    user
+  } = await obtenirUtilisateurEtProfil();
+
+  if (!user) {
+    return;
+  }
+
+  const {
+    data: notifications,
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .select(`
+        id,
+        titre,
+        message,
+        type,
+        lu,
+        date_creation,
+        lien
+      `)
+      .order(
+        "date_creation",
+        {
+          ascending: false
+        }
+      );
+
+  if (error) {
+
+    console.error(
+      "Erreur notifications :",
+      error
+    );
+
+    alert(
+      "Impossible de charger les notifications."
+    );
+
+    return;
+  }
+
+
+  /*
+   * Création de la fenêtre
+   */
+
+  const ancienneFenetre =
+    document.getElementById(
+      "fenetre-notifications"
+    );
+
+  if (ancienneFenetre) {
+    ancienneFenetre.remove();
+  }
+
+
+  const fenetre =
+    document.createElement("div");
+
+  fenetre.id =
+    "fenetre-notifications";
+
+  fenetre.style.position =
+    "fixed";
+
+  fenetre.style.top =
+    "70px";
+
+  fenetre.style.right =
+    "20px";
+
+  fenetre.style.width =
+    "380px";
+
+  fenetre.style.maxWidth =
+    "calc(100vw - 40px)";
+
+  fenetre.style.maxHeight =
+    "70vh";
+
+  fenetre.style.overflowY =
+    "auto";
+
+  fenetre.style.background =
+    "white";
+
+  fenetre.style.border =
+    "1px solid #ddd";
+
+  fenetre.style.borderRadius =
+    "12px";
+
+  fenetre.style.boxShadow =
+    "0 8px 25px rgba(0,0,0,0.2)";
+
+  fenetre.style.zIndex =
+    "10000";
+
+
+  /*
+   * En-tête
+   */
+
+  const titre =
+    document.createElement("div");
+
+  titre.style.padding =
+    "15px";
+
+  titre.style.fontWeight =
+    "bold";
+
+  titre.style.fontSize =
+    "18px";
+
+  titre.style.borderBottom =
+    "1px solid #eee";
+
+  titre.textContent =
+    "Notifications";
+
+  fenetre.appendChild(titre);
+
+
+  /*
+   * Aucune notification
+   */
+
+  if (
+    !notifications ||
+    notifications.length === 0
+  ) {
+
+    const vide =
+      document.createElement("div");
+
+    vide.style.padding =
+      "20px";
+
+    vide.style.textAlign =
+      "center";
+
+    vide.textContent =
+      "Aucune notification.";
+
+    fenetre.appendChild(vide);
+
+  }
+
+
+  /*
+   * Liste des notifications
+   */
+
+  notifications.forEach(
+    notification => {
+
+      const element =
+        document.createElement("div");
+
+      element.style.padding =
+        "15px";
+
+      element.style.borderBottom =
+        "1px solid #eee";
+
+      element.style.cursor =
+        "pointer";
+
+
+      /*
+       * Différencier les notifications
+       * lues et non lues
+       */
+
+      if (!notification.lu) {
+
+        element.style.background =
+          "#eef6ff";
+
+        element.style.fontWeight =
+          "600";
+
+      }
+
+
+      const titreNotification =
+        document.createElement("div");
+
+      titreNotification.textContent =
+        notification.titre ||
+        "Notification";
+
+      titreNotification.style.marginBottom =
+        "6px";
+
+
+      const messageNotification =
+        document.createElement("div");
+
+      messageNotification.textContent =
+        notification.message ||
+        "";
+
+      messageNotification.style.fontWeight =
+        "normal";
+
+      messageNotification.style.lineHeight =
+        "1.4";
+
+
+      const dateNotification =
+        document.createElement("small");
+
+      dateNotification.textContent =
+        notification.date_creation
+          ? new Date(
+              notification.date_creation
+            ).toLocaleString("fr-FR")
+          : "";
+
+      dateNotification.style.display =
+        "block";
+
+      dateNotification.style.marginTop =
+        "8px";
+
+      dateNotification.style.color =
+        "#777";
+
+
+      element.appendChild(
+        titreNotification
+      );
+
+      element.appendChild(
+        messageNotification
+      );
+
+      element.appendChild(
+        dateNotification
+      );
+
+
+      /*
+       * Clic sur une notification
+       */
+
+      element.onclick =
+        async function() {
+
+          /*
+           * Marquer comme lue
+           */
+
+          if (!notification.lu) {
+
+            const {
+              error: erreurLecture
+            } =
+              await supabaseClient
+                .from("Notifications")
+                .update({
+                  lu: true
+                })
+                .eq(
+                  "id",
+                  notification.id
+                );
+
+            if (erreurLecture) {
+
+              console.error(
+                "Erreur lors de la lecture :",
+                erreurLecture
+              );
+
+            }
+
+          }
+
+
+          /*
+           * Actualiser le badge
+           */
+
+          await chargerNotifications();
+
+
+          /*
+           * Si la notification possède
+           * un lien, on peut naviguer.
+           *
+           * Pour l'instant on ferme
+           * simplement la fenêtre.
+           */
+
+          fenetre.remove();
+
+        };
+
+
+      fenetre.appendChild(
+        element
+      );
+
+    }
+  );
+
+
+  document.body.appendChild(
+    fenetre
+  );
+
+
+  /*
+   * Fermer en cliquant ailleurs
+   */
+
+  setTimeout(
+    function() {
+
+      document.addEventListener(
+        "click",
+        function fermerNotifications(event) {
+
+          const bouton =
+            document.getElementById(
+              "bouton-notifications"
+            );
+
+          if (
+            !fenetre.contains(
+              event.target
+            ) &&
+            bouton &&
+            !bouton.contains(
+              event.target
+            )
+          ) {
+
+            fenetre.remove();
+
+            document.removeEventListener(
+              "click",
+              fermerNotifications
+            );
+
+          }
+
+        }
+      );
+
+    },
+    100
+  );
+
+}
 
 /* =========================================================
    DECONNEXION
