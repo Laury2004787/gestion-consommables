@@ -1875,7 +1875,7 @@ function afficherPhotoInformationGrande(url) {
 
   document.body.appendChild(fond);
 }
-  async function telechargerImageInformation(url) {
+  async function telechargerFichierInformation(url) {
 
   try {
 
@@ -1884,24 +1884,28 @@ function afficherPhotoInformationGrande(url) {
 
     if (!reponse.ok) {
       throw new Error(
-        "Impossible de récupérer l'image."
+        "Impossible de récupérer le fichier."
       );
     }
 
     const blob =
       await reponse.blob();
 
-    const lien =
-      document.createElement("a");
+    const nomFichier =
+      url.split("/").pop().split("?")[0]
+      || "fichier";
 
     const urlBlob =
       URL.createObjectURL(blob);
+
+    const lien =
+      document.createElement("a");
 
     lien.href =
       urlBlob;
 
     lien.download =
-      "information.jpg";
+      nomFichier;
 
     document.body.appendChild(lien);
 
@@ -1909,19 +1913,24 @@ function afficherPhotoInformationGrande(url) {
 
     lien.remove();
 
-    URL.revokeObjectURL(urlBlob);
+    setTimeout(
+      function() {
+        URL.revokeObjectURL(urlBlob);
+      },
+      1000
+    );
 
   }
 
   catch (erreur) {
 
     console.error(
-      "Erreur téléchargement :",
+      "Erreur téléchargement fichier :",
       erreur
     );
 
     alert(
-      "Impossible de télécharger l'image."
+      "Impossible de télécharger le fichier."
     );
 
   }
@@ -2016,7 +2025,7 @@ if (information.image) {
 
      <button
   type="button"
-  onclick="telechargerImageInformation('${information.image}')"
+  onclick="telechargerFichierInformation('${information.image}')"
   style="
     margin-top:10px;
     padding:8px 12px;
