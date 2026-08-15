@@ -1197,13 +1197,10 @@ document
         );
 
 
-      const photo =
-        document
-          .getElementById(
-            "photoProposition"
-          )
-          .value
-          .trim();
+      const fichierPhoto =
+  document
+    .getElementById("photoProposition")
+    .files[0];
 
 
       if (
@@ -1292,7 +1289,70 @@ document
         return;
 
       }
+let photo = null;
 
+if (fichierPhoto) {
+
+  const extension =
+    fichierPhoto.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+  const nomFichier =
+    `${crypto.randomUUID()}.${extension}`;
+
+  const chemin =
+    `propositions/${profil.id}/${nomFichier}`;
+
+  const {
+    error: erreurUpload
+  } =
+    await supabaseClient
+      .storage
+      .from("photos-consommables")
+      .upload(
+        chemin,
+        fichierPhoto,
+        {
+          cacheControl: "3600",
+          upsert: false
+        }
+      );
+
+  if (erreurUpload) {
+
+    console.error(
+      "Erreur upload photo :",
+      erreurUpload
+    );
+
+    zone.innerHTML = `
+      <div class="error">
+        Impossible d'envoyer la photo.
+        <br><br>
+        ${echapperHTML(
+          erreurUpload.message
+        )}
+      </div>
+    `;
+
+    return;
+  }
+
+  const {
+    data: urlPhoto
+  } =
+    supabaseClient
+      .storage
+      .from("photos-consommables")
+      .getPublicUrl(
+        chemin
+      );
+
+  photo =
+    urlPhoto.publicUrl;
+}
 
       const {
         error
