@@ -12,7 +12,7 @@
   <title>Tableau de bord gestionnaire</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <style>
 
     * {
@@ -990,7 +990,91 @@
     </div>
 
   </div>
+<!-- ======================================================
+     IMPORT EXCEL
+     ====================================================== -->
 
+<div
+  class="form-card"
+  style="margin-top:30px;">
+
+  <h3>
+    📊 Ajouter plusieurs consommables
+  </h3>
+
+  <div class="info">
+
+    Vous pouvez importer plusieurs consommables
+    en une seule fois à partir d'un fichier Excel.
+
+    <br><br>
+
+    Le fichier doit contenir les colonnes :
+
+    <strong>
+      Nom du sortant, Catégorie, Laboratoire,
+      Description, État, Quantité
+    </strong>
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label for="fichierExcel">
+      Fichier Excel
+    </label>
+
+    <input
+      type="file"
+      id="fichierExcel"
+      accept=".xlsx,.xls"
+    >
+
+    <small>
+      Sélectionnez votre fichier Excel depuis
+      votre ordinateur ou votre téléphone.
+    </small>
+
+  </div>
+
+
+  <div class="actions">
+
+    <button
+      type="button"
+      class="accept"
+      onclick="lireFichierExcel()">
+
+      📊 Lire le fichier Excel
+
+    </button>
+
+
+    <button
+      type="button"
+      class="nav-button"
+      onclick="telechargerModeleExcel()">
+
+      📥 Télécharger le modèle Excel
+
+    </button>
+
+  </div>
+
+
+  <div
+    id="apercuExcel"
+    style="margin-top:20px;">
+  </div>
+
+
+  <div
+    id="messageExcel"
+    style="margin-top:20px;">
+  </div>
+
+</div>
 </section>
 
 
@@ -6037,9 +6121,316 @@ document
    ========================================================= */
 
 verifierGestionnaire();
+async function lireFichierExcel() {
 
+  const input =
+    document.getElementById(
+      "fichierExcel"
+    );
+
+  const zone =
+    document.getElementById(
+      "apercuExcel"
+    );
+
+  const message =
+    document.getElementById(
+      "messageExcel"
+    );
+
+
+  zone.innerHTML = "";
+  message.innerHTML = "";
+
+
+  if (
+    !input.files ||
+    input.files.length === 0
+  ) {
+
+    message.innerHTML = `
+      <div class="error">
+        Veuillez sélectionner un fichier Excel.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const fichier =
+    input.files[0];
+
+
+  try {
+
+    const tableau =
+      await fichier.arrayBuffer();
+
+
+    const classeur =
+      XLSX.read(
+        tableau,
+        {
+          type: "array"
+        }
+      );
+
+
+    const nomFeuille =
+      classeur.SheetNames[0];
+
+
+    const feuille =
+      classeur.Sheets[
+        nomFeuille
+      ];
+
+
+    const lignes =
+      XLSX.utils.sheet_to_json(
+        feuille,
+        {
+          defval: ""
+        }
+      );
+
+
+    if (
+      !lignes ||
+      lignes.length === 0
+    ) {
+
+      message.innerHTML = `
+        <div class="error">
+          Le fichier Excel est vide.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    afficherApercuExcel(
+      lignes
+    );
+
+
+    message.innerHTML = `
+      <div class="success">
+        ${lignes.length}
+        consommable(s) trouvé(s) dans le fichier.
+      </div>
+    `;
+
+  }
+
+  catch (erreur) {
+
+    console.error(
+      "Erreur lecture Excel :",
+      erreur
+    );
+
+    message.innerHTML = `
+      <div class="error">
+        Impossible de lire le fichier Excel.
+        <br><br>
+        ${erreur.message}
+      </div>
+    `;
+
+  }
+
+}
 </script>
+function afficherApercuExcel(
+  lignes
+) {
 
+  const zone =
+    document.getElementById(
+      "apercuExcel"
+    );
+
+
+  let html = `
+
+    <h3>
+      Aperçu des consommables
+    </h3>
+
+    <div
+      style="
+        overflow-x:auto;
+      "
+    >
+
+      <table
+        style="
+          width:100%;
+          border-collapse:collapse;
+        "
+      >
+
+        <thead>
+
+          <tr>
+
+            <th
+              style="
+                padding:10px;
+                border:1px solid #ddd;
+                text-align:left;
+              "
+            >
+              Nom du sortant
+            </th>
+
+            <th
+              style="
+                padding:10px;
+                border:1px solid #ddd;
+                text-align:left;
+              "
+            >
+              Catégorie
+            </th>
+
+            <th
+              style="
+                padding:10px;
+                border:1px solid #ddd;
+                text-align:left;
+              "
+            >
+              Laboratoire
+            </th>
+
+            <th
+              style="
+                padding:10px;
+                border:1px solid #ddd;
+                text-align:left;
+              "
+            >
+              Description
+            </th>
+
+            <th
+              style="
+                padding:10px;
+                border:1px solid #ddd;
+                text-align:left;
+              "
+            >
+              État
+            </th>
+
+            <th
+              style="
+                padding:10px;
+                border:1px solid #ddd;
+                text-align:left;
+              "
+            >
+              Quantité
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+  `;
+
+
+  lignes.forEach(
+    function(ligne) {
+
+      html += `
+
+        <tr>
+
+          <td
+            style="
+              padding:10px;
+              border:1px solid #ddd;
+            "
+          >
+            ${ligne["Nom du sortant"] || ""}
+          </td>
+
+          <td
+            style="
+              padding:10px;
+              border:1px solid #ddd;
+            "
+          >
+            ${ligne["Catégorie"] || ""}
+          </td>
+
+          <td
+            style="
+              padding:10px;
+              border:1px solid #ddd;
+            "
+          >
+            ${ligne["Laboratoire"] || ""}
+          </td>
+
+          <td
+            style="
+              padding:10px;
+              border:1px solid #ddd;
+            "
+          >
+            ${ligne["Description"] || ""}
+          </td>
+
+          <td
+            style="
+              padding:10px;
+              border:1px solid #ddd;
+            "
+          >
+            ${ligne["État"] || ""}
+          </td>
+
+          <td
+            style="
+              padding:10px;
+              border:1px solid #ddd;
+            "
+          >
+            ${ligne["Quantité"] || ""}
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+
+  html += `
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+
+  zone.innerHTML =
+    html;
+
+}
 
 </body>
 
