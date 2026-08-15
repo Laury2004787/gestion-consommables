@@ -2165,22 +2165,19 @@ async function modifierStatut(
 
   else {
 
-    const resultat =
-      await supabaseClient
-        .from("Réservations")
-        .update({
-          statut:
-            nouveauStatut
-        })
-        .eq(
-          "id",
+  const resultat =
+    await supabaseClient.rpc(
+      "refuser_reservation",
+      {
+        reservation_id:
           reservationId
-        );
+      }
+    );
 
-    error =
-      resultat.error;
+  error =
+    resultat.error;
 
-  }
+}
 
 
   if (error) {
