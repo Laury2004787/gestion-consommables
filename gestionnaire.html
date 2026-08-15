@@ -6123,30 +6123,14 @@ document
 verifierGestionnaire();
 async function lireFichierExcel() {
 
-  const input =
-    document.getElementById(
-      "fichierExcel"
-    );
-
-  const zone =
-    document.getElementById(
-      "apercuExcel"
-    );
-
-  const message =
-    document.getElementById(
-      "messageExcel"
-    );
-
+  const input = document.getElementById("fichierExcel");
+  const zone = document.getElementById("apercuExcel");
+  const message = document.getElementById("messageExcel");
 
   zone.innerHTML = "";
   message.innerHTML = "";
 
-
-  if (
-    !input.files ||
-    input.files.length === 0
-  ) {
+  if (!input.files || input.files.length === 0) {
 
     message.innerHTML = `
       <div class="error">
@@ -6155,52 +6139,30 @@ async function lireFichierExcel() {
     `;
 
     return;
-
   }
 
-
-  const fichier =
-    input.files[0];
-
+  const fichier = input.files[0];
 
   try {
 
-    const tableau =
-      await fichier.arrayBuffer();
+    const tableau = await fichier.arrayBuffer();
 
+    const classeur = XLSX.read(tableau, {
+      type: "array"
+    });
 
-    const classeur =
-      XLSX.read(
-        tableau,
-        {
-          type: "array"
-        }
-      );
+    const nomFeuille = classeur.SheetNames[0];
 
+    const feuille = classeur.Sheets[nomFeuille];
 
-    const nomFeuille =
-      classeur.SheetNames[0];
+    const lignes = XLSX.utils.sheet_to_json(
+      feuille,
+      {
+        defval: ""
+      }
+    );
 
-
-    const feuille =
-      classeur.Sheets[
-        nomFeuille
-      ];
-
-
-    const lignes =
-      XLSX.utils.sheet_to_json(
-        feuille,
-        {
-          defval: ""
-        }
-      );
-
-
-    if (
-      !lignes ||
-      lignes.length === 0
-    ) {
+    if (!lignes || lignes.length === 0) {
 
       message.innerHTML = `
         <div class="error">
@@ -6209,19 +6171,102 @@ async function lireFichierExcel() {
       `;
 
       return;
-
     }
 
+    let html = `
+      <h3>Aperçu des consommables</h3>
 
-    afficherApercuExcel(
-      lignes
-    );
+      <div style="overflow-x:auto;">
+
+        <table style="
+          width:100%;
+          border-collapse:collapse;
+        ">
+
+          <thead>
+            <tr>
+
+              <th style="border:1px solid #ddd;padding:10px;">
+                Nom du sortant
+              </th>
+
+              <th style="border:1px solid #ddd;padding:10px;">
+                Catégorie
+              </th>
+
+              <th style="border:1px solid #ddd;padding:10px;">
+                Laboratoire
+              </th>
+
+              <th style="border:1px solid #ddd;padding:10px;">
+                Description
+              </th>
+
+              <th style="border:1px solid #ddd;padding:10px;">
+                État
+              </th>
+
+              <th style="border:1px solid #ddd;padding:10px;">
+                Quantité
+              </th>
+
+            </tr>
+          </thead>
+
+          <tbody>
+    `;
+
+
+    lignes.forEach(function(ligne) {
+
+      html += `
+        <tr>
+
+          <td style="border:1px solid #ddd;padding:10px;">
+            ${ligne["Nom du sortant"] || ""}
+          </td>
+
+          <td style="border:1px solid #ddd;padding:10px;">
+            ${ligne["Catégorie"] || ""}
+          </td>
+
+          <td style="border:1px solid #ddd;padding:10px;">
+            ${ligne["Laboratoire"] || ""}
+          </td>
+
+          <td style="border:1px solid #ddd;padding:10px;">
+            ${ligne["Description"] || ""}
+          </td>
+
+          <td style="border:1px solid #ddd;padding:10px;">
+            ${ligne["État"] || ""}
+          </td>
+
+          <td style="border:1px solid #ddd;padding:10px;">
+            ${ligne["Quantité"] || ""}
+          </td>
+
+        </tr>
+      `;
+
+    });
+
+
+    html += `
+          </tbody>
+
+        </table>
+
+      </div>
+    `;
+
+
+    zone.innerHTML = html;
 
 
     message.innerHTML = `
       <div class="success">
-        ${lignes.length}
-        consommable(s) trouvé(s) dans le fichier.
+        ${lignes.length} consommable(s) trouvé(s).
       </div>
     `;
 
