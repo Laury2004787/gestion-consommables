@@ -3088,37 +3088,25 @@ async function refuserProposition(
   propositionId
 ) {
 
-  if (
-    !confirm(
-      "Voulez-vous vraiment refuser cette proposition ?"
-    )
-  ) {
+  const commentaire =
+    prompt(
+      "Pourquoi refusez-vous cette proposition ?"
+    );
 
+
+  if (commentaire === null) {
     return;
-
   }
 
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("Propositions_consommables")
-      .update({
-        statut:
-          "refusee"
-      })
-      .eq(
-        "id",
-        propositionId
-      );
+  const commentaireFinal =
+    commentaire.trim();
 
 
-  if (error) {
+  if (!commentaireFinal) {
 
     alert(
-      "Impossible de refuser la proposition : " +
-      error.message
+      "Veuillez indiquer la raison du refus."
     );
 
     return;
@@ -3126,12 +3114,198 @@ async function refuserProposition(
   }
 
 
-  await chargerPropositions();
+  try {
 
-  await chargerStatistiques();
+    /*
+     * Récupérer la proposition
+     * et l'utilisateur concerné.
+     */
+
+    const {
+      data: proposition,
+      error: erreurProposition
+    } =
+      await supabaseClient
+        .from("Propositions_consommables")
+        .select(`
+          id,
+          nom_consommable,
+          statut,
+          utilisateur_id
+        `)
+        .eq(
+          "id",
+          propositionId
+        )
+        .single();
+
+
+    if (
+      erreurProposition ||
+      !proposition
+    ) {
+
+      throw new Error(
+        erreurProposition?.message ||
+        "Proposition introuvable."
+      );
+
+    }
+
+
+    if (
+      proposition.statut !==
+      "en_attente"
+    ) {
+
+      alert(
+        "Cette proposition a déjà été traitée."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Récupérer le compte utilisateur.
+     */
+
+    const {
+      data: profil,
+      error: erreurProfil
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select(`
+          id,
+          user_id
+        `)
+        .eq(
+          "id",
+          proposition.utilisateur_id
+        )
+        .single();
+
+
+    if (
+      erreurProfil ||
+      !profil
+    ) {
+
+      throw new Error(
+        erreurProfil?.message ||
+        "Profil utilisateur introuvable."
+      );
+
+    }
+
+
+    /*
+     * Refuser la proposition.
+     */
+
+    const {
+      error: erreurStatut
+    } =
+      await supabaseClient
+        .from("Propositions_consommables")
+        .update({
+
+          statut:
+            "refusee"
+
+        })
+        .eq(
+          "id",
+          propositionId
+        );
+
+
+    if (erreurStatut) {
+
+      throw erreurStatut;
+
+    }
+
+
+    /*
+     * Envoyer la notification.
+     */
+
+    const {
+      error: erreurNotification
+    } =
+      await supabaseClient
+        .from("Notifications")
+        .insert({
+
+          user_id:
+            profil.user_id,
+
+          titre:
+            "Proposition de consommable refusée",
+
+          message:
+            `Votre proposition "${proposition.nom_consommable}" a été refusée par le gestionnaire.\n\nMotif du refus :\n${commentaireFinal}`,
+
+          type:
+            "proposition",
+
+          lu:
+            false,
+
+          date_creation:
+            new Date().toISOString(),
+
+          lien:
+            "propositions"
+
+        });
+
+
+    if (erreurNotification) {
+
+      console.error(
+        "Erreur notification :",
+        erreurNotification
+      );
+
+      alert(
+        "La proposition a été refusée, mais la notification n'a pas pu être envoyée."
+      );
+
+    }
+    else {
+
+      alert(
+        "Proposition refusée et utilisateur notifié."
+      );
+
+    }
+
+
+    await chargerPropositions();
+
+    await chargerStatistiques();
+
+  }
+
+  catch (erreur) {
+
+    console.error(
+      "Erreur refus proposition :",
+      erreur
+    );
+
+    alert(
+      "Impossible de refuser la proposition : " +
+      erreur.message
+    );
+
+  }
 
 }
-
 
 /* =========================================================
    FORMULAIRE AJOUT
