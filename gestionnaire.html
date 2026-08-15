@@ -4770,6 +4770,10 @@ async function repondreMessage(
 
   try {
 
+    /*
+     * Utilisateur connecté
+     */
+
     const {
       data: {
         user
@@ -4786,6 +4790,10 @@ async function repondreMessage(
 
     }
 
+
+    /*
+     * Profil du gestionnaire
+     */
 
     const {
       data: profil,
@@ -4815,6 +4823,10 @@ async function repondreMessage(
     }
 
 
+    /*
+     * Vérification du rôle
+     */
+
     if (
       ![
         "gestionnaire",
@@ -4830,6 +4842,57 @@ async function repondreMessage(
 
     }
 
+
+    /*
+     * Récupérer le message original
+     * et son propriétaire
+     */
+
+    const {
+      data: messageOriginal,
+      error: erreurMessage
+    } =
+      await supabaseClient
+        .from("Messages")
+        .select(`
+          id,
+          utilisateur_id
+        `)
+        .eq(
+          "id",
+          messageId
+        )
+        .single();
+
+
+    if (
+      erreurMessage ||
+      !messageOriginal
+    ) {
+
+      throw new Error(
+        "Message introuvable."
+      );
+
+    }
+
+
+    const utilisateurId =
+      messageOriginal.utilisateur_id;
+
+
+    if (!utilisateurId) {
+
+      throw new Error(
+        "Impossible de trouver le destinataire."
+      );
+
+    }
+
+
+    /*
+     * Enregistrer la réponse
+     */
 
     const {
       error: erreurInsertion
@@ -4856,6 +4919,10 @@ async function repondreMessage(
 
     }
 
+
+    /*
+     * Marquer le message comme répondu
+     */
 
     const {
       error: erreurStatut
@@ -4884,11 +4951,67 @@ async function repondreMessage(
     }
 
 
+    /*
+     * Créer la notification chez l'utilisateur
+     */
+
+    const {
+      error: erreurNotification
+    } =
+      await supabaseClient
+        .from("Notifications")
+        .insert({
+
+          user_id:
+            utilisateurId,
+
+          titre:
+            "Réponse du gestionnaire",
+
+          message:
+            contenu,
+
+          type:
+            "message",
+
+          lu:
+            false,
+
+          date_creation:
+            new Date().toISOString(),
+
+          lien:
+            "messages"
+
+        });
+
+
+    if (erreurNotification) {
+
+      console.error(
+        "Erreur notification :",
+        erreurNotification
+      );
+
+      /*
+       * La réponse a bien été envoyée.
+       * On ne bloque donc pas la réponse
+       * uniquement parce que la notification
+       * a échoué.
+       */
+
+    }
+
+
+    /*
+     * Message de confirmation
+     */
+
     resultat.className =
       "success-box";
 
     resultat.textContent =
-      "Réponse envoyée.";
+      "Réponse envoyée et notification transmise à l'utilisateur.";
 
 
     zoneReponse.value =
