@@ -2098,33 +2098,52 @@ async function chargerReservations() {
 
 
       ${
-        reservation.statut === "retour_signale"
+  reservation.statut === "retour_signale"
 
-        ?
+  ?
 
-        `
-          <div class="actions">
+  `
+    <div class="actions">
 
-            <button
-              class="confirm-button"
-              onclick="
-                confirmerRetour(
-                  '${reservation.id}'
-                )
-              ">
+      <label>
+        <strong>Quantité réellement retournée :</strong>
+        <input
+          type="number"
+          id="quantite-retour-${reservation.id}"
+          min="1"
+          max="${reservation.quantite}"
+          value="${reservation.quantite}"
+        >
+      </label>
 
-              Confirmer le retour
+      <label>
+        <strong>Date réelle du retour :</strong>
+        <input
+          type="date"
+          id="date-retour-${reservation.id}"
+          value="${new Date().toISOString().split("T")[0]}"
+        >
+      </label>
 
-            </button>
+      <button
+        class="confirm-button"
+        onclick="
+          confirmerRetour(
+            '${reservation.id}'
+          )
+        ">
 
-          </div>
-        `
+        Confirmer le retour
 
-        :
+      </button>
 
-        ""
-      }
+    </div>
+  `
 
+  :
+
+  ""
+}
     `;
 
 
@@ -2207,6 +2226,60 @@ async function confirmerRetour(
   reservationId
 ) {
 
+  const inputQuantite =
+    document.getElementById(
+      `quantite-retour-${reservationId}`
+    );
+
+  const inputDate =
+    document.getElementById(
+      `date-retour-${reservationId}`
+    );
+
+
+  if (!inputQuantite || !inputDate) {
+
+    alert(
+      "Impossible de récupérer les informations du retour."
+    );
+
+    return;
+
+  }
+
+
+  const quantiteRetournee =
+    Number(inputQuantite.value);
+
+  const dateRetourReel =
+    inputDate.value;
+
+
+  if (
+    !Number.isInteger(quantiteRetournee) ||
+    quantiteRetournee <= 0
+  ) {
+
+    alert(
+      "Veuillez saisir une quantité retournée valide."
+    );
+
+    return;
+
+  }
+
+
+  if (!dateRetourReel) {
+
+    alert(
+      "Veuillez sélectionner la date réelle du retour."
+    );
+
+    return;
+
+  }
+
+
   const {
     error
   } =
@@ -2214,7 +2287,13 @@ async function confirmerRetour(
       "confirmer_retour_reservation",
       {
         reservation_id:
-          reservationId
+          reservationId,
+
+        quantite_retournee_param:
+          quantiteRetournee,
+
+        date_retour_reel_param:
+          dateRetourReel
       }
     );
 
@@ -2241,7 +2320,6 @@ async function confirmerRetour(
   await chargerStatistiques();
 
 }
-
 
 /* =========================================================
    PROPOSITIONS
