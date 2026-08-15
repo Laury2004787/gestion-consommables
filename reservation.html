@@ -112,17 +112,6 @@
   value="1"
   required
 >
-    <label for="quantite">
-  Quantité souhaitée
-</label>
-
-<input
-  type="number"
-  id="quantite"
-  min="1"
-  value="1"
-  required
->
     <label for="date_debut">
       Date de début
     </label>
@@ -333,11 +322,6 @@ const quantite =
 
   const commentaire =
     document.getElementById("commentaire").value.trim();
-const quantite =
-  parseInt(
-    document.getElementById("quantite").value,
-    10
-  );
   if (
   Number.isNaN(quantite) ||
   quantite < 1
@@ -465,47 +449,6 @@ if (
 
     return;
   }
-const { data: consommable, error: erreurConsommable } =
-  await supabaseClient
-    .from("Consommables")
-    .select("Quantite")
-    .eq("id", consommableId)
-    .single();
-
-
-if (
-  erreurConsommable ||
-  !consommable
-) {
-
-  message.className =
-    "message error";
-
-  message.textContent =
-    "Impossible de vérifier la disponibilité du consommable.";
-
-  message.style.display =
-    "block";
-
-  return;
-}
-
-
-if (
-  consommable.Quantite <= 0
-) {
-
-  message.className =
-    "message error";
-
-  message.textContent =
-    "Ce consommable n'est plus disponible. Sa quantité est actuellement de 0.";
-
-  message.style.display =
-    "block";
-
-  return;
-}
 
   const { error } =
     await supabaseClient
