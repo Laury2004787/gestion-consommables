@@ -1119,8 +1119,58 @@ async function chargerConsommables() {
   );
 
 }
+/* =========================================================
+   PROTECTION DU HTML
+   ========================================================= */
 
+function echapperHTML(texte) {
 
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    texte ?? "";
+
+  return div.innerHTML;
+}
+/* =========================================================
+   AFFICHER LA PHOTO EN GRAND
+   ========================================================= */
+
+function afficherPhotoGrande(url) {
+
+  const fond = document.createElement("div");
+
+  fond.style.position = "fixed";
+  fond.style.top = "0";
+  fond.style.left = "0";
+  fond.style.width = "100%";
+  fond.style.height = "100%";
+  fond.style.background = "rgba(0,0,0,0.85)";
+  fond.style.display = "flex";
+  fond.style.alignItems = "center";
+  fond.style.justifyContent = "center";
+  fond.style.zIndex = "9999";
+  fond.style.cursor = "pointer";
+
+  const image = document.createElement("img");
+
+  image.src = url;
+  image.alt = "Photo du consommable";
+
+  image.style.maxWidth = "90%";
+  image.style.maxHeight = "90%";
+  image.style.objectFit = "contain";
+  image.style.borderRadius = "8px";
+
+  fond.appendChild(image);
+
+  fond.onclick = function() {
+    fond.remove();
+  };
+
+  document.body.appendChild(fond);
+}
 
 /* =========================================================
    PROPOSER UN CONSOMMABLE
