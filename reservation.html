@@ -354,6 +354,42 @@ const quantite =
 
   return;
 }
+  const { data: stock, error: erreurStock } =
+  await supabaseClient
+    .from("Consommables")
+    .select("Quantite")
+    .eq("id", consommableId)
+    .single();
+
+
+if (erreurStock || !stock) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Impossible de vérifier la quantité disponible.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
+
+
+if (quantite > stock.Quantite) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    `Quantité insuffisante. Il reste ${stock.Quantite} unité(s) disponible(s).`;
+
+  message.style.display =
+    "block";
+
+  return;
+}
   const {
   data: consommableActuel,
   error: erreurConsommable
