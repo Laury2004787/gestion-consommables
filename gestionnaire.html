@@ -4919,7 +4919,104 @@ async function repondreMessage(
 
     }
 
+/* =========================================================
+   NOTIFICATION DE L'UTILISATEUR
+   ========================================================= */
 
+const {
+  data: messageOriginal,
+  error: erreurMessage
+} =
+  await supabaseClient
+    .from("Messages")
+    .select(`
+      utilisateur_id,
+      sujet
+    `)
+    .eq("id", messageId)
+    .single();
+
+
+if (erreurMessage || !messageOriginal) {
+
+  console.error(
+    "Impossible de récupérer l'utilisateur du message :",
+    erreurMessage
+  );
+
+}
+else {
+
+  const {
+    data: utilisateur,
+    error: erreurUtilisateur
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select("user_id")
+      .eq(
+        "id",
+        messageOriginal.utilisateur_id
+      )
+      .single();
+
+
+  if (
+    erreurUtilisateur ||
+    !utilisateur
+  ) {
+
+    console.error(
+      "Impossible de trouver l'utilisateur :",
+      erreurUtilisateur
+    );
+
+  }
+  else {
+
+    const {
+      error: erreurNotification
+    } =
+      await supabaseClient
+        .from("Notifications")
+        .insert({
+
+          user_id:
+            utilisateur.user_id,
+
+          titre:
+            "Réponse du gestionnaire",
+
+          message:
+            `Le gestionnaire a répondu à votre message "${messageOriginal.sujet}".\n\n${contenu}`,
+
+          type:
+            "message",
+
+          lu:
+            false,
+
+          date_creation:
+            new Date().toISOString(),
+
+          lien:
+            "messages"
+
+        });
+
+
+    if (erreurNotification) {
+
+      console.error(
+        "Erreur notification utilisateur :",
+        erreurNotification
+      );
+
+    }
+
+  }
+
+}
     /*
      * Marquer le message comme répondu
      */
