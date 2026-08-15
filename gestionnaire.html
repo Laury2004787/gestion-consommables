@@ -6499,6 +6499,54 @@ consommablesExcel = lignes;
   }
 
 }
+  function telechargerModeleExcel() {
+
+  const donnees = [
+
+    {
+      "Nom du sortant": "Bécher 500 ml",
+      "Catégorie": "Verrerie",
+      "Laboratoire": "Chimie",
+      "Description": "Bécher en verre",
+      "État": "Bon état",
+      "Quantité": 20
+    },
+
+    {
+      "Nom du sortant": "Tube à essai",
+      "Catégorie": "Verrerie",
+      "Laboratoire": "Biologie",
+      "Description": "Tube standard",
+      "État": "Neuf",
+      "Quantité": 50
+    }
+
+  ];
+
+
+  const feuille =
+    XLSX.utils.json_to_sheet(
+      donnees
+    );
+
+
+  const classeur =
+    XLSX.utils.book_new();
+
+
+  XLSX.utils.book_append_sheet(
+    classeur,
+    feuille,
+    "Consommables"
+  );
+
+
+  XLSX.writeFile(
+    classeur,
+    "modele-consommables.xlsx"
+  );
+
+}
 </script>
 function afficherApercuExcel(
   lignes
