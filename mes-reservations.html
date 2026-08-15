@@ -105,9 +105,13 @@ const supabaseClient =
     return "Retour déclaré — en attente de confirmation";
   }
 
-  if (statut === "retournee") {
-    return "Retour confirmé";
-  }
+  if (statut === "retour_partiel") {
+  return "Retour partiel — reste à retourner";
+}
+
+if (statut === "retournee") {
+  return "Retour confirmé";
+}
 
   if (statut === "refusee") {
     return "Réservation refusée";
@@ -163,14 +167,16 @@ async function chargerReservations() {
     await supabaseClient
       .from("Réservations")
       .select(`
-        id,
-        date_demande,
-        date_debut,
-        date_retour,
-        commentaire,
-        statut,
-        consommable_id
-      `)
+  id,
+  date_demande,
+  date_debut,
+  date_retour,
+  commentaire,
+  statut,
+  consommable_id,
+  quantite,
+  quantite_retournee
+`)
       .eq("utilisateur_id", profil.id)
       .order("date_demande", {
         ascending: false
@@ -255,7 +261,29 @@ async function chargerReservations() {
         <strong>Date de retour :</strong>
         ${reservation.date_retour}
       </p>
+<p>
+  <strong>Quantité réservée :</strong>
+  ${reservation.quantite}
+</p>
 
+<p>
+  <strong>Quantité déjà retournée :</strong>
+  ${reservation.quantite_retournee || 0}
+</p>
+
+${
+  reservation.quantite - (reservation.quantite_retournee || 0) > 0
+  ? `
+    <p>
+      <strong>Quantité restante à retourner :</strong>
+      ${
+        reservation.quantite -
+        (reservation.quantite_retournee || 0)
+      }
+    </p>
+  `
+  : ""
+}
       <p>
         <strong>Commentaire :</strong>
         ${reservation.commentaire || "Aucun"}
@@ -267,13 +295,23 @@ async function chargerReservations() {
 </p>
 
 ${
-  reservation.statut === "acceptee"
+  (
+    reservation.statut === "acceptee" ||
+    reservation.statut === "retour_partiel"
+  )
+  &&
+  reservation.quantite_retournee < reservation.quantite
+
   ? `
     <div class="actions">
 
       <button
         onclick="signalerRetour('${reservation.id}')">
-        Signaler le retour
+        ${
+          reservation.statut === "retour_partiel"
+            ? "Signaler le retour du reste"
+            : "Signaler le retour"
+        }
       </button>
 
     </div>
