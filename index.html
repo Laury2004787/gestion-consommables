@@ -1994,79 +1994,106 @@ async function chargerInformations() {
 
   data.forEach(function(information) {
 
-    const card =
-      document.createElement("div");
+  const card =
+    document.createElement("div");
 
-    card.className =
-      "card";
+  card.className =
+    "card";
 
-    let imageHTML = "";
 
-if (information.image) {
+  const contenu =
+    information.contenu || "";
 
-  imageHTML = `
 
-    <div style="margin-top:15px;">
+  const longueurApercu =
+    180;
+
+
+  const apercu =
+    contenu.length > longueurApercu
+      ? contenu.substring(
+          0,
+          longueurApercu
+        ) + "..."
+      : contenu;
+
+
+  let imageHTML = "";
+
+
+  if (information.image) {
+
+    imageHTML = `
 
       <img
         src="${information.image}"
         alt="Image de l'information"
         style="
-          max-width:100%;
-          max-height:300px;
-          border-radius:8px;
-          cursor:pointer;
+          width:100%;
+          max-height:220px;
           object-fit:contain;
+          border-radius:8px;
+          margin-top:15px;
+          cursor:pointer;
         "
-        onclick="afficherPhotoInformationGrande('${information.image}')"
+        onclick="
+          window.location.href =
+          'information.html?id=${information.id}'
+        "
       >
 
-      <br>
+    `;
 
-     <button
-  type="button"
-  onclick="telechargerFichierInformation('${information.image}')"
-  style="
-    margin-top:10px;
-    padding:8px 12px;
-    border:none;
-    border-radius:6px;
-    background:#2563eb;
-    color:white;
-    cursor:pointer;
-  "
->
-  📥 Télécharger l'image
-</button>
+  }
+
+
+  card.innerHTML = `
+
+    <div class="card-content">
+
+      <h3>
+        ${information.titre || ""}
+      </h3>
+
+
+      <p>
+        ${apercu}
+      </p>
+
+
+      ${imageHTML}
+
+
+      <button
+        type="button"
+        style="
+          margin-top:15px;
+          padding:10px 16px;
+          border:none;
+          border-radius:6px;
+          background:#2563eb;
+          color:white;
+          cursor:pointer;
+        "
+        onclick="
+          window.location.href =
+          'information.html?id=${information.id}'
+        "
+      >
+
+        Voir plus →
+
+      </button>
+
 
     </div>
 
   `;
 
-}
 
+  zone.appendChild(card);
 
-card.innerHTML = `
-
-  <div class="card-content">
-
-    <h3>
-      ${information.titre || ""}
-    </h3>
-
-    <p>
-      ${information.contenu || ""}
-    </p>
-
-    ${imageHTML}
-
-  </div>
-
-`;
-
-    zone.appendChild(card);
-
-  });
+});
 
 }
 
