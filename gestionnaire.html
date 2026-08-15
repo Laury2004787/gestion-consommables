@@ -1772,6 +1772,7 @@ async function chargerReservations() {
         date_retour,
         commentaire,
         statut,
+        quantite,
 
         Profils!Réservations_utilisateur_id_fkey (
           nom,
@@ -1912,7 +1913,10 @@ async function chargerReservations() {
         <strong>Date de retour :</strong>
         ${echapperHTML(reservation.date_retour)}
       </p>
-
+<p>
+  <strong>Quantité demandée :</strong>
+  ${reservation.quantite}
+</p>
 
       <p>
         <strong>Commentaire :</strong>
