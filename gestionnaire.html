@@ -640,7 +640,43 @@
       </strong>
 
     </div>
+<div class="stat">
 
+  <h3>
+    Retours partiels
+  </h3>
+
+  <strong id="statRetoursPartiels">
+    0
+  </strong>
+
+</div>
+
+
+<div class="stat">
+
+  <h3>
+    Quantité restant à retourner
+  </h3>
+
+  <strong id="statQuantiteRestante">
+    0
+  </strong>
+
+</div>
+
+
+<div class="stat">
+
+  <h3>
+    Retours en retard
+  </h3>
+
+  <strong id="statRetards">
+    0
+  </strong>
+
+</div>
 
     <div class="stat">
 
@@ -5755,63 +5791,241 @@ async function chargerStatistiques() {
    */
 
   const {
-    data: reservations
-  } =
-    await supabaseClient
-      .from("Réservations")
-      .select(
-        "statut"
-      );
+  data: reservations,
+  error: erreurReservations
+} =
+  await supabaseClient
+    .from("Réservations")
+    .select(`
+      id,
+      statut,
+      quantite,
+      quantite_retournee,
+      date_retour,
+      date_retour_reel
+    `);
+  if (erreurReservations) {
 
+  console.error(
+    "Erreur statistiques réservations :",
+    erreurReservations
+  );
+
+}
 
   if (reservations) {
 
+  /*
+   * Réservations en attente
+   */
+
+  document.getElementById(
+    "statAttente"
+  ).textContent =
+    reservations.filter(
+      r =>
+        r.statut === "en_attente"
+    ).length;
+
+
+  /*
+   * Réservations acceptées / actuellement en prêt
+   */
+
+  document.getElementById(
+    "statAcceptee"
+  ).textContent =
+    reservations.filter(
+      r =>
+        r.statut === "acceptee"
+    ).length;
+
+
+  /*
+   * Retours signalés au gestionnaire
+   */
+
+  document.getElementById(
+    "statRetour"
+  ).textContent =
+    reservations.filter(
+      r =>
+        r.statut === "retour_signale"
+    ).length;
+
+
+  /*
+   * Retours partiels
+   */
+
+  const retoursPartiels =
+    reservations.filter(
+      r =>
+        r.statut === "retour_partiel"
+    );
+
+
+  const elementPartiels =
     document.getElementById(
-      "statAttente"
-    ).textContent =
-      reservations.filter(
-        r =>
-          r.statut ===
-          "en_attente"
-      ).length;
+      "statRetoursPartiels"
+    );
 
 
-    document.getElementById(
-      "statAcceptee"
-    ).textContent =
-      reservations.filter(
-        r =>
-          r.statut ===
-          "acceptee"
-      ).length;
+  if (elementPartiels) {
 
-
-    document.getElementById(
-      "statRetour"
-    ).textContent =
-      reservations.filter(
-        r =>
-          r.statut ===
-          "retour_signale"
-      ).length;
-
-
-    /*
-     * Ici "retournee" représente un retour
-     * confirmé.
-     */
-
-    document.getElementById(
-      "statCollectes"
-    ).textContent =
-      reservations.filter(
-        r =>
-          r.statut ===
-          "retournee"
-      ).length;
+    elementPartiels.textContent =
+      retoursPartiels.length;
 
   }
 
+
+  /*
+   * Retours complètement terminés
+   */
+
+  document.getElementById(
+    "statCollectes"
+  ).textContent =
+    reservations.filter(
+      r =>
+        r.statut === "retournee"
+    ).length;
+
+
+  /*
+   * Quantité totale encore à retourner
+   */
+
+  const quantiteRestante =
+    reservations.reduce(
+      (
+        total,
+        reservation
+      ) => {
+
+        const quantite =
+          Number(
+            reservation.quantite
+          ) || 0;
+
+        const retournee =
+          Number(
+            reservation.quantite_retournee
+          ) || 0;
+
+        const reste =
+          Math.max(
+            quantite - retournee,
+            0
+          );
+
+        return total + reste;
+
+      },
+      0
+    );
+
+
+  const elementQuantiteRestante =
+    document.getElementById(
+      "statQuantiteRestante"
+    );
+
+
+  if (elementQuantiteRestante) {
+
+    elementQuantiteRestante.textContent =
+      quantiteRestante;
+
+  }
+
+
+  /*
+   * Retours en retard
+   *
+   * Une réservation est considérée
+   * comme en retard si :
+   *
+   * - la date de retour est dépassée
+   * - il reste encore des quantités
+   * - le retour n'est pas terminé
+   */
+
+  const aujourdHui =
+    new Date();
+
+  aujourdHui.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+
+  const retoursEnRetard =
+    reservations.filter(
+      reservation => {
+
+        if (
+          !reservation.date_retour
+        ) {
+          return false;
+        }
+
+
+        if (
+          reservation.statut ===
+          "retournee"
+        ) {
+          return false;
+        }
+
+
+        const quantite =
+          Number(
+            reservation.quantite
+          ) || 0;
+
+        const retournee =
+          Number(
+            reservation.quantite_retournee
+          ) || 0;
+
+
+        if (
+          retournee >= quantite
+        ) {
+          return false;
+        }
+
+
+        const dateRetour =
+          new Date(
+            reservation.date_retour +
+            "T00:00:00"
+          );
+
+
+        return dateRetour < aujourdHui;
+
+      }
+    );
+
+
+  const elementRetards =
+    document.getElementById(
+      "statRetards"
+    );
+
+
+  if (elementRetards) {
+
+    elementRetards.textContent =
+      retoursEnRetard.length;
+
+  }
+
+}
 
   /*
    * Consommables
