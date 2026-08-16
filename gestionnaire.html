@@ -3378,7 +3378,7 @@ if (profil?.user_id) {
 }
 
 /* =========================================================
-   AFFICHER PROPOSITIONS ET MESSAGES D'UN UTILISATEUR
+   AFFICHER LES PROPOSITIONS D'UN UTILISATEUR
    ========================================================= */
 
 async function afficherPropositionsUtilisateur(
@@ -3390,10 +3390,9 @@ async function afficherPropositionsUtilisateur(
       "listePropositions"
     );
 
-
   zone.innerHTML = `
     <div class="message">
-      Chargement...
+      Chargement des propositions...
     </div>
   `;
 
@@ -3425,15 +3424,11 @@ async function afficherPropositionsUtilisateur(
 
     zone.innerHTML = `
       <div class="error-box">
-
         Impossible de charger l'utilisateur.
-
         <br><br>
-
         ${echapperHTML(
           erreurProfil.message
         )}
-
       </div>
     `;
 
@@ -3443,7 +3438,7 @@ async function afficherPropositionsUtilisateur(
 
 
   /*
-   * Récupérer les propositions
+   * Récupérer uniquement les propositions
    */
 
   const {
@@ -3480,15 +3475,11 @@ async function afficherPropositionsUtilisateur(
 
     zone.innerHTML = `
       <div class="error-box">
-
         Impossible de charger les propositions.
-
         <br><br>
-
         ${echapperHTML(
           erreurPropositions.message
         )}
-
       </div>
     `;
 
@@ -3498,48 +3489,7 @@ async function afficherPropositionsUtilisateur(
 
 
   /*
-   * Récupérer les messages
-   */
-
-  const {
-    data: messages,
-    error: erreurMessages
-  } =
-    await supabaseClient
-      .from("Messages")
-      .select(`
-        id,
-        sujet,
-        contenu,
-        date_envoi,
-        lu,
-        repondu,
-        utilisateur_id
-      `)
-      .eq(
-        "utilisateur_id",
-        utilisateurId
-      )
-      .order(
-        "date_envoi",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (erreurMessages) {
-
-    console.error(
-      "Erreur messages :",
-      erreurMessages
-    );
-
-  }
-
-
-  /*
-   * Afficher l'en-tête
+   * Afficher l'en-tête utilisateur
    */
 
   zone.innerHTML = `
@@ -3600,7 +3550,7 @@ async function afficherPropositionsUtilisateur(
 
 
   /*
-   * Afficher les propositions
+   * Aucune proposition
    */
 
   if (
@@ -3614,354 +3564,51 @@ async function afficherPropositionsUtilisateur(
       </div>
     `;
 
-  }
-  else {
-
-    propositions.forEach(
-      proposition => {
-
-        let badge =
-          "badge-warning";
-
-        let statut =
-          "En attente";
-
-
-        if (
-          proposition.statut ===
-          "acceptee"
-        ) {
-
-          badge =
-            "badge-success";
-
-          statut =
-            "Acceptée";
-
-        }
-
-
-        if (
-          proposition.statut ===
-          "refusee"
-        ) {
-
-          badge =
-            "badge-danger";
-
-          statut =
-            "Refusée";
-
-        }
-
-
-        const card =
-          document.createElement("div");
-
-
-        card.className =
-          "card";
-
-
-        card.innerHTML = `
-
-          <h3>
-
-            ${echapperHTML(
-              proposition.nom_consommable
-            )}
-
-          </h3>
-
-
-          <p>
-
-            <strong>
-              Catégorie :
-            </strong>
-
-            ${echapperHTML(
-              proposition.categorie ||
-              "Non renseignée"
-            )}
-
-          </p>
-
-
-          <p>
-
-            <strong>
-              État :
-            </strong>
-
-            ${echapperHTML(
-              proposition.Etat ||
-              "Non renseigné"
-            )}
-
-          </p>
-
-
-          <p>
-
-            <strong>
-              Quantité :
-            </strong>
-
-            ${proposition.quantite ?? 0}
-
-          </p>
-
-
-          <p>
-
-            <strong>
-              Date :
-            </strong>
-
-            ${formaterDate(
-              proposition.date_proposition
-            )}
-
-          </p>
-
-
-          ${
-            proposition.description
-
-            ?
-
-            `
-              <p>
-
-                <strong>
-                  Description :
-                </strong>
-
-                ${echapperHTML(
-                  proposition.description
-                )}
-
-              </p>
-            `
-
-            :
-
-            ""
-          }
-
-
-          <p>
-
-            <strong>
-              Statut :
-            </strong>
-
-            <span class="badge ${badge}">
-              ${statut}
-            </span>
-
-          </p>
-
-
-          ${
-            proposition.statut ===
-            "en_attente"
-
-            ?
-
-            `
-              <div class="actions">
-
-                <button
-                  class="accept"
-                  type="button"
-                  onclick="
-                    accepterProposition(
-                      '${proposition.id}'
-                    )
-                  "
-                >
-
-                  Accepter
-
-                </button>
-
-
-                <button
-                  class="refuse"
-                  type="button"
-                  onclick="
-                    refuserProposition(
-                      '${proposition.id}'
-                    )
-                  "
-                >
-
-                  Refuser
-
-                </button>
-
-              </div>
-            `
-
-            :
-
-            ""
-          }
-
-        `;
-
-
-        zone.appendChild(card);
-
-      }
-    );
+    return;
 
   }
 
 
   /*
-   * Section messages
+   * Afficher les propositions
    */
 
-  const titreMessages =
-    document.createElement("h3");
+  propositions.forEach(
+    proposition => {
+
+      let badge =
+        "badge-warning";
+
+      let statut =
+        "En attente";
 
 
-  titreMessages.textContent =
-    "Messages de cet utilisateur";
+      if (
+        proposition.statut ===
+        "acceptee"
+      ) {
 
+        badge =
+          "badge-success";
 
-  zone.appendChild(
-    titreMessages
-  );
-
-
-  if (
-    !messages ||
-    messages.length === 0
-  ) {
-
-    const aucunMessage =
-      document.createElement("div");
-
-
-    aucunMessage.className =
-      "message";
-
-
-    aucunMessage.textContent =
-      "Aucun message.";
-
-
-    zone.appendChild(
-      aucunMessage
-    );
-
-  }
-  else {
-
-    for (
-      const message of messages
-    ) {
-
-      /*
-       * Marquer comme lu
-       */
-
-      if (!message.lu) {
-
-        await supabaseClient
-          .from("Messages")
-          .update({
-            lu: true
-          })
-          .eq(
-            "id",
-            message.id
-          );
-
-        message.lu =
-          true;
+        statut =
+          "Acceptée";
 
       }
 
 
-      /*
-       * Récupérer les réponses
-       */
+      if (
+        proposition.statut ===
+        "refusee"
+      ) {
 
-      const {
-        data: reponses
-      } =
-        await supabaseClient
-          .from("ReponsesMessages")
-          .select(`
-            id,
-            message_id,
-            gestionnaire_id,
-            contenu,
-            date_reponse
-          `)
-          .eq(
-            "message_id",
-            message.id
-          )
-          .order(
-            "date_reponse",
-            {
-              ascending: true
-            }
-          );
+        badge =
+          "badge-danger";
 
+        statut =
+          "Refusée";
 
-      const historique =
-        reponses?.length
-
-        ?
-
-        `
-          <div class="reply-box">
-
-            <h4>
-              Historique
-            </h4>
-
-            ${
-              reponses.map(
-                reponse => `
-
-                  <div class="reply-item">
-
-                    <strong>
-                      Gestionnaire
-                    </strong>
-
-                    <p>
-                      ${echapperHTML(
-                        reponse.contenu
-                      )}
-                    </p>
-
-                    <small>
-                      ${formaterDate(
-                        reponse.date_reponse
-                      )}
-                    </small>
-
-                  </div>
-
-                `
-              ).join("")
-            }
-
-          </div>
-        `
-
-        :
-
-        "";
+      }
 
 
       const card =
@@ -3974,98 +3621,150 @@ async function afficherPropositionsUtilisateur(
 
       card.innerHTML = `
 
-        <div class="conversation">
+        <h3>
 
-          <div class="conversation-body">
+          ${echapperHTML(
+            proposition.nom_consommable
+          )}
 
-            <h3>
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Catégorie :
+          </strong>
+
+          ${echapperHTML(
+            proposition.categorie ||
+            "Non renseignée"
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            État :
+          </strong>
+
+          ${echapperHTML(
+            proposition.Etat ||
+            "Non renseigné"
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Quantité :
+          </strong>
+
+          ${proposition.quantite ?? 0}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date :
+          </strong>
+
+          ${formaterDate(
+            proposition.date_proposition
+          )}
+
+        </p>
+
+
+        ${
+          proposition.description
+
+          ?
+
+          `
+            <p>
+
+              <strong>
+                Description :
+              </strong>
 
               ${echapperHTML(
-                message.sujet
+                proposition.description
               )}
 
-            </h3>
+            </p>
+          `
+
+          :
+
+          ""
+        }
 
 
-            <div class="message-original">
+        <p>
 
-              <p>
+          <strong>
+            Statut :
+          </strong>
 
-                <strong>
-                  Message de l'utilisateur
-                </strong>
+          <span class="badge ${badge}">
+            ${statut}
+          </span>
 
-              </p>
-
-
-              <p>
-
-                ${echapperHTML(
-                  message.contenu
-                )}
-
-              </p>
+        </p>
 
 
-              <p>
+        ${
+          proposition.statut ===
+          "en_attente"
 
-                <strong>
-                  Date :
-                </strong>
+          ?
 
-                ${formaterDate(
-                  message.date_envoi
-                )}
+          `
+            <div class="actions">
 
-              </p>
+              <button
+                class="accept"
+                type="button"
+                onclick="
+                  accepterProposition(
+                    '${proposition.id}'
+                  )
+                "
+              >
 
-            </div>
+                Accepter
 
-
-            ${historique}
-
-
-            <div class="reply-box">
-
-              <h4>
-                Répondre
-              </h4>
-
-
-              <textarea
-                id="reponse-${message.id}"
-                placeholder="Écrivez votre réponse..."
-              ></textarea>
+              </button>
 
 
-              <div class="actions">
+              <button
+                class="refuse"
+                type="button"
+                onclick="
+                  refuserProposition(
+                    '${proposition.id}'
+                  )
+                "
+              >
 
-                <button
-                  class="reply-button"
-                  type="button"
-                  onclick="
-                    repondreMessage(
-                      '${message.id}'
-                    )
-                  "
-                >
+                Refuser
 
-                  Envoyer la réponse
-
-                </button>
-
-              </div>
-
-
-              <div
-                id="resultat-reponse-${message.id}"
-              ></div>
+              </button>
 
             </div>
+          `
 
-          </div>
+          :
 
-        </div>
+          ""
+        }
 
       `;
 
@@ -4073,11 +3772,9 @@ async function afficherPropositionsUtilisateur(
       zone.appendChild(card);
 
     }
-
-  }
+  );
 
 }
-
 /* =========================================================
    REFUSER PROPOSITION
    ========================================================= */
