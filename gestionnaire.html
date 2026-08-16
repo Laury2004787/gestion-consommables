@@ -5254,6 +5254,10 @@ async function chargerMessages() {
   `;
 
 
+  /*
+   * Récupérer tous les messages
+   */
+
   const {
     data: messages,
     error: erreurMessages
@@ -5281,11 +5285,15 @@ async function chargerMessages() {
 
     zone.innerHTML = `
       <div class="error-box">
+
         Impossible de charger les messages.
+
         <br><br>
+
         ${echapperHTML(
           erreurMessages.message
         )}
+
       </div>
     `;
 
@@ -5294,7 +5302,10 @@ async function chargerMessages() {
   }
 
 
-  if (!messages || messages.length === 0) {
+  if (
+    !messages ||
+    messages.length === 0
+  ) {
 
     zone.innerHTML = `
       <div class="message">
@@ -5307,15 +5318,18 @@ async function chargerMessages() {
   }
 
 
-  const ids =
-    [
-      ...new Set(
-        messages.map(
-          message =>
-            message.utilisateur_id
-        )
+  /*
+   * Récupérer les utilisateurs concernés
+   */
+
+  const ids = [
+    ...new Set(
+      messages.map(
+        message =>
+          message.utilisateur_id
       )
-    ];
+    )
+  ];
 
 
   let profils = [];
@@ -5338,7 +5352,15 @@ async function chargerMessages() {
         );
 
 
-    if (!resultat.error) {
+    if (resultat.error) {
+
+      console.error(
+        "Erreur profils :",
+        resultat.error
+      );
+
+    }
+    else {
 
       profils =
         resultat.data || [];
@@ -5348,39 +5370,432 @@ async function chargerMessages() {
   }
 
 
+  /*
+   * Indexer les profils
+   */
+
   const profilsParId = {};
 
 
-  profils.forEach(profil => {
+  profils.forEach(
+    profil => {
 
-    profilsParId[
-      profil.id
-    ] =
-      profil;
+      profilsParId[
+        profil.id
+      ] =
+        profil;
 
-  });
+    }
+  );
 
+
+  /*
+   * Regrouper les messages par utilisateur
+   */
+
+  const utilisateurs = {};
+
+
+  messages.forEach(
+    message => {
+
+      const utilisateurId =
+        message.utilisateur_id;
+
+
+      const profil =
+        profilsParId[
+          utilisateurId
+        ];
+
+
+      if (
+        !utilisateurs[
+          utilisateurId
+        ]
+      ) {
+
+        utilisateurs[
+          utilisateurId
+        ] = {
+
+          id:
+            utilisateurId,
+
+          nom:
+            profil?.nom || "",
+
+          prenom:
+            profil?.prenom || "",
+
+          service:
+            profil?.service || "",
+
+          messages: []
+
+        };
+
+      }
+
+
+      utilisateurs[
+        utilisateurId
+      ].messages.push(
+        message
+      );
+
+    }
+  );
+
+
+  /*
+   * Afficher la liste des utilisateurs
+   */
 
   zone.innerHTML = "";
 
+
+  const titre =
+    document.createElement("h3");
+
+
+  titre.textContent =
+    "Utilisateurs ayant envoyé des messages";
+
+
+  zone.appendChild(
+    titre
+  );
+
+
+  Object.values(
+    utilisateurs
+  ).forEach(
+    utilisateur => {
+
+      const card =
+        document.createElement("div");
+
+
+      card.className =
+        "card";
+
+
+      const nombreMessages =
+        utilisateur.messages.length;
+
+
+      const messagesNonLus =
+        utilisateur.messages.filter(
+          message =>
+            !message.lu
+        ).length;
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${echapperHTML(
+            utilisateur.prenom
+          )}
+
+          ${echapperHTML(
+            utilisateur.nom
+          )}
+
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Service :
+          </strong>
+
+          ${echapperHTML(
+            utilisateur.service ||
+            "Non renseigné"
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Nombre de messages :
+          </strong>
+
+          ${nombreMessages}
+
+        </p>
+
+
+        ${
+          messagesNonLus > 0
+
+          ?
+
+          `
+            <p>
+
+              <strong>
+                Messages non lus :
+              </strong>
+
+              ${messagesNonLus}
+
+            </p>
+          `
+
+          :
+
+          ""
+        }
+
+
+        <div class="actions">
+
+          <button
+            class="accept"
+            type="button"
+            onclick="
+              afficherMessagesUtilisateur(
+                '${utilisateur.id}'
+              )
+            "
+          >
+
+            Voir les messages
+
+          </button>
+
+        </div>
+
+      `;
+
+
+      zone.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+/* =========================================================
+   AFFICHER LES MESSAGES D'UN UTILISATEUR
+   ========================================================= */
+
+async function afficherMessagesUtilisateur(
+  utilisateurId
+) {
+
+  const zone =
+    document.getElementById(
+      "listeMessages"
+    );
+
+
+  zone.innerHTML = `
+    <div class="message">
+      Chargement des messages...
+    </div>
+  `;
+
+
+  /*
+   * Récupérer le profil
+   */
+
+  const {
+    data: profil,
+    error: erreurProfil
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select(`
+        id,
+        nom,
+        prenom,
+        service
+      `)
+      .eq(
+        "id",
+        utilisateurId
+      )
+      .single();
+
+
+  if (erreurProfil) {
+
+    zone.innerHTML = `
+      <div class="error-box">
+
+        Impossible de charger l'utilisateur.
+
+        <br><br>
+
+        ${echapperHTML(
+          erreurProfil.message
+        )}
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  /*
+   * Récupérer les messages de cet utilisateur
+   */
+
+  const {
+    data: messages,
+    error: erreurMessages
+  } =
+    await supabaseClient
+      .from("Messages")
+      .select(`
+        id,
+        sujet,
+        contenu,
+        date_envoi,
+        lu,
+        repondu,
+        utilisateur_id
+      `)
+      .eq(
+        "utilisateur_id",
+        utilisateurId
+      )
+      .order(
+        "date_envoi",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (erreurMessages) {
+
+    zone.innerHTML = `
+      <div class="error-box">
+
+        Impossible de charger les messages.
+
+        <br><br>
+
+        ${echapperHTML(
+          erreurMessages.message
+        )}
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  /*
+   * En-tête
+   */
+
+  zone.innerHTML = `
+
+    <div class="actions">
+
+      <button
+        class="nav-button"
+        type="button"
+        onclick="
+          chargerMessages()
+        "
+      >
+
+        ← Retour aux utilisateurs
+
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>
+
+        ${echapperHTML(
+          profil.prenom
+        )}
+
+        ${echapperHTML(
+          profil.nom
+        )}
+
+      </h2>
+
+
+      <p>
+
+        <strong>
+          Service :
+        </strong>
+
+        ${echapperHTML(
+          profil.service ||
+          "Non renseigné"
+        )}
+
+      </p>
+
+    </div>
+
+
+    <h3>
+      Messages de cet utilisateur
+    </h3>
+
+  `;
+
+
+  if (
+    !messages ||
+    messages.length === 0
+  ) {
+
+    zone.innerHTML += `
+      <div class="message">
+        Aucun message.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  /*
+   * Afficher les messages
+   */
 
   for (
     const message of messages
   ) {
 
-    const profil =
-      profilsParId[
-        message.utilisateur_id
-      ];
-
+    /*
+     * Marquer le message comme lu
+     */
 
     if (!message.lu) {
 
       await supabaseClient
         .from("Messages")
         .update({
-          lu:
-            true
+          lu: true
         })
         .eq(
           "id",
@@ -5392,6 +5807,10 @@ async function chargerMessages() {
 
     }
 
+
+    /*
+     * Récupérer les réponses
+     */
 
     const {
       data: reponses
@@ -5420,11 +5839,14 @@ async function chargerMessages() {
     let texteStatut =
       "Lu";
 
+
     let classeStatut =
       "statut-lu";
 
 
-    if (message.repondu) {
+    if (
+      message.repondu
+    ) {
 
       texteStatut =
         "Répondu";
@@ -5434,6 +5856,10 @@ async function chargerMessages() {
 
     }
 
+
+    /*
+     * Historique des réponses
+     */
 
     const historique =
       reponses?.length
@@ -5448,29 +5874,35 @@ async function chargerMessages() {
           </h4>
 
           ${
-            reponses.map(reponse => `
+            reponses.map(
+              reponse => `
 
-              <div class="reply-item">
+                <div class="reply-item">
 
-                <strong>
-                  Gestionnaire
-                </strong>
+                  <strong>
+                    Gestionnaire
+                  </strong>
 
-                <p>
-                  ${echapperHTML(
-                    reponse.contenu
-                  )}
-                </p>
+                  <p>
 
-                <small>
-                  ${formaterDate(
-                    reponse.date_reponse
-                  )}
-                </small>
+                    ${echapperHTML(
+                      reponse.contenu
+                    )}
 
-              </div>
+                  </p>
 
-            `).join("")
+                  <small>
+
+                    ${formaterDate(
+                      reponse.date_reponse
+                    )}
+
+                  </small>
+
+                </div>
+
+              `
+            ).join("")
           }
 
         </div>
@@ -5480,6 +5912,10 @@ async function chargerMessages() {
 
       "";
 
+
+    /*
+     * Carte du message
+     */
 
     const card =
       document.createElement("div");
@@ -5492,43 +5928,6 @@ async function chargerMessages() {
     card.innerHTML = `
 
       <div class="conversation">
-
-        <div class="conversation-header">
-
-          <h4>
-
-            ${
-              echapperHTML(
-                profil?.prenom || ""
-              )
-            }
-
-            ${
-              echapperHTML(
-                profil?.nom || ""
-              )
-            }
-
-          </h4>
-
-
-          <div>
-
-            <strong>
-              Service :
-            </strong>
-
-            ${
-              echapperHTML(
-                profil?.service ||
-                "Non renseigné"
-              )
-            }
-
-          </div>
-
-        </div>
-
 
         <div class="conversation-body">
 
@@ -5544,16 +5943,20 @@ async function chargerMessages() {
           <div class="message-original">
 
             <p>
+
               <strong>
                 Message de l'utilisateur
               </strong>
+
             </p>
 
 
             <p>
+
               ${echapperHTML(
                 message.contenu
               )}
+
             </p>
 
 
@@ -5572,7 +5975,9 @@ async function chargerMessages() {
           </div>
 
 
-          <p class="statut ${classeStatut}">
+          <p
+            class="statut ${classeStatut}"
+          >
 
             <strong>
               Statut :
@@ -5595,19 +6000,21 @@ async function chargerMessages() {
 
             <textarea
               id="reponse-${message.id}"
-              placeholder="Écrivez votre réponse..."></textarea>
+              placeholder="Écrivez votre réponse..."
+            ></textarea>
 
 
             <div class="actions">
 
               <button
                 class="reply-button"
-                id="bouton-reponse-${message.id}"
+                type="button"
                 onclick="
                   repondreMessage(
                     '${message.id}'
                   )
-                ">
+                "
+              >
 
                 Envoyer la réponse
 
@@ -5617,8 +6024,8 @@ async function chargerMessages() {
 
 
             <div
-              id="resultat-reponse-${message.id}">
-            </div>
+              id="resultat-reponse-${message.id}"
+            ></div>
 
           </div>
 
@@ -5629,12 +6036,13 @@ async function chargerMessages() {
     `;
 
 
-    zone.appendChild(card);
+    zone.appendChild(
+      card
+    );
 
   }
 
 }
-
 
 /* =========================================================
    REPONSE MESSAGE
