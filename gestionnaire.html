@@ -1922,14 +1922,17 @@ async function deconnexion() {
 
 }
 
-
 /* =========================================================
    RESERVATIONS
    ========================================================= */
 
 async function chargerReservations() {
 
-  const zone = document.getElementById("listeReservations");
+  const zone =
+    document.getElementById(
+      "listeReservations"
+    );
+
 
   zone.innerHTML = `
     <div class="message">
@@ -1937,9 +1940,12 @@ async function chargerReservations() {
     </div>
   `;
 
-  try {
 
-    const resultat = await supabaseClient
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
       .from("Réservations")
       .select(`
         id,
@@ -1949,163 +1955,217 @@ async function chargerReservations() {
         date_retour,
         commentaire,
         statut,
-        quantite
+        quantite,
+
+        Profils!Réservations_utilisateur_id_fkey (
+          id,
+          nom,
+          prenom,
+          service
+        )
       `)
-      .order("date_demande", {
-        ascending: false
-      });
-
-    if (resultat.error) {
-
-      console.error(
-        "Erreur réservations :",
-        resultat.error
+      .order(
+        "date_demande",
+        {
+          ascending: false
+        }
       );
 
-      zone.innerHTML = `
-        <div class="error-box">
-          Impossible de charger les réservations.
-          <br><br>
-          ${echapperHTML(resultat.error.message)}
-        </div>
-      `;
 
-      return;
-    }
-
-    const data = resultat.data || [];
-
-    if (data.length === 0) {
-
-      zone.innerHTML = `
-        <div class="message">
-          Aucune réservation.
-        </div>
-      `;
-
-      return;
-    }
-
-    zone.innerHTML = "";
-
-    data.forEach(reservation => {
-
-      const card =
-        document.createElement("div");
-
-      card.className = "card";
-
-      card.innerHTML = `
-        <h3>
-          Demande de réservation
-        </h3>
-
-        <p>
-          <strong>ID utilisateur :</strong>
-          ${echapperHTML(
-            reservation.utilisateur_id || ""
-          )}
-        </p>
-
-        <p>
-          <strong>Date de demande :</strong>
-          ${echapperHTML(
-            reservation.date_demande || ""
-          )}
-        </p>
-
-        <p>
-          <strong>Date de début :</strong>
-          ${echapperHTML(
-            reservation.date_debut || ""
-          )}
-        </p>
-
-        <p>
-          <strong>Date de retour :</strong>
-          ${echapperHTML(
-            reservation.date_retour || ""
-          )}
-        </p>
-
-        <p>
-          <strong>Quantité :</strong>
-          ${reservation.quantite ?? 0}
-        </p>
-
-        <p>
-          <strong>Commentaire :</strong>
-          ${echapperHTML(
-            reservation.commentaire || "Aucun"
-          )}
-        </p>
-
-        <p>
-          <strong>Statut :</strong>
-          ${echapperHTML(
-            reservation.statut || ""
-          )}
-        </p>
-
-        ${
-          reservation.statut === "en_attente"
-            ? `
-              <div class="actions">
-
-                <button
-                  class="accept"
-                  onclick="
-                    modifierStatut(
-                      '${reservation.id}',
-                      'acceptee'
-                    )
-                  ">
-
-                  Accepter
-
-                </button>
-
-                <button
-                  class="refuse"
-                  onclick="
-                    refuserReservation(
-                      '${reservation.id}'
-                    )
-                  ">
-
-                  Refuser
-
-                </button>
-
-              </div>
-            `
-            : ""
-        }
-      `;
-
-      zone.appendChild(card);
-
-    });
-
-  }
-  catch (erreur) {
+  if (error) {
 
     console.error(
-      "Erreur inattendue réservations :",
-      erreur
+      "Erreur réservations :",
+      error
     );
 
     zone.innerHTML = `
       <div class="error-box">
-        Une erreur est survenue lors du chargement des réservations.
+
+        Impossible de charger les réservations.
+
         <br><br>
-        ${echapperHTML(erreur.message)}
+
+        ${echapperHTML(
+          error.message
+        )}
+
       </div>
     `;
 
+    return;
   }
 
+
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucune réservation.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  /*
+   * REGROUPER LES RESERVATIONS
+   * PAR UTILISATEUR
+   */
+
+  const utilisateurs = {};
+
+
+  data.forEach(
+    reservation => {
+
+      const profil =
+        reservation.Profils;
+
+
+      if (!profil) {
+        return;
+      }
+
+
+      const utilisateurId =
+        reservation.utilisateur_id;
+
+
+      if (!utilisateurs[utilisateurId]) {
+
+        utilisateurs[utilisateurId] = {
+
+          id:
+            utilisateurId,
+
+          nom:
+            profil.nom || "",
+
+          prenom:
+            profil.prenom || "",
+
+          service:
+            profil.service || "",
+
+          reservations: []
+
+        };
+
+      }
+
+
+      utilisateurs[
+        utilisateurId
+      ].reservations.push(
+        reservation
+      );
+
+    }
+  );
+
+
+  /*
+   * AFFICHER LES UTILISATEURS
+   */
+
+  zone.innerHTML = "";
+
+
+  const titre =
+    document.createElement("h3");
+
+
+  titre.textContent =
+    "Utilisateurs ayant effectué une réservation";
+
+
+  zone.appendChild(titre);
+
+
+  Object.values(
+    utilisateurs
+  ).forEach(
+    utilisateur => {
+
+      const card =
+        document.createElement("div");
+
+
+      card.className =
+        "card";
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${echapperHTML(
+            utilisateur.prenom
+          )}
+
+          ${echapperHTML(
+            utilisateur.nom
+          )}
+
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Service :
+          </strong>
+
+          ${echapperHTML(
+            utilisateur.service ||
+            "Non renseigné"
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Nombre de demandes :
+          </strong>
+
+          ${utilisateur.reservations.length}
+
+        </p>
+
+
+        <div class="actions">
+
+          <button
+            class="accept"
+            type="button"
+            onclick="
+              afficherReservationsUtilisateur(
+                '${utilisateur.id}'
+              )
+            "
+          >
+
+            Voir les demandes
+
+          </button>
+
+        </div>
+
+      `;
+
+
+      zone.appendChild(card);
+
+    }
+  );
+
 }
+```
+
 
 /* =========================================================
    AFFICHER LES RESERVATIONS D'UN UTILISATEUR
