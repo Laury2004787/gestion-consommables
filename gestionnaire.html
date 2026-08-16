@@ -1943,28 +1943,15 @@ async function chargerReservations() {
     await supabaseClient
       .from("Réservations")
       .select(`
-        id,
-        utilisateur_id,
-        date_demande,
-        date_debut,
-        date_retour,
-        commentaire,
-        statut,
-        quantite,
-
-        Profils!Réservations_utilisateur_id_fkey (
-          id,
-          nom,
-          prenom,
-          service
-        ),
-
-        Consommables!Réservations_consommable_id_fkey (
-          "Nom du sortant",
-          Categorie,
-          Laboratoire
-        )
-      `)
+  id,
+  utilisateur_id,
+  date_demande,
+  date_debut,
+  date_retour,
+  commentaire,
+  statut,
+  quantite
+`)
       .order(
         "date_demande",
         {
