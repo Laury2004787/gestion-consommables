@@ -1481,173 +1481,85 @@ window.consommablesDisponibles =
   }
 
 
-  zone.innerHTML = "";
+  const categories = [
+  ...new Set(
+    consommables
+      .map(
+        consommable =>
+          consommable.Categorie
+      )
+      .filter(
+        categorie =>
+          categorie &&
+          categorie.trim() !== ""
+      )
+  )
+];
 
 
-  consommables.forEach(
-    function(consommable) {
+zone.innerHTML = `
 
+  <div class="filtre-consommables">
 
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "card";
-
-
-      let photoHTML = "";
-
-
-      if (
-  consommable.photo
-) {
-
-  photoHTML = `
-
-    <img
-      src="${consommable.photo}"
-      alt="Photo du consommable"
-      class="photo-consommable"
-      onclick="afficherPhotoGrande('${consommable.photo}')"
+    <label
+      for="filtre-categorie"
     >
 
-  `;
+      <strong>
+        Filtrer par catégorie :
+      </strong>
 
-}
-
-
-      card.innerHTML = `
-
-        ${photoHTML}
-
-        <div class="card-content">
-
-          <h3>
-            ${
-              consommable[
-                "Nom du sortant"
-              ]
-              || ""
-            }
-          </h3>
+    </label>
 
 
-          <p>
+    <select
+      id="filtre-categorie"
+      onchange="filtrerConsommablesParCategorie()"
+    >
 
-            <strong>
-              Catégorie :
-            </strong>
+      <option value="">
+        Toutes les catégories
+      </option>
 
-            ${
-              consommable.Categorie
-              || ""
-            }
+      ${
+        categories
+          .sort()
+          .map(
+            categorie => `
 
-          </p>
+              <option
+                value="${echapperHTML(
+                  categorie
+                )}"
+              >
 
+                ${echapperHTML(
+                  categorie
+                )}
 
-          <p>
+              </option>
 
-            <strong>
-              Laboratoire :
-            </strong>
+            `
+          )
+          .join("")
+      }
 
-            ${
-              consommable.Laboratoire
-              || ""
-            }
+    </select>
 
-          </p>
-
-
-          <p>
-
-            ${
-              consommable.Description
-              || ""
-            }
-
-          </p>
-
-
-          <p>
-
-            <strong>
-              État :
-            </strong>
-
-            ${
-              consommable.Etat
-              || ""
-            }
-
-          </p>
+  </div>
 
 
-          <p>
+  <div
+    id="liste-consommables"
+    class="liste-consommables"
+  ></div>
 
-            <strong>
-              Quantité :
-            </strong>
-
-            ${
-              consommable.Quantite
-              ?? 0
-            }
-
-          </p>
+`;
 
 
-          ${
-  consommable.Quantite > 0
-
-  ?
-
-  `
-    <button
-      class="reserve"
-      onclick="
-        reserver(
-          '${consommable.id}'
-        )
-      ">
-
-      Réserver
-
-    </button>
-  `
-
-  :
-
-  `
-    <button
-      class="reserve"
-      disabled
-      style="
-        background:#9ca3af;
-        cursor:not-allowed;
-      ">
-
-      Indisponible
-
-    </button>
-  `
-}
-
-        </div>
-
-      `;
-
-
-      zone.appendChild(
-        card
-      );
-
-    }
-  );
+  afficherListeConsommables(
+  consommables
+);
 
 }
 /* =========================================================
