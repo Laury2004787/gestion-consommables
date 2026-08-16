@@ -3008,7 +3008,51 @@ if ("serviceWorker" in navigator) {
   );
 
 }
+async function activerNotifications() {
 
+  if (!("Notification" in window)) {
+
+    alert(
+      "Les notifications ne sont pas supportées par ce navigateur."
+    );
+
+    return;
+  }
+
+
+  const permission =
+    await Notification.requestPermission();
+
+
+  if (permission === "granted") {
+
+    alert(
+      "Les notifications sont maintenant activées."
+    );
+
+    console.log(
+      "Autorisation des notifications : OK"
+    );
+
+  }
+
+  else if (permission === "denied") {
+
+    alert(
+      "Les notifications ont été refusées."
+    );
+
+  }
+
+  else {
+
+    console.log(
+      "Demande de notification annulée."
+    );
+
+  }
+
+}
 </script>
 
 </body>
