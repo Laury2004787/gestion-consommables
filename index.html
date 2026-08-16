@@ -1339,7 +1339,6 @@ async function deconnexion() {
    SUPPRESSION DU COMPTE
    ========================================================= */
 
-
 async function supprimerCompte() {
 
   const confirmation =
@@ -1355,34 +1354,126 @@ async function supprimerCompte() {
   }
 
 
-  const { error } =
-    await supabaseClient.functions.invoke(
-      "supprimer-compte"
-    );
+  try {
+
+    /*
+     * Vérifier que l'utilisateur possède
+     * bien une session active.
+     */
+
+    const {
+      data: sessionData,
+      error: sessionError
+    } =
+      await supabaseClient.auth.getSession();
 
 
-  if (error) {
+    if (
+      sessionError ||
+      !sessionData.session
+    ) {
+
+      alert(
+        "Votre session a expiré. Veuillez vous reconnecter."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Appeler l'Edge Function
+     */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.functions.invoke(
+        "supprimer-compte",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${sessionData.session.access_token}`
+          }
+        }
+      );
+
+
+    /*
+     * Vérifier l'erreur
+     */
+
+    if (error) {
+
+      console.error(
+        "Erreur suppression compte :",
+        error
+      );
+
+      alert(
+        "Impossible de supprimer le compte : " +
+        error.message
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Vérifier la réponse de l'Edge Function
+     */
+
+    if (
+      !data ||
+      data.success !== true
+    ) {
+
+      console.error(
+        "Réponse suppression compte :",
+        data
+      );
+
+      alert(
+        data?.error ||
+        "La suppression du compte a échoué."
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Suppression réussie
+     */
 
     alert(
-      "Impossible de supprimer le compte : " +
-      error.message
+      "Votre compte a été supprimé."
     );
 
-    return;
+
+    await supabaseClient.auth.signOut();
+
+
+    window.location.href =
+      "index.html";
 
   }
+  catch (erreur) {
 
+    console.error(
+      "Erreur inattendue suppression compte :",
+      erreur
+    );
 
-  alert(
-    "Votre compte a été supprimé."
-  );
+    alert(
+      "Une erreur est survenue lors de la suppression du compte."
+    );
 
-
-  await supabaseClient.auth.signOut();
-
-
-  window.location.href =
-    "index.html";
+  }
 
 }
 
