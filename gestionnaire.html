@@ -6006,21 +6006,22 @@ async function afficherMessagesUtilisateur(
 
             <div class="actions">
 
-              <button
-                class="reply-button"
-                type="button"
-                onclick="
-                  repondreMessage(
-                    '${message.id}'
-                  )
-                "
-              >
+  <button
+    class="reply-button"
+    type="button"
+    id="bouton-reponse-${message.id}"
+    onclick="
+      repondreMessage(
+        '${message.id}'
+      )
+    "
+  >
 
-                Envoyer la réponse
+    Envoyer la réponse
 
-              </button>
+  </button>
 
-            </div>
+</div>>
 
 
             <div
@@ -6082,7 +6083,9 @@ async function repondreMessage(messageId) {
   }
 
 
+  if (bouton) {
   bouton.disabled = true;
+}
 
 
   try {
@@ -6379,8 +6382,9 @@ async function repondreMessage(messageId) {
 
   finally {
 
-    bouton.disabled =
-      false;
+    if (bouton) {
+  bouton.disabled = false;
+}
 
   }
 
