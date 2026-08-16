@@ -1923,6 +1923,7 @@ async function deconnexion() {
 }
 
 
+```js
 /* =========================================================
    RESERVATIONS
    ========================================================= */
@@ -1943,6 +1944,7 @@ async function chargerReservations() {
       .from("Réservations")
       .select(`
         id,
+        utilisateur_id,
         date_demande,
         date_debut,
         date_retour,
@@ -1951,6 +1953,7 @@ async function chargerReservations() {
         quantite,
 
         Profils!Réservations_utilisateur_id_fkey (
+          id,
           nom,
           prenom,
           service
@@ -1983,6 +1986,7 @@ async function chargerReservations() {
     `;
 
     return;
+
   }
 
 
@@ -1995,226 +1999,567 @@ async function chargerReservations() {
     `;
 
     return;
+
   }
 
+
+  /*
+   * Regrouper les réservations
+   * par utilisateur.
+   */
+
+  const utilisateurs = {};
+
+
+  data.forEach(
+    reservation => {
+
+      const profil =
+        reservation.Profils;
+
+
+      if (!profil) {
+        return;
+      }
+
+
+      const utilisateurId =
+        reservation.utilisateur_id;
+
+
+      if (!utilisateurs[utilisateurId]) {
+
+        utilisateurs[utilisateurId] = {
+
+          id:
+            utilisateurId,
+
+          nom:
+            profil.nom || "",
+
+          prenom:
+            profil.prenom || "",
+
+          service:
+            profil.service || "",
+
+          reservations: []
+
+        };
+
+      }
+
+
+      utilisateurs[
+        utilisateurId
+      ].reservations.push(
+        reservation
+      );
+
+    }
+  );
+
+
+  /*
+   * Afficher la liste des utilisateurs.
+   */
 
   zone.innerHTML = "";
 
 
-  data.forEach(reservation => {
-
-    const card =
-      document.createElement("div");
+  const titre =
+    document.createElement("h3");
 
 
-    card.className =
-      "card";
+  titre.textContent =
+    "Utilisateurs ayant effectué une réservation";
 
 
-    card.innerHTML = `
-
-      <h3>
-        ${
-          echapperHTML(
-            reservation.Consommables?.[
-              "Nom du sortant"
-            ] ||
-            "Consommable"
-          )
-        }
-      </h3>
+  zone.appendChild(titre);
 
 
-      <p>
-        <strong>Demandeur :</strong>
-        ${
-          echapperHTML(
-            reservation.Profils?.prenom || ""
-          )
-        }
-        ${
-          echapperHTML(
-            reservation.Profils?.nom || ""
-          )
-        }
-      </p>
+  Object.values(
+    utilisateurs
+  ).forEach(
+    utilisateur => {
+
+      const card =
+        document.createElement("div");
 
 
-      <p>
-        <strong>Service :</strong>
-        ${
-          echapperHTML(
-            reservation.Profils?.service ||
+      card.className =
+        "card";
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${echapperHTML(
+            utilisateur.prenom
+          )}
+
+          ${echapperHTML(
+            utilisateur.nom
+          )}
+
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Service :
+          </strong>
+
+          ${echapperHTML(
+            utilisateur.service ||
             "Non renseigné"
-          )
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Réservations :
+          </strong>
+
+          ${utilisateur.reservations.length}
+
+        </p>
+
+
+        <div class="actions">
+
+          <button
+            class="accept"
+            onclick="
+              afficherReservationsUtilisateur(
+                '${utilisateur.id}'
+              )
+            ">
+
+            Voir les demandes
+
+          </button>
+
+        </div>
+
+      `;
+
+
+      zone.appendChild(card);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   AFFICHER LES RESERVATIONS D'UN UTILISATEUR
+   ========================================================= */
+
+async function afficherReservationsUtilisateur(
+  utilisateurId
+) {
+
+  const zone =
+    document.getElementById(
+      "listeReservations"
+    );
+
+
+  zone.innerHTML = `
+    <div class="message">
+      Chargement des réservations...
+    </div>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Réservations")
+      .select(`
+        id,
+        utilisateur_id,
+        date_demande,
+        date_debut,
+        date_retour,
+        commentaire,
+        statut,
+        quantite,
+
+        Profils!Réservations_utilisateur_id_fkey (
+          nom,
+          prenom,
+          service
+        ),
+
+        Consommables!Réservations_consommable_id_fkey (
+          "Nom du sortant",
+          Categorie,
+          Laboratoire
+        )
+      `)
+      .eq(
+        "utilisateur_id",
+        utilisateurId
+      )
+      .order(
+        "date_demande",
+        {
+          ascending: false
         }
-      </p>
+      );
 
 
-      <p>
-        <strong>Catégorie :</strong>
-        ${
-          echapperHTML(
-            reservation.Consommables?.Categorie ||
-            "Non renseignée"
-          )
-        }
-      </p>
+  if (error) {
+
+    console.error(error);
+
+    zone.innerHTML = `
+      <div class="error-box">
+
+        Impossible de charger les réservations.
+
+        <br><br>
+
+        ${echapperHTML(
+          error.message
+        )}
+
+      </div>
+    `;
+
+    return;
+
+  }
 
 
-      <p>
-        <strong>Laboratoire :</strong>
-        ${
-          echapperHTML(
-            reservation.Consommables?.Laboratoire ||
-            "Non renseigné"
-          )
-        }
-      </p>
+  if (!data || data.length === 0) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucune réservation pour cet utilisateur.
+      </div>
+    `;
+
+    return;
+
+  }
 
 
-      <p>
-        <strong>Date de demande :</strong>
-        ${echapperHTML(reservation.date_demande)}
-      </p>
+  const profil =
+    data[0].Profils;
 
 
-      <p>
-        <strong>Date de début :</strong>
-        ${echapperHTML(reservation.date_debut)}
-      </p>
+  zone.innerHTML = `
 
-
-      <p>
-        <strong>Date de retour :</strong>
-        ${echapperHTML(reservation.date_retour)}
-      </p>
-<p>
-  <strong>Quantité demandée :</strong>
-  ${reservation.quantite}
-</p>
-
-      <p>
-        <strong>Commentaire :</strong>
-        ${
-          echapperHTML(
-            reservation.commentaire || "Aucun"
-          )
-        }
-      </p>
-
-
-      <p class="statut">
-
-        <strong>Statut :</strong>
-
-        ${
-          echapperHTML(
-            reservation.statut
-          )
-        }
-
-      </p>
-
-
-      ${
-        reservation.statut === "en_attente"
-
-        ?
-
-        `
-          <div class="actions">
-
-            <button
-              class="accept"
-              onclick="
-                modifierStatut(
-                  '${reservation.id}',
-                  'acceptee'
-                )
-              ">
-
-              Accepter
-
-            </button>
-
-
-            <button
-  class="refuse"
-  onclick="
-    refuserReservation(
-      '${reservation.id}'
-    )
-  ">
-
-  Refuser
-
-</button>
-
-          </div>
-        `
-
-        :
-
-        ""
-      }
-
-
-      ${
-  reservation.statut === "retour_signale"
-
-  ?
-
-  `
     <div class="actions">
 
-      <label>
-        <strong>Quantité réellement retournée :</strong>
-        <input
-          type="number"
-          id="quantite-retour-${reservation.id}"
-          min="1"
-          max="${reservation.quantite}"
-          value="${reservation.quantite}"
-        >
-      </label>
-
-      <label>
-        <strong>Date réelle du retour :</strong>
-        <input
-          type="date"
-          id="date-retour-${reservation.id}"
-          value="${new Date().toISOString().split("T")[0]}"
-        >
-      </label>
-
       <button
-        class="confirm-button"
+        class="nav-button"
         onclick="
-          confirmerRetour(
-            '${reservation.id}'
-          )
+          chargerReservations()
         ">
 
-        Confirmer le retour
+        ← Retour aux utilisateurs
 
       </button>
 
     </div>
-  `
 
-  :
 
-  ""
+    <h3>
+
+      Réservations de
+
+      ${echapperHTML(
+        profil?.prenom || ""
+      )}
+
+      ${echapperHTML(
+        profil?.nom || ""
+      )}
+
+    </h3>
+
+
+    <p>
+
+      <strong>
+        Service :
+      </strong>
+
+      ${echapperHTML(
+        profil?.service ||
+        "Non renseigné"
+      )}
+
+    </p>
+
+  `;
+
+
+  data.forEach(
+    reservation => {
+
+      const card =
+        document.createElement("div");
+
+
+      card.className =
+        "card";
+
+
+      card.innerHTML = `
+
+        <h3>
+
+          ${
+            echapperHTML(
+              reservation.Consommables?.[
+                "Nom du sortant"
+              ] ||
+              "Consommable"
+            )
+          }
+
+        </h3>
+
+
+        <p>
+
+          <strong>
+            Catégorie :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.Consommables?.Categorie ||
+              "Non renseignée"
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Laboratoire :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.Consommables?.Laboratoire ||
+              "Non renseigné"
+            )
+          }
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date de demande :
+          </strong>
+
+          ${echapperHTML(
+            reservation.date_demande
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date de début :
+          </strong>
+
+          ${echapperHTML(
+            reservation.date_debut
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Date de retour :
+          </strong>
+
+          ${echapperHTML(
+            reservation.date_retour
+          )}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Quantité demandée :
+          </strong>
+
+          ${reservation.quantite}
+
+        </p>
+
+
+        <p>
+
+          <strong>
+            Commentaire :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.commentaire ||
+              "Aucun"
+            )
+          }
+
+        </p>
+
+
+        <p class="statut">
+
+          <strong>
+            Statut :
+          </strong>
+
+          ${
+            echapperHTML(
+              reservation.statut
+            )
+          }
+
+        </p>
+
+
+        ${
+          reservation.statut === "en_attente"
+
+          ?
+
+          `
+            <div class="actions">
+
+              <button
+                class="accept"
+                onclick="
+                  modifierStatut(
+                    '${reservation.id}',
+                    'acceptee'
+                  )
+                ">
+
+                Accepter
+
+              </button>
+
+
+              <button
+                class="refuse"
+                onclick="
+                  refuserReservation(
+                    '${reservation.id}'
+                  )
+                ">
+
+                Refuser
+
+              </button>
+
+            </div>
+          `
+
+          :
+
+          ""
+        }
+
+
+        ${
+          reservation.statut === "retour_signale"
+
+          ?
+
+          `
+            <div class="actions">
+
+              <label>
+
+                <strong>
+                  Quantité réellement retournée :
+                </strong>
+
+                <input
+                  type="number"
+                  id="quantite-retour-${reservation.id}"
+                  min="1"
+                  max="${reservation.quantite}"
+                  value="${reservation.quantite}"
+                >
+
+              </label>
+
+
+              <label>
+
+                <strong>
+                  Date réelle du retour :
+                </strong>
+
+                <input
+                  type="date"
+                  id="date-retour-${reservation.id}"
+                  value="${new Date().toISOString().split("T")[0]}"
+                >
+
+              </label>
+
+
+              <button
+                class="confirm-button"
+                onclick="
+                  confirmerRetour(
+                    '${reservation.id}'
+                  )
+                ">
+
+                Confirmer le retour
+
+              </button>
+
+            </div>
+          `
+
+          :
+
+          ""
+        }
+
+      `;
+
+
+      zone.appendChild(card);
+
+    }
+  );
+
 }
-    `;
-
-
-    zone.appendChild(card);
-
-  });
-
-}
+```
 
 
 /* =========================================================
