@@ -1457,7 +1457,8 @@ async function chargerConsommables() {
 
   const consommables =
     resultat.data;
-
+window.consommablesDisponibles =
+  consommables;
 
   if (
     !consommables ||
@@ -1649,6 +1650,252 @@ async function chargerConsommables() {
   );
 
 }
+/* =========================================================
+   FILTRER LES CONSOMMABLES PAR CATÉGORIE
+   ========================================================= */
+
+function filtrerConsommablesParCategorie() {
+
+  const select =
+    document.getElementById(
+      "filtre-categorie"
+    );
+
+  if (!select) {
+    return;
+  }
+
+  const categorieSelectionnee =
+    select.value;
+
+  const liste =
+    window.consommablesDisponibles || [];
+
+  const consommablesFiltres =
+    categorieSelectionnee === ""
+
+      ?
+
+      liste
+
+      :
+
+      liste.filter(
+        consommable =>
+          consommable.Categorie ===
+          categorieSelectionnee
+      );
+
+  afficherListeConsommables(
+    consommablesFiltres
+  );
+
+}
+
+
+/* =========================================================
+   AFFICHER LES CONSOMMABLES FILTRÉS
+   ========================================================= */
+
+function afficherListeConsommables(
+  consommables
+) {
+
+  const zone =
+    document.getElementById(
+      "liste-consommables"
+    );
+
+  if (!zone) {
+    return;
+  }
+
+  zone.innerHTML = "";
+
+
+  if (
+    !consommables ||
+    consommables.length === 0
+  ) {
+
+    zone.innerHTML = `
+      <div class="message">
+        Aucun consommable disponible
+        dans cette catégorie.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  consommables.forEach(
+    function(consommable) {
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "card";
+
+
+      let photoHTML = "";
+
+
+      if (consommable.photo) {
+
+        photoHTML = `
+
+          <img
+            src="${consommable.photo}"
+            alt="Photo du consommable"
+            class="photo-consommable"
+            onclick="
+              afficherPhotoGrande(
+                '${consommable.photo}'
+              )
+            "
+          >
+
+        `;
+
+      }
+
+
+      card.innerHTML = `
+
+        ${photoHTML}
+
+        <div class="card-content">
+
+          <h3>
+            ${
+              echapperHTML(
+                consommable["Nom du sortant"] || ""
+              )
+            }
+          </h3>
+
+
+          <p>
+
+            <strong>
+              Catégorie :
+            </strong>
+
+            ${
+              echapperHTML(
+                consommable.Categorie || ""
+              )
+            }
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Laboratoire :
+            </strong>
+
+            ${
+              echapperHTML(
+                consommable.Laboratoire || ""
+              )
+            }
+
+          </p>
+
+
+          <p>
+
+            ${
+              echapperHTML(
+                consommable.Description || ""
+              )
+            }
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              État :
+            </strong>
+
+            ${
+              echapperHTML(
+                consommable.Etat || ""
+              )
+            }
+
+          </p>
+
+
+          <p>
+
+            <strong>
+              Quantité :
+            </strong>
+
+            ${
+              consommable.Quantite ?? 0
+            }
+
+          </p>
+
+
+          ${
+            consommable.Quantite > 0
+
+            ?
+
+            `
+              <button
+                class="reserve"
+                onclick="
+                  reserver(
+                    '${consommable.id}'
+                  )
+                "
+              >
+
+                Réserver
+
+              </button>
+            `
+
+            :
+
+            `
+              <button
+                class="reserve"
+                disabled
+                style="
+                  background:#9ca3af;
+                  cursor:not-allowed;
+                "
+              >
+
+                Indisponible
+
+              </button>
+            `
+          }
+
+        </div>
+
+      `;
+
+
+      zone.appendChild(card);
+
+    }
+  );
+
+}
+  
 /* =========================================================
    PROTECTION DU HTML
    ========================================================= */
