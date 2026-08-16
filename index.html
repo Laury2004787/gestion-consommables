@@ -2966,7 +2966,42 @@ chargerConsommables();
 chargerInformations();
 
 </script>
+<script>
 
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener(
+    "load",
+    async function () {
+
+      try {
+
+        const registration =
+          await navigator.serviceWorker.register(
+            "/sw.js"
+          );
+
+        console.log(
+          "Service Worker enregistré :",
+          registration
+        );
+
+      }
+      catch (error) {
+
+        console.error(
+          "Erreur Service Worker :",
+          error
+        );
+
+      }
+
+    }
+  );
+
+}
+
+</script>
 
 </body>
 
