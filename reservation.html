@@ -492,7 +492,94 @@ quantite:
 
     return;
   }
+/* =========================================================
+   NOTIFICATION DU GESTIONNAIRE
+   ========================================================= */
 
+try {
+
+  /*
+   * Récupérer le nom du consommable
+   */
+
+  const {
+    data: consommable
+  } =
+    await supabaseClient
+      .from("Consommables")
+      .select(`
+        "Nom du sortant"
+      `)
+      .eq(
+        "id",
+        consommableId
+      )
+      .single();
+
+
+  /*
+   * Créer la notification
+   */
+
+  const {
+    error: erreurNotification
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .insert({
+
+        /*
+         * Pour l'instant, on met le user_id
+         * de l'utilisateur connecté.
+         *
+         * ATTENTION :
+         * si ta table Notifications est destinée
+         * uniquement aux gestionnaires, nous adapterons
+         * cette partie avec l'ID du gestionnaire.
+         */
+
+        user_id:
+          user.id,
+
+        titre:
+          "Nouvelle demande de réservation",
+
+        message:
+          `Une nouvelle demande de réservation a été envoyée pour le consommable "${consommable?.["Nom du sortant"] || "consommable"}".`,
+
+        type:
+          "reservation",
+
+        lu:
+          false,
+
+        date_creation:
+          new Date().toISOString(),
+
+        lien:
+          "reservations"
+
+      });
+
+
+  if (erreurNotification) {
+
+    console.error(
+      "Erreur notification réservation :",
+      erreurNotification
+    );
+
+  }
+
+}
+catch (erreurNotification) {
+
+  console.error(
+    "Erreur lors de la création de la notification :",
+    erreurNotification
+  );
+
+}
 
   message.className =
     "message success";
