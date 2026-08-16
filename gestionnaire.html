@@ -5827,7 +5827,117 @@ if (fichier) {
         return;
 
       }
+/* =========================================================
+   NOTIFICATION INFORMATION AUX UTILISATEURS
+   ========================================================= */
 
+if (
+  publie &&
+  !resultat.error
+) {
+
+  /*
+   * Récupérer tous les utilisateurs
+   */
+
+  const {
+    data: profils,
+    error: erreurProfils
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select("user_id");
+
+
+  if (erreurProfils) {
+
+    console.error(
+      "Erreur récupération utilisateurs :",
+      erreurProfils
+    );
+
+  }
+  else if (profils && profils.length > 0) {
+
+    /*
+     * Préparer les notifications
+     */
+
+    const notifications =
+      profils
+        .filter(
+          profil =>
+            profil.user_id
+        )
+        .map(
+          profil => ({
+
+            user_id:
+              profil.user_id,
+
+            titre:
+              titre,
+
+            message:
+              contenu,
+
+            type:
+              "information",
+
+            lu:
+              false,
+
+            date_creation:
+              new Date().toISOString(),
+
+            lien:
+              "informations"
+
+          })
+        );
+
+
+    /*
+     * Envoyer les notifications
+     */
+
+    if (
+      notifications.length > 0
+    ) {
+
+      const {
+        error: erreurNotifications
+      } =
+        await supabaseClient
+          .from("Notifications")
+          .insert(
+            notifications
+          );
+
+
+      if (erreurNotifications) {
+
+        console.error(
+          "Erreur envoi notifications information :",
+          erreurNotifications
+        );
+
+      }
+      else {
+
+        console.log(
+          "Notifications envoyées à",
+          notifications.length,
+          "utilisateur(s)."
+        );
+
+      }
+
+    }
+
+  }
+
+}
 
       message.innerHTML = `
         <div class="success-box">
