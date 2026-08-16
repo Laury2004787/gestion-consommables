@@ -233,7 +233,22 @@ async function chargerReservations() {
 
     }
 
+const quantiteReservee =
+  reservation.statut === "refusee"
+    ? 0
+    : Number(reservation.quantite) || 0;
 
+const quantiteRetournee =
+  reservation.statut === "refusee"
+    ? 0
+    : Number(reservation.quantite_retournee) || 0;
+
+const quantiteRestante =
+  Math.max(
+    quantiteReservee -
+    quantiteRetournee,
+    0
+  );
     const card =
       document.createElement("div");
 
@@ -263,23 +278,20 @@ async function chargerReservations() {
       </p>
 <p>
   <strong>Quantité réservée :</strong>
-  ${reservation.quantite}
+  ${quantiteReservee}
 </p>
 
 <p>
   <strong>Quantité déjà retournée :</strong>
-  ${reservation.quantite_retournee || 0}
+  ${quantiteRetournee}
 </p>
 
 ${
-  reservation.quantite - (reservation.quantite_retournee || 0) > 0
+  quantiteRestante > 0
   ? `
     <p>
       <strong>Quantité restante à retourner :</strong>
-      ${
-        reservation.quantite -
-        (reservation.quantite_retournee || 0)
-      }
+      ${quantiteRestante}
     </p>
   `
   : ""
