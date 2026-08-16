@@ -2984,7 +2984,104 @@ chargerInformations();
 
 </script>
 <script>
+  function urlBase64ToUint8Array(base64String) {
 
+  const padding =
+    "=".repeat(
+      (4 - base64String.length % 4) % 4
+    );
+
+  const base64 =
+    (
+      base64String + padding
+    )
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+  const rawData =
+    atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map(
+      char => char.charCodeAt(0)
+    )
+  );
+}
+async function enregistrerAbonnementPush(registration) {
+
+  try {
+
+    if (!("PushManager" in window)) {
+      console.log("Push non supporté.");
+      return;
+    }
+
+    const {
+      data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      console.log("Aucun utilisateur connecté.");
+      return;
+    }
+
+    const permission =
+      await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      console.log("Notifications refusées.");
+      return;
+    }
+
+    const VAPID_PUBLIC_KEY =
+      "BJihPRdQDaGHiqrBBbfzUfzUsiKGgPU8MvidPo5fOMhRf_j-K-uZ0p95iExdpm9U1Y7dMHGpb1nWu52ZyaA4n9o";
+
+    const subscription =
+      await registration.pushManager.subscribe({
+
+        userVisibleOnly: true,
+
+        applicationServerKey:
+          urlBase64ToUint8Array(
+            VAPID_PUBLIC_KEY
+          )
+
+      });
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("PushSubscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            subscription: subscription.toJSON(),
+            date_creation: new Date().toISOString()
+          },
+          {
+            onConflict: "user_id"
+          }
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    console.log(
+      "Abonnement Push enregistré."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Erreur abonnement Push :",
+      error
+    );
+
+  }
+
+}
 if ("serviceWorker" in navigator) {
 
   window.addEventListener(
@@ -3002,7 +3099,7 @@ if ("serviceWorker" in navigator) {
           "Service Worker enregistré :",
           registration
         );
-
+await enregistrerAbonnementPush(registration);
       }
       catch (error) {
 
