@@ -1930,35 +1930,26 @@ async function deconnexion() {
 
 async function chargerReservations() {
 
-  const zone =
-    document.getElementById(
-      "listeReservations"
-    );
-
+  const zone = document.getElementById("listeReservations");
 
   const {
     data,
     error
-  } =
-    await supabaseClient
-      .from("Réservations")
-      .select(`
-  id,
-  utilisateur_id,
-  date_demande,
-  date_debut,
-  date_retour,
-  commentaire,
-  statut,
-  quantite
-`)
-      .order(
-        "date_demande",
-        {
-          ascending: false
-        }
-      );
-
+  } = await supabaseClient
+    .from("Réservations")
+    .select(`
+      id,
+      utilisateur_id,
+      date_demande,
+      date_debut,
+      date_retour,
+      commentaire,
+      statut,
+      quantite
+    `)
+    .order("date_demande", {
+      ascending: false
+    });
 
   if (error) {
 
@@ -1973,9 +1964,7 @@ async function chargerReservations() {
     `;
 
     return;
-
   }
-
 
   if (!data || data.length === 0) {
 
@@ -1986,161 +1975,86 @@ async function chargerReservations() {
     `;
 
     return;
-
   }
-
-
-  /*
-   * Regrouper les réservations
-   * par utilisateur.
-   */
-
-  const utilisateurs = {};
-
-
-  data.forEach(
-    reservation => {
-
-      const profil =
-        reservation.Profils;
-
-
-      if (!profil) {
-        return;
-      }
-
-
-      const utilisateurId =
-        reservation.utilisateur_id;
-
-
-      if (!utilisateurs[utilisateurId]) {
-
-        utilisateurs[utilisateurId] = {
-
-          id:
-            utilisateurId,
-
-          nom:
-            profil.nom || "",
-
-          prenom:
-            profil.prenom || "",
-
-          service:
-            profil.service || "",
-
-          reservations: []
-
-        };
-
-      }
-
-
-      utilisateurs[
-        utilisateurId
-      ].reservations.push(
-        reservation
-      );
-
-    }
-  );
-
-
-  /*
-   * Afficher la liste des utilisateurs.
-   */
 
   zone.innerHTML = "";
 
+  data.forEach(reservation => {
 
-  const titre =
-    document.createElement("h3");
+    const card = document.createElement("div");
 
+    card.className = "card";
 
-  titre.textContent =
-    "Utilisateurs ayant effectué une réservation";
+    card.innerHTML = `
+      <h3>
+        Demande de réservation
+      </h3>
 
+      <p>
+        <strong>ID utilisateur :</strong>
+        ${echapperHTML(reservation.utilisateur_id || "")}
+      </p>
 
-  zone.appendChild(titre);
+      <p>
+        <strong>Date de demande :</strong>
+        ${echapperHTML(reservation.date_demande || "")}
+      </p>
 
+      <p>
+        <strong>Date de début :</strong>
+        ${echapperHTML(reservation.date_debut || "")}
+      </p>
 
-  Object.values(
-    utilisateurs
-  ).forEach(
-    utilisateur => {
+      <p>
+        <strong>Date de retour :</strong>
+        ${echapperHTML(reservation.date_retour || "")}
+      </p>
 
-      const card =
-        document.createElement("div");
+      <p>
+        <strong>Quantité :</strong>
+        ${reservation.quantite ?? 0}
+      </p>
 
+      <p>
+        <strong>Commentaire :</strong>
+        ${echapperHTML(reservation.commentaire || "Aucun")}
+      </p>
 
-      card.className =
-        "card";
+      <p>
+        <strong>Statut :</strong>
+        ${echapperHTML(reservation.statut || "")}
+      </p>
 
+      ${
+        reservation.statut === "en_attente"
+          ? `
+            <div class="actions">
 
-      card.innerHTML = `
+              <button
+                class="accept"
+                onclick="modifierStatut('${reservation.id}', 'acceptee')">
 
-        <h3>
+                Accepter
 
-          ${echapperHTML(
-            utilisateur.prenom
-          )}
+              </button>
 
-          ${echapperHTML(
-            utilisateur.nom
-          )}
+              <button
+                class="refuse"
+                onclick="refuserReservation('${reservation.id}')">
 
-        </h3>
+                Refuser
 
+              </button>
 
-        <p>
+            </div>
+          `
+          : ""
+      }
+    `;
 
-          <strong>
-            Service :
-          </strong>
+    zone.appendChild(card);
 
-          ${echapperHTML(
-            utilisateur.service ||
-            "Non renseigné"
-          )}
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Réservations :
-          </strong>
-
-          ${utilisateur.reservations.length}
-
-        </p>
-
-
-        <div class="actions">
-
-          <button
-            class="accept"
-            onclick="
-              afficherReservationsUtilisateur(
-                '${utilisateur.id}'
-              )
-            ">
-
-            Voir les demandes
-
-          </button>
-
-        </div>
-
-      `;
-
-
-      zone.appendChild(card);
-
-    }
-  );
+  });
 
 }
 
