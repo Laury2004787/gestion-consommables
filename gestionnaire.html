@@ -7543,34 +7543,51 @@ async function chargerStatistiques() {
    */
 
   const quantiteRestante =
-    reservations.reduce(
-      (
-        total,
-        reservation
-      ) => {
+  reservations.reduce(
+    (
+      total,
+      reservation
+    ) => {
 
-        const quantite =
-          Number(
-            reservation.quantite
-          ) || 0;
+      /*
+       * Une réservation refusée ou en attente
+       * ne constitue pas un prêt.
+       */
 
-        const retournee =
-          Number(
-            reservation.quantite_retournee
-          ) || 0;
+      if (
+        reservation.statut === "refusee" ||
+        reservation.statut === "en_attente"
+      ) {
 
-        const reste =
-          Math.max(
-            quantite - retournee,
-            0
-          );
+        return total;
 
-        return total + reste;
+      }
 
-      },
-      0
-    );
 
+      const quantite =
+        Number(
+          reservation.quantite
+        ) || 0;
+
+
+      const retournee =
+        Number(
+          reservation.quantite_retournee
+        ) || 0;
+
+
+      const reste =
+        Math.max(
+          quantite - retournee,
+          0
+        );
+
+
+      return total + reste;
+
+    },
+    0
+  );
 
   const elementQuantiteRestante =
     document.getElementById(
