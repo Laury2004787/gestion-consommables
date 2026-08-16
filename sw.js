@@ -1,71 +1,103 @@
-self.addEventListener(
-  "push",
-  function (event) {
+self.addEventListener("install", event => {
 
-    if (!event.data) {
-      return;
+  console.log("Service Worker installé");
+
+  self.skipWaiting();
+
+});
+
+
+self.addEventListener("activate", event => {
+
+  console.log("Service Worker activé");
+
+  event.waitUntil(
+    self.clients.claim()
+  );
+
+});
+
+
+self.addEventListener("push", event => {
+
+  console.log("Notification push reçue");
+
+  let donnees = {};
+
+  if (event.data) {
+
+    try {
+      donnees = event.data.json();
     }
 
-    const data =
-      event.data.json();
+    catch (erreur) {
 
-    const titre =
-      data.titre ||
-      "Nouvelle notification";
+      donnees = {
+        titre: "Nouvelle notification",
+        message: event.data.text()
+      };
 
-    const options = {
-
-      body:
-        data.message ||
-        "Vous avez une nouvelle notification.",
-
-      icon:
-        "/icon-192.png",
-
-      badge:
-        "/icon-192.png",
-
-      tag:
-        "notification-exebio",
-
-      renotify:
-        true,
-
-      requireInteraction:
-        false,
-
-      data: {
-        lien:
-          data.lien ||
-          "/index.html"
-      }
-
-    };
-
-
-    event.waitUntil(
-
-      self.registration.showNotification(
-        titre,
-        options
-      )
-
-    );
+    }
 
   }
-);
+
+
+  const titre =
+    donnees.titre ||
+    "Nouvelle notification";
+
+
+  const options = {
+
+    body:
+      donnees.message ||
+      "Vous avez une nouvelle notification.",
+
+    icon:
+      "/gestion-consommables/icon-192.png",
+
+    badge:
+      "/gestion-consommables/icon-192.png",
+
+    vibrate: [
+      200,
+      100,
+      200
+    ],
+
+    data: {
+
+      lien:
+        donnees.lien ||
+        "/gestion-consommables/"
+
+    }
+
+  };
+
+
+  event.waitUntil(
+
+    self.registration.showNotification(
+      titre,
+      options
+    )
+
+  );
+
+});
 
 
 self.addEventListener(
   "notificationclick",
-  function (event) {
+  event => {
 
     event.notification.close();
 
 
     const lien =
       event.notification.data?.lien ||
-      "/index.html";
+      "/gestion-consommables/";
 
 
     event.waitUntil(
@@ -74,21 +106,22 @@ self.addEventListener(
         type: "window",
         includeUncontrolled: true
       }).then(
-        function (clientList) {
+        fenetres => {
 
           for (
-            const client of clientList
+            const fenetre
+            of fenetres
           ) {
 
             if (
-              "focus" in client
+              "focus" in fenetre
             ) {
 
-              client.navigate(
+              fenetre.focus();
+
+              return fenetre.navigate(
                 lien
               );
-
-              return client.focus();
 
             }
 
