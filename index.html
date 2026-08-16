@@ -82,11 +82,45 @@
     }
 
     #consommables {
-      display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
+  width: 100%;
+}
+
+.filtre-consommables {
+  width: 100%;
+  background: white;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-sizing: border-box;
+}
+
+.filtre-consommables label {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+#filtre-categorie {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.liste-consommables {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
 
     .card {
       background: white;
