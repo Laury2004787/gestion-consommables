@@ -609,43 +609,48 @@ async function chargerMessages() {
       `;
 
 
-      listeReponses.forEach(
-        function(reponse) {
+     listeReponses.forEach(
+  function(reponse) {
 
-          html += `
+    const auteur =
+      reponse.gestionnaire_id
+        ? "Gestionnaire"
+        : "Vous";
 
-            <div class="reponse">
+    html += `
 
-              <p>
-                <strong>
-                  Gestionnaire
-                </strong>
-              </p>
+      <div class="reponse">
 
-              <p>
-                ${echapperHTML(
-                  reponse.contenu
-                )}
-              </p>
+        <p>
+          <strong>
+            ${auteur}
+          </strong>
+        </p>
 
-              <p>
+        <p>
+          ${echapperHTML(
+            reponse.contenu
+          )}
+        </p>
 
-                <strong>
-                  Date :
-                </strong>
+        <p>
 
-                ${formaterDate(
-                  reponse.date_reponse
-                )}
+          <strong>
+            Date :
+          </strong>
 
-              </p>
+          ${formaterDate(
+            reponse.date_reponse
+          )}
 
-            </div>
+        </p>
 
-          `;
+      </div>
 
-        }
-      );
+    `;
+
+  }
+);
 
 
       /*
