@@ -560,7 +560,13 @@
       onclick="afficherSection('messages')">
       Messages
     </button>
-
+<button
+  class="nav-button"
+  id="boutonNotificationsPush"
+  type="button"
+  onclick="activerNotifications()">
+  🔔 Activer les notifications
+</button>
     <button
       class="nav-button"
       onclick="afficherSection('informations')">
@@ -9167,6 +9173,49 @@ async function chargerSuiviRetours() {
 
     }
   );
+
+}
+  async function activerNotifications() {
+
+  if (!("Notification" in window)) {
+
+    alert(
+      "Les notifications ne sont pas supportées par ce navigateur."
+    );
+
+    return;
+  }
+
+  const permission =
+    await Notification.requestPermission();
+
+  if (permission === "granted") {
+
+    alert(
+      "Les notifications sont maintenant activées."
+    );
+
+    console.log(
+      "Autorisation des notifications : OK"
+    );
+
+  }
+
+  else if (permission === "denied") {
+
+    alert(
+      "Les notifications ont été refusées."
+    );
+
+  }
+
+  else {
+
+    console.log(
+      "Demande de notification annulée."
+    );
+
+  }
 
 }
 </script>
