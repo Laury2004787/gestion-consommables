@@ -5921,36 +5921,40 @@ async function afficherMessagesUtilisateur(
           </h4>
 
           ${
-            reponses.map(
-              reponse => `
+  reponses.map(
+    reponse => `
 
-                <div class="reply-item">
+      <div class="reply-item">
 
-                  <strong>
-                    Gestionnaire
-                  </strong>
-
-                  <p>
-
-                    ${echapperHTML(
-                      reponse.contenu
-                    )}
-
-                  </p>
-
-                  <small>
-
-                    ${formaterDate(
-                      reponse.date_reponse
-                    )}
-
-                  </small>
-
-                </div>
-
-              `
-            ).join("")
+        <strong>
+          ${
+            reponse.gestionnaire_id
+              ? "Gestionnaire"
+              : "Utilisateur"
           }
+        </strong>
+
+        <p>
+
+          ${echapperHTML(
+            reponse.contenu
+          )}
+
+        </p>
+
+        <small>
+
+          ${formaterDate(
+            reponse.date_reponse
+          )}
+
+        </small>
+
+      </div>
+
+    `
+  ).join("")
+}
 
         </div>
       `
