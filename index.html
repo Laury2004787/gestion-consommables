@@ -2304,7 +2304,105 @@ if (fichierPhoto) {
         return;
 
       }
+/* =========================================================
+   NOTIFICATION DES GESTIONNAIRES
+   ========================================================= */
 
+try {
+
+  const {
+    data: gestionnaires,
+    error: erreurGestionnaires
+  } =
+    await supabaseClient
+      .from("Profils")
+      .select("user_id")
+      .eq("role", "gestionnaire");
+
+
+  if (erreurGestionnaires) {
+
+    console.error(
+      "Erreur récupération gestionnaires :",
+      erreurGestionnaires
+    );
+
+  }
+  else if (
+    gestionnaires &&
+    gestionnaires.length > 0
+  ) {
+
+    const notifications =
+      gestionnaires
+        .filter(
+          gestionnaire =>
+            gestionnaire.user_id
+        )
+        .map(
+          gestionnaire => ({
+
+            user_id:
+              gestionnaire.user_id,
+
+            titre:
+              "Nouvelle proposition de consommable",
+
+            message:
+              `Une nouvelle proposition de consommable "${nom}" a été envoyée par un utilisateur.`,
+
+            type:
+              "proposition",
+
+            lu:
+              false,
+
+            date_creation:
+              new Date().toISOString(),
+
+            lien:
+              "/gestion-consommables/gestionnaire.html"
+
+          })
+        );
+
+
+    if (
+      notifications.length > 0
+    ) {
+
+      const {
+        error: erreurNotification
+      } =
+        await supabaseClient
+          .from("Notifications")
+          .insert(
+            notifications
+          );
+
+
+      if (erreurNotification) {
+
+        console.error(
+          "Erreur notification proposition :",
+          erreurNotification
+        );
+
+      }
+
+    }
+
+  }
+
+}
+catch (erreur) {
+
+  console.error(
+    "Erreur lors de la création de la notification proposition :",
+    erreur
+  );
+
+}
 
       zone.innerHTML = `
 
