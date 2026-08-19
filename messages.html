@@ -1007,6 +1007,333 @@ async function repondreUtilisateur(messageId) {
 
 }
 
+/*
+ * Réponse de l'utilisateur à une conversation existante
+ */
+
+async function repondreUtilisateur(messageId) {
+
+  const zoneReponse =
+    document.getElementById(
+      `reponse-utilisateur-${messageId}`
+    );
+
+  const resultat =
+    document.getElementById(
+      `resultat-reponse-utilisateur-${messageId}`
+    );
+
+  const contenu =
+    zoneReponse?.value.trim();
+
+
+  if (!contenu) {
+
+    resultat.className =
+      "erreur";
+
+    resultat.textContent =
+      "Veuillez écrire une réponse.";
+
+    return;
+
+  }
+
+
+  try {
+
+    /*
+     * Vérifier l'utilisateur connecté
+     */
+
+    const {
+      data: {
+        user
+      }
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+      throw new Error(
+        "Vous devez être connecté."
+      );
+
+    }
+
+
+    /*
+     * Récupérer le profil utilisateur
+     */
+
+    const {
+      data: profil,
+      error: erreurProfil
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select("id")
+        .eq(
+          "user_id",
+          user.id
+        )
+        .single();
+
+
+    if (
+      erreurProfil ||
+      !profil
+    ) {
+
+      throw new Error(
+        "Impossible de trouver votre profil."
+      );
+
+    }
+
+
+    /*
+     * Vérifier que le message appartient
+     * bien à l'utilisateur connecté
+     */
+
+    const {
+      data: messageOriginal,
+      error: erreurMessage
+    } =
+      await supabaseClient
+        .from("Messages")
+        .select(`
+          id,
+          utilisateur_id,
+          sujet
+        `)
+        .eq(
+          "id",
+          messageId
+        )
+        .eq(
+          "utilisateur_id",
+          profil.id
+        )
+        .single();
+
+
+    if (
+      erreurMessage ||
+      !messageOriginal
+    ) {
+
+      throw new Error(
+        "Conversation introuvable ou accès non autorisé."
+      );
+
+    }
+
+
+    /*
+     * Enregistrer la réponse utilisateur
+     *
+     * gestionnaire_id reste NULL car
+     * cette réponse vient de l'utilisateur.
+     */
+
+    const {
+      error: erreurInsertion
+    } =
+      await supabaseClient
+        .from("ReponsesMessages")
+        .insert({
+
+          message_id:
+            messageId,
+
+          gestionnaire_id:
+            null,
+
+          contenu:
+            contenu
+
+        });
+
+
+    if (erreurInsertion) {
+
+      throw erreurInsertion;
+
+    }
+
+
+    /*
+     * Le message attend maintenant une réponse
+     * du gestionnaire.
+     */
+
+    const {
+      error: erreurStatut
+    } =
+      await supabaseClient
+        .from("Messages")
+        .update({
+
+          repondu:
+            false,
+
+          lu:
+            false
+
+        })
+        .eq(
+          "id",
+          messageId
+        );
+
+
+    if (erreurStatut) {
+
+      throw erreurStatut;
+
+    }
+
+
+    /*
+     * Récupérer les gestionnaires
+     */
+
+    const {
+      data: gestionnaires,
+      error: erreurGestionnaires
+    } =
+      await supabaseClient
+        .from("Profils")
+        .select("user_id")
+        .in(
+          "role",
+          [
+            "gestionnaire",
+            "administrateur"
+          ]
+        );
+
+
+    if (erreurGestionnaires) {
+
+      console.error(
+        "Erreur récupération gestionnaires :",
+        erreurGestionnaires
+      );
+
+    }
+    else if (
+      gestionnaires &&
+      gestionnaires.length > 0
+    ) {
+
+      /*
+       * Préparer les notifications
+       */
+
+      const notifications =
+        gestionnaires
+          .filter(
+            gestionnaire =>
+              gestionnaire.user_id
+          )
+          .map(
+            gestionnaire => ({
+
+              user_id:
+                gestionnaire.user_id,
+
+              titre:
+                "Nouvelle réponse utilisateur",
+
+              message:
+                `L'utilisateur a répondu à la conversation "${messageOriginal.sujet}".`,
+
+              type:
+                "message",
+
+              lu:
+                false,
+
+              date_creation:
+                new Date().toISOString(),
+
+              lien:
+                "messages"
+
+            })
+          );
+
+
+      if (
+        notifications.length > 0
+      ) {
+
+        const {
+          error: erreurNotification
+        } =
+          await supabaseClient
+            .from("Notifications")
+            .insert(
+              notifications
+            );
+
+
+        if (erreurNotification) {
+
+          console.error(
+            "Erreur notification gestionnaire :",
+            erreurNotification
+          );
+
+        }
+
+      }
+
+    }
+
+
+    /*
+     * Confirmation
+     */
+
+    resultat.className =
+      "succes";
+
+    resultat.textContent =
+      "Votre réponse a bien été envoyée.";
+
+
+    zoneReponse.value = "";
+
+
+    /*
+     * Actualiser la conversation
+     */
+
+    await chargerMessages();
+
+  }
+
+  catch (erreur) {
+
+    console.error(
+      "Erreur réponse utilisateur :",
+      erreur
+    );
+
+    resultat.className =
+      "erreur";
+
+    resultat.textContent =
+      erreur.message;
+
+  }
+
+}
 
 /*
  * Envoi d'un nouveau message.
