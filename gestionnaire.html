@@ -9177,42 +9177,167 @@ async function chargerSuiviRetours() {
 }
   async function activerNotifications() {
 
-  if (!("Notification" in window)) {
+  try {
 
-    alert(
-      "Les notifications ne sont pas supportées par ce navigateur."
-    );
+    if (!("Notification" in window)) {
 
-    return;
-  }
+      alert(
+        "Les notifications ne sont pas supportées par ce navigateur."
+      );
 
-  const permission =
-    await Notification.requestPermission();
+      return;
+    }
 
-  if (permission === "granted") {
+
+    if (!("serviceWorker" in navigator)) {
+
+      alert(
+        "Les notifications Push ne sont pas supportées par ce navigateur."
+      );
+
+      return;
+    }
+
+
+    const {
+      data: { user },
+      error: erreurUtilisateur
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (
+      erreurUtilisateur ||
+      !user
+    ) {
+
+      alert(
+        "Vous devez être connecté pour activer les notifications."
+      );
+
+      return;
+    }
+
+
+    const permission =
+      await Notification.requestPermission();
+
+
+    if (permission !== "granted") {
+
+      alert(
+        "Les notifications ont été refusées."
+      );
+
+      return;
+    }
+
+
+    const registration =
+      await navigator.serviceWorker.register(
+        "/gestion-consommables/sw.js"
+      );
+
+
+    let subscription =
+      await registration.pushManager.getSubscription();
+
+
+    if (!subscription) {
+
+      const VAPID_PUBLIC_KEY =
+        "BJihPRdQDaGHiqrBBbfzUfzUsiKGgPU8MvidPo5fOMhRf_j-K-uZ0p95iExdpm9U1Y7dMHGpb1nWu52ZyaA4n9o";
+
+
+      subscription =
+        await registration.pushManager.subscribe({
+
+          userVisibleOnly:
+            true,
+
+          applicationServerKey:
+            urlBase64ToUint8Array(
+              VAPID_PUBLIC_KEY
+            )
+
+        });
+
+    }
+
+
+    const {
+      error: erreurAbonnement
+    } =
+      await supabaseClient
+        .from("PushSubscriptions")
+        .upsert(
+
+          {
+            user_id:
+              user.id,
+
+            subscription:
+              subscription.toJSON(),
+
+            date_creation:
+              new Date().toISOString()
+          },
+
+          {
+            onConflict:
+              "user_id"
+          }
+
+        );
+
+
+    if (erreurAbonnement) {
+
+      throw erreurAbonnement;
+
+    }
+
+
+    const bouton =
+      document.getElementById(
+        "boutonNotificationsPush"
+      );
+
+
+    if (bouton) {
+
+      bouton.textContent =
+        "🔔 Notifications activées";
+
+      bouton.disabled =
+        true;
+
+    }
+
 
     alert(
       "Les notifications sont maintenant activées."
     );
 
+
     console.log(
-      "Autorisation des notifications : OK"
+      "Abonnement Push enregistré pour :",
+      user.id
     );
 
   }
 
-  else if (permission === "denied") {
+  catch (erreur) {
+
+    console.error(
+      "Erreur activation notifications :",
+      erreur
+    );
+
 
     alert(
-      "Les notifications ont été refusées."
-    );
-
-  }
-
-  else {
-
-    console.log(
-      "Demande de notification annulée."
+      "Impossible d'activer les notifications : " +
+      erreur.message
     );
 
   }
