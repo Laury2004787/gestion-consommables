@@ -589,7 +589,7 @@ async function chargerMessages() {
     `;
 
 
-    /*
+       /*
      * Affichage des réponses
      * du gestionnaire.
      */
@@ -647,6 +647,50 @@ async function chargerMessages() {
         }
       );
 
+
+      /*
+       * Formulaire pour continuer
+       * la conversation.
+       */
+
+      html += `
+
+        <div
+          class="reponse-utilisateur"
+          style="
+            margin-top:15px;
+            padding:15px;
+            border-top:1px solid #ddd;
+          "
+        >
+
+          <textarea
+            id="reponse-utilisateur-${message.id}"
+            rows="4"
+            placeholder="Écrire une réponse..."
+            style="
+              width:100%;
+              box-sizing:border-box;
+              margin-bottom:10px;
+            "
+          ></textarea>
+
+          <button
+            type="button"
+            onclick="repondreUtilisateur('${message.id}')"
+          >
+            Répondre
+          </button>
+
+          <div
+            id="resultat-reponse-utilisateur-${message.id}"
+            style="margin-top:10px;"
+          ></div>
+
+        </div>
+
+      `;
+
     }
     else {
 
@@ -665,7 +709,6 @@ async function chargerMessages() {
 
     card.innerHTML =
       html;
-
 
     zone.appendChild(
       card
