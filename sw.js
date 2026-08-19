@@ -94,10 +94,16 @@ self.addEventListener(
 
     event.notification.close();
 
-
     const lien =
       event.notification.data?.lien ||
-      "/gestion-consommables/";
+      "/gestion-consommables/gestionnaire.html";
+
+
+    const url =
+      new URL(
+        lien,
+        self.location.origin
+      ).href;
 
 
     event.waitUntil(
@@ -120,7 +126,7 @@ self.addEventListener(
               fenetre.focus();
 
               return fenetre.navigate(
-                lien
+                url
               );
 
             }
@@ -133,7 +139,7 @@ self.addEventListener(
           ) {
 
             return clients.openWindow(
-              lien
+              url
             );
 
           }
