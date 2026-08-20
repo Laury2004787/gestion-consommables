@@ -615,7 +615,11 @@
   onclick="afficherSection('suiviRetours')">
   Suivi des retours
 </button>
-    
+   <button
+  class="nav-button"
+  onclick="afficherSection('suiviPrets')">
+  Suivi des prêts
+</button> 
 <button
   class="nav-button"
   onclick="afficherSection('propositions'); marquerNotificationsPropositionsLues()"
@@ -952,7 +956,28 @@
 </div>
 
 </section>
+<!-- ======================================================
+     SUIVI DES PRÊTS
+     ====================================================== -->
 
+<section
+  id="suiviPrets"
+  class="section">
+
+  <h2>
+    Suivi des prêts
+  </h2>
+
+  <div
+    id="listeSuiviPrets">
+
+    <div class="message">
+      Chargement du suivi des prêts...
+    </div>
+
+  </div>
+
+</section>
 
 <!-- ======================================================
      PROPOSITIONS
@@ -2010,6 +2035,9 @@ function afficherSection(sectionId) {
   }
   if (sectionId === "suiviRetours") {
   chargerSuiviRetours();
+}
+  if (sectionId === "suiviPrets") {
+  chargerSuiviPrets();
 }
 
   if (sectionId === "propositions") {
@@ -9278,6 +9306,351 @@ async function chargerSuiviRetours() {
 
   }
 );
+}
+  /* =========================================================
+   SUIVI DES PRÊTS
+   ========================================================= */
+
+async function chargerSuiviPrets() {
+
+  const zone =
+    document.getElementById(
+      "listeSuiviPrets"
+    );
+
+
+  if (!zone) {
+    return;
+  }
+
+
+  zone.innerHTML = `
+    <div class="message">
+      Chargement du suivi des prêts...
+    </div>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("Réservations")
+      .select(`
+        id,
+        date_demande,
+        date_debut,
+        date_retour,
+        date_retour_reel,
+        statut,
+        quantite,
+        quantite_retournee,
+        type_demande,
+
+        Profils!Réservations_utilisateur_id_fkey (
+          nom,
+          prenom,
+          service
+        ),
+
+        Consommables!Réservations_consommable_id_fkey (
+          "Nom du sortant",
+          Categorie,
+          Laboratoire,
+          Etat
+        )
+      `)
+      .eq(
+        "type_demande",
+        "pret"
+      )
+      .order(
+        "date_retour",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur suivi prêts :",
+      error
+    );
+
+
+    zone.innerHTML = `
+      <div class="error-box">
+
+        Impossible de charger
+        le suivi des prêts.
+
+        <br><br>
+
+        ${echapperHTML(
+          error.message
+        )}
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    zone.innerHTML = `
+      <div class="message">
+
+        Aucun prêt à afficher.
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  zone.innerHTML = `
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Consommable</th>
+            <th>Demandeur</th>
+            <th>Service</th>
+            <th>Quantité</th>
+            <th>Date de début</th>
+            <th>Date de retour prévue</th>
+            <th>Date de retour réelle</th>
+            <th>Quantité retournée</th>
+            <th>État</th>
+            <th>Statut</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="tableauSuiviPrets">
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+
+  const tableauSuivi =
+    document.getElementById(
+      "tableauSuiviPrets"
+    );
+
+
+  data.forEach(
+    reservation => {
+
+      const quantite =
+        Number(
+          reservation.quantite
+        ) || 0;
+
+
+      const quantiteRetournee =
+        Number(
+          reservation.quantite_retournee
+        ) || 0;
+
+
+      let statutTexte =
+        reservation.statut;
+
+
+      if (
+        reservation.statut ===
+        "en_attente"
+      ) {
+
+        statutTexte =
+          "En attente";
+
+      }
+
+      else if (
+        reservation.statut ===
+        "acceptee"
+      ) {
+
+        statutTexte =
+          "En prêt";
+
+      }
+
+      else if (
+        reservation.statut ===
+        "retour_signale"
+      ) {
+
+        statutTexte =
+          "Retour signalé";
+
+      }
+
+      else if (
+        reservation.statut ===
+        "retour_partiel"
+      ) {
+
+        statutTexte =
+          "Retour partiel";
+
+      }
+
+      else if (
+        reservation.statut ===
+        "retournee"
+      ) {
+
+        statutTexte =
+          "Retour complet";
+
+      }
+
+
+      const nomUtilisateur =
+        `${
+          reservation.Profils?.prenom ||
+          ""
+        } ${
+          reservation.Profils?.nom ||
+          ""
+        }`.trim();
+
+
+      const ligne =
+        document.createElement(
+          "tr"
+        );
+
+
+      ligne.innerHTML = `
+
+        <td>
+          ${
+            echapperHTML(
+              reservation.Consommables?.[
+                "Nom du sortant"
+              ] ||
+              "Consommable"
+            )
+          }
+        </td>
+
+
+        <td>
+          ${
+            echapperHTML(
+              nomUtilisateur ||
+              "Utilisateur"
+            )
+          }
+        </td>
+
+
+        <td>
+          ${
+            echapperHTML(
+              reservation.Profils?.service ||
+              "Non renseigné"
+            )
+          }
+        </td>
+
+
+        <td>
+          ${quantite}
+        </td>
+
+
+        <td>
+          ${
+            echapperHTML(
+              reservation.date_debut ||
+              "Non renseignée"
+            )
+          }
+        </td>
+
+
+        <td>
+          ${
+            echapperHTML(
+              reservation.date_retour ||
+              "Non renseignée"
+            )
+          }
+        </td>
+
+
+        <td>
+          ${
+            echapperHTML(
+              reservation.date_retour_reel ||
+              "—"
+            )
+          }
+        </td>
+
+
+        <td>
+          ${quantiteRetournee}
+        </td>
+
+
+        <td>
+          ${
+            echapperHTML(
+              reservation.Consommables?.Etat ||
+              "—"
+            )
+          }
+        </td>
+
+
+        <td>
+          <strong>
+            ${
+              echapperHTML(
+                statutTexte
+              )
+            }
+          </strong>
+        </td>
+
+      `;
+
+
+      tableauSuivi.appendChild(
+        ligne
+      );
+
+    }
+  );
+
 }
   async function activerNotifications() {
 
