@@ -9872,6 +9872,85 @@ async function ouvrirNotifications() {
   });
 
 }
+  
+/* =========================================================
+   MISE A JOUR AUTOMATIQUE DES NOTIFICATIONS
+   ========================================================= */
+
+async function activerMiseAJourNotifications() {
+
+  const {
+    data: { user },
+    error
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (error || !user) {
+    return;
+  }
+
+
+  /*
+   * Charger immédiatement le compteur
+   */
+
+  await chargerNotifications();
+
+
+  /*
+   * Écouter les nouvelles notifications
+   * en temps réel.
+   */
+
+  supabaseClient
+    .channel(
+      "notifications-temps-reel-" + user.id
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "Notifications",
+        filter: "user_id=eq." + user.id
+      },
+      function(payload) {
+
+        console.log(
+          "Nouvelle notification reçue :",
+          payload.new
+        );
+
+
+        /*
+         * Recalculer immédiatement
+         * les compteurs.
+         */
+
+        chargerNotifications();
+
+      }
+    )
+    .subscribe(
+      function(status) {
+
+        console.log(
+          "Canal notifications :",
+          status
+        );
+
+      }
+    );
+
+}
+
+
+/*
+ * Activation automatique
+ */
+
+activerMiseAJourNotifications();
 </script>
   
 </body>
