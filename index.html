@@ -929,22 +929,45 @@ zone.innerHTML = `
 
   <!-- PROPOSER UN CONSOMMABLE -->
 
-  <a
-    href="#section-proposition"
-   onclick="
-  marquerPropositionsLues();
+<a
+  href="#section-proposition"
+  onclick="
+    marquerPropositionsLues();
 
-  document.getElementById('section-proposition').style.display = 'block';
+    document.getElementById('section-proposition').style.display = 'block';
 
-  document.getElementById('section-proposition').scrollIntoView({
-    behavior: 'smooth'
-  });
+    document.getElementById('section-proposition').scrollIntoView({
+      behavior: 'smooth'
+    });
 
-  return false;
-"
+    return false;
+  "
+  style="position:relative;"
+>
+  Proposer un consommable
+
+  <span
+    id="badge-propositions"
+    style="
+      display:none;
+      position:absolute;
+      top:-8px;
+      right:-12px;
+      background:red;
+      color:white;
+      border-radius:50%;
+      min-width:18px;
+      height:18px;
+      font-size:11px;
+      line-height:18px;
+      text-align:center;
+      font-weight:bold;
+    "
   >
-    Proposer un consommable
-  </a>
+    0
+  </span>
+
+</a>
 
 
   <!-- MES RESERVATIONS -->
