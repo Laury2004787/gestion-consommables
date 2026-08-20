@@ -527,21 +527,69 @@
       Tableau de bord
     </button>
 
-    <button
-      class="nav-button"
-      onclick="afficherSection('reservations')">
-      Réservations
-    </button>
+<button
+  class="nav-button"
+  onclick="afficherSection('reservations'); marquerNotificationsReservationsLues()"
+  style="position:relative;"
+>
+  Réservations
+
+  <span
+    id="badge-reservations"
+    style="
+      display:none;
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      background:red;
+      color:white;
+      border-radius:50%;
+      min-width:18px;
+      height:18px;
+      font-size:11px;
+      line-height:18px;
+      text-align:center;
+      font-weight:bold;
+    "
+  >
+    0
+  </span>
+</button>
+    
 <button
   class="nav-button"
   onclick="afficherSection('suiviRetours')">
   Suivi des retours
 </button>
-    <button
-      class="nav-button"
-      onclick="afficherSection('propositions')">
-      Propositions
-    </button>
+    
+<button
+  class="nav-button"
+  onclick="afficherSection('propositions'); marquerNotificationsPropositionsLues()"
+  style="position:relative;"
+>
+  Propositions
+
+  <span
+    id="badge-propositions"
+    style="
+      display:none;
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      background:red;
+      color:white;
+      border-radius:50%;
+      min-width:18px;
+      height:18px;
+      font-size:11px;
+      line-height:18px;
+      text-align:center;
+      font-weight:bold;
+    "
+  >
+    0
+  </span>
+</button>
 
     <button
       class="nav-button"
@@ -9436,9 +9484,6 @@ async function chargerSuiviRetours() {
   );
 
 }
-  /* =========================================================
-   NOTIFICATIONS
-   ========================================================= */
 
 async function chargerNotifications() {
 
@@ -9472,6 +9517,10 @@ async function chargerNotifications() {
         date_creation,
         lien
       `)
+      .eq(
+        "user_id",
+        user.id
+      )
       .order(
         "date_creation",
         {
@@ -9490,40 +9539,128 @@ async function chargerNotifications() {
     return;
   }
 
-const badgeMessages =
-  document.getElementById(
-    "badge-messages"
-  );
+
+  /*
+   * MESSAGES
+   */
+
+  const badgeMessages =
+    document.getElementById(
+      "badge-messages"
+    );
 
 
-if (badgeMessages) {
+  if (badgeMessages) {
 
-  const messagesNonLus =
-    notifications.filter(
-      notification =>
-        notification.type === "message" &&
-        notification.lu === false
-    ).length;
+    const nombreMessages =
+      notifications.filter(
+        notification =>
+          notification.type === "message" &&
+          notification.lu === false
+      ).length;
 
 
-  if (messagesNonLus > 0) {
+    if (nombreMessages > 0) {
 
-    badgeMessages.textContent =
-      messagesNonLus > 99
-        ? "99+"
-        : messagesNonLus;
+      badgeMessages.textContent =
+        nombreMessages > 99
+          ? "99+"
+          : nombreMessages;
 
-    badgeMessages.style.display =
-      "block";
+      badgeMessages.style.display =
+        "block";
+
+    }
+    else {
+
+      badgeMessages.style.display =
+        "none";
+
+    }
 
   }
-  else {
 
-    badgeMessages.style.display =
-      "none";
+
+  /*
+   * RESERVATIONS
+   */
+
+  const badgeReservations =
+    document.getElementById(
+      "badge-reservations"
+    );
+
+
+  if (badgeReservations) {
+
+    const nombreReservations =
+      notifications.filter(
+        notification =>
+          notification.type === "reservation" &&
+          notification.lu === false
+      ).length;
+
+
+    if (nombreReservations > 0) {
+
+      badgeReservations.textContent =
+        nombreReservations > 99
+          ? "99+"
+          : nombreReservations;
+
+      badgeReservations.style.display =
+        "block";
+
+    }
+    else {
+
+      badgeReservations.style.display =
+        "none";
+
+    }
+
   }
 
-}
+
+  /*
+   * PROPOSITIONS
+   */
+
+  const badgePropositions =
+    document.getElementById(
+      "badge-propositions"
+    );
+
+
+  if (badgePropositions) {
+
+    const nombrePropositions =
+      notifications.filter(
+        notification =>
+          notification.type === "proposition" &&
+          notification.lu === false
+      ).length;
+
+
+    if (nombrePropositions > 0) {
+
+      badgePropositions.textContent =
+        nombrePropositions > 99
+          ? "99+"
+          : nombrePropositions;
+
+      badgePropositions.style.display =
+        "block";
+
+    }
+    else {
+
+      badgePropositions.style.display =
+        "none";
+
+    }
+
+  }
 
 }
 /* =========================================================
