@@ -723,9 +723,8 @@ async function chargerMessages() {
 
 }
 
-
 /* =========================================================
-   REPONSE DE L'UTILISATEUR
+   REPONSE DE L'UTILISATEUR A UNE CONVERSATION EXISTANTE
    ========================================================= */
 
 async function repondreUtilisateur(messageId) {
@@ -742,7 +741,14 @@ async function repondreUtilisateur(messageId) {
 
 
   if (!zoneReponse || !resultat) {
+
+    console.error(
+      "Zone de réponse introuvable pour :",
+      messageId
+    );
+
     return;
+
   }
 
 
@@ -765,10 +771,12 @@ async function repondreUtilisateur(messageId) {
 
   try {
 
+    /*
+     * UTILISATEUR CONNECTÉ
+     */
+
     const {
-      data: {
-        user
-      },
+      data: { user },
       error: erreurUtilisateur
     } =
       await supabaseClient.auth.getUser();
@@ -786,290 +794,8 @@ async function repondreUtilisateur(messageId) {
     }
 
 
-    const {
-      data: profil,
-      error: erreurProfil
-    } =
-      await supabaseClient
-        .from("Profils")
-        .select("id")
-        .eq(
-          "user_id",
-          user.id
-        )
-        .single();
-
-
-    if (
-      erreurProfil ||
-      !profil
-    ) {
-
-      throw new Error(
-        "Impossible de trouver votre profil."
-      );
-
-    }
-
-
     /*
-     * Vérifier que le message appartient
-     * bien à l'utilisateur connecté.
-     */
-
-    const {
-      data: messageOriginal,
-      error: erreurMessage
-    } =
-      await supabaseClient
-        .from("Messages")
-        .select(`
-          id,
-          utilisateur_id,
-          sujet
-        `)
-        .eq(
-          "id",
-          messageId
-        )
-        .eq(
-          "utilisateur_id",
-          profil.id
-        )
-        .single();
-
-
-    if (
-      erreurMessage ||
-      !messageOriginal
-    ) {
-
-      throw new Error(
-        "Conversation introuvable."
-      );
-
-    }
-
-
-    /*
-     * Enregistrer la réponse
-     */
-
-    const {
-      error: erreurInsertion
-    } =
-      await supabaseClient
-        .from("ReponsesUtilisateurs")
-        .insert({
-
-          message_id:
-            messageId,
-
-          utilisateur_id:
-            profil.id,
-
-          contenu:
-            contenu
-
-        });
-
-
-    if (erreurInsertion) {
-
-      throw erreurInsertion;
-
-    }
-
-
-    /*
-     * Récupérer les gestionnaires
-     */
-
-    const {
-      data: gestionnaires,
-      error: erreurGestionnaires
-    } =
-      await supabaseClient
-        .from("Profils")
-        .select("user_id")
-        .in(
-          "role",
-          [
-            "gestionnaire",
-            "administrateur"
-          ]
-        );
-
-
-    if (
-      erreurGestionnaires
-    ) {
-
-      console.error(
-        "Erreur récupération gestionnaires :",
-        erreurGestionnaires
-      );
-
-    }
-    else if (
-      gestionnaires &&
-      gestionnaires.length > 0
-    ) {
-
-      const notifications =
-        gestionnaires
-          .filter(
-            gestionnaire =>
-              gestionnaire.user_id
-          )
-          .map(
-            gestionnaire => ({
-
-              user_id:
-                gestionnaire.user_id,
-
-              titre:
-                "Nouvelle réponse utilisateur",
-
-              message:
-                `L'utilisateur a répondu à la conversation "${messageOriginal.sujet}".`,
-
-              type:
-                "message",
-
-              lu:
-                false,
-
-              date_creation:
-                new Date().toISOString(),
-
-              lien:
-                "messages"
-
-            })
-          );
-
-
-      if (
-        notifications.length > 0
-      ) {
-
-        const {
-          error: erreurNotification
-        } =
-          await supabaseClient
-            .from("Notifications")
-            .insert(
-              notifications
-            );
-
-
-        if (
-          erreurNotification
-        ) {
-
-          console.error(
-            "Erreur notification gestionnaire :",
-            erreurNotification
-          );
-
-        }
-
-      }
-
-    }
-
-
-    resultat.className =
-      "succes";
-
-    resultat.textContent =
-      "Votre réponse a bien été envoyée.";
-
-
-    zoneReponse.value =
-      "";
-
-
-    await chargerMessages();
-
-  }
-
-  catch (erreur) {
-
-    console.error(
-      "Erreur réponse utilisateur :",
-      erreur
-    );
-
-    resultat.className =
-      "erreur";
-
-    resultat.textContent =
-      erreur.message;
-
-  }
-
-}
-
-/*
- * Réponse de l'utilisateur à une conversation existante
- */
-
-async function repondreUtilisateur(messageId) {
-
-  const zoneReponse =
-    document.getElementById(
-      `reponse-utilisateur-${messageId}`
-    );
-
-  const resultat =
-    document.getElementById(
-      `resultat-reponse-utilisateur-${messageId}`
-    );
-
-  const contenu =
-    zoneReponse?.value.trim();
-
-
-  if (!contenu) {
-
-    resultat.className =
-      "erreur";
-
-    resultat.textContent =
-      "Veuillez écrire une réponse.";
-
-    return;
-
-  }
-
-
-  try {
-
-    /*
-     * Vérifier l'utilisateur connecté
-     */
-
-    const {
-      data: {
-        user
-      }
-    } =
-      await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-
-      throw new Error(
-        "Vous devez être connecté."
-      );
-
-    }
-
-
-    /*
-     * Récupérer le profil utilisateur
+     * PROFIL UTILISATEUR
      */
 
     const {
@@ -1099,8 +825,7 @@ async function repondreUtilisateur(messageId) {
 
 
     /*
-     * Vérifier que le message appartient
-     * bien à l'utilisateur connecté
+     * VERIFIER LA CONVERSATION
      */
 
     const {
@@ -1138,13 +863,17 @@ async function repondreUtilisateur(messageId) {
 
 
     /*
-     * Enregistrer la réponse utilisateur
+     * ENREGISTRER LA REPONSE
      *
-     * gestionnaire_id reste NULL car
-     * cette réponse vient de l'utilisateur.
+     * IMPORTANT :
+     * gestionnaire_id = NULL
+     *
+     * Cela indique que la réponse
+     * vient de l'utilisateur.
      */
 
     const {
+      data: nouvelleReponse,
       error: erreurInsertion
     } =
       await supabaseClient
@@ -1160,7 +889,9 @@ async function repondreUtilisateur(messageId) {
           contenu:
             contenu
 
-        });
+        })
+        .select()
+        .single();
 
 
     if (erreurInsertion) {
@@ -1170,9 +901,15 @@ async function repondreUtilisateur(messageId) {
     }
 
 
+    console.log(
+      "Réponse utilisateur enregistrée :",
+      nouvelleReponse
+    );
+
+
     /*
-     * Le message attend maintenant une réponse
-     * du gestionnaire.
+     * LE MESSAGE ATTEND UNE REPONSE
+     * DU GESTIONNAIRE
      */
 
     const {
@@ -1203,7 +940,7 @@ async function repondreUtilisateur(messageId) {
 
 
     /*
-     * Récupérer les gestionnaires
+     * RECUPERER LES GESTIONNAIRES
      */
 
     const {
@@ -1212,7 +949,11 @@ async function repondreUtilisateur(messageId) {
     } =
       await supabaseClient
         .from("Profils")
-        .select("user_id")
+        .select(`
+          id,
+          user_id,
+          role
+        `)
         .in(
           "role",
           [
@@ -1224,20 +965,26 @@ async function repondreUtilisateur(messageId) {
 
     if (erreurGestionnaires) {
 
-      console.error(
-        "Erreur récupération gestionnaires :",
-        erreurGestionnaires
-      );
+      throw erreurGestionnaires;
 
     }
-    else if (
+
+
+    console.log(
+      "Gestionnaires trouvés :",
+      gestionnaires
+    );
+
+
+    /*
+     * CREER UNE NOTIFICATION POUR
+     * CHAQUE GESTIONNAIRE
+     */
+
+    if (
       gestionnaires &&
       gestionnaires.length > 0
     ) {
-
-      /*
-       * Préparer les notifications
-       */
 
       const notifications =
         gestionnaires
@@ -1267,10 +1014,16 @@ async function repondreUtilisateur(messageId) {
                 new Date().toISOString(),
 
               lien:
-                "messages"
+                "/gestion-consommables/gestionnaire.html"
 
             })
           );
+
+
+      console.log(
+        "Notifications à créer :",
+        notifications
+      );
 
 
       if (
@@ -1278,23 +1031,33 @@ async function repondreUtilisateur(messageId) {
       ) {
 
         const {
+          data: notificationsCreees,
           error: erreurNotification
         } =
           await supabaseClient
             .from("Notifications")
             .insert(
               notifications
-            );
+            )
+            .select();
 
 
         if (erreurNotification) {
 
           console.error(
-            "Erreur notification gestionnaire :",
+            "ERREUR INSERTION NOTIFICATION :",
             erreurNotification
           );
 
+          throw erreurNotification;
+
         }
+
+
+        console.log(
+          "Notifications créées :",
+          notificationsCreees
+        );
 
       }
 
@@ -1302,7 +1065,7 @@ async function repondreUtilisateur(messageId) {
 
 
     /*
-     * Confirmation
+     * CONFIRMATION
      */
 
     resultat.className =
@@ -1312,11 +1075,12 @@ async function repondreUtilisateur(messageId) {
       "Votre réponse a bien été envoyée.";
 
 
-    zoneReponse.value = "";
+    zoneReponse.value =
+      "";
 
 
     /*
-     * Actualiser la conversation
+     * ACTUALISER LA CONVERSATION
      */
 
     await chargerMessages();
@@ -1340,197 +1104,6 @@ async function repondreUtilisateur(messageId) {
 
 }
 
-/*
- * Envoi d'un nouveau message.
- */
-
-document
-  .getElementById("formMessage")
-  .addEventListener(
-    "submit",
-    async function(event) {
-
-      event.preventDefault();
-
-
-      const sujet =
-        document
-          .getElementById("sujet")
-          .value
-          .trim();
-
-
-      const contenu =
-        document
-          .getElementById("contenu")
-          .value
-          .trim();
-
-
-      const zoneMessage =
-        document.getElementById(
-          "messageFormulaire"
-        );
-
-
-      const bouton =
-        document.getElementById(
-          "boutonEnvoyer"
-        );
-
-
-      zoneMessage.className =
-        "";
-
-
-      /*
-       * Vérification des champs.
-       */
-
-      if (
-        !sujet ||
-        !contenu
-      ) {
-
-        zoneMessage.className =
-          "erreur";
-
-        zoneMessage.textContent =
-          "Veuillez remplir tous les champs.";
-
-        return;
-      }
-
-
-      /*
-       * Désactivation du bouton
-       * pendant l'envoi.
-       */
-
-      bouton.disabled =
-        true;
-
-      bouton.textContent =
-        "Envoi en cours...";
-
-
-      try {
-
-
-        /*
-         * Vérification de l'utilisateur.
-         */
-
-        const {
-          data: { user },
-          error: erreurUtilisateur
-        } =
-          await supabaseClient.auth.getUser();
-
-
-        if (
-          erreurUtilisateur ||
-          !user
-        ) {
-
-          zoneMessage.className =
-            "erreur";
-
-          zoneMessage.textContent =
-            "Vous devez être connecté pour envoyer un message.";
-
-          return;
-        }
-
-
-        /*
-         * Recherche du profil.
-         */
-
-        const {
-          data: profil,
-          error: erreurProfil
-        } =
-          await supabaseClient
-            .from("Profils")
-            .select("id")
-            .eq(
-              "user_id",
-              user.id
-            )
-            .single();
-
-
-        if (
-          erreurProfil ||
-          !profil
-        ) {
-
-          console.error(
-            "Erreur profil :",
-            erreurProfil
-          );
-
-          zoneMessage.className =
-            "erreur";
-
-          zoneMessage.textContent =
-            "Impossible de trouver votre profil.";
-
-          return;
-        }
-
-
-        /*
-         * Création du message.
-         */
-
-        const {
-          data: nouveauMessage,
-          error: erreurInsertion
-        } =
-          await supabaseClient
-            .from("Messages")
-            .insert({
-
-              utilisateur_id:
-                profil.id,
-
-              sujet:
-                sujet,
-
-              contenu:
-                contenu,
-
-              lu:
-                false,
-
-              repondu:
-                false
-
-            })
-            .select()
-            .single();
-
-
-        if (
-          erreurInsertion
-        ) {
-
-          console.error(
-            "Erreur insertion message :",
-            erreurInsertion
-          );
-
-          zoneMessage.className =
-            "erreur";
-
-          zoneMessage.textContent =
-            "Impossible d'envoyer le message : " +
-            erreurInsertion.message;
-
-          return;
-        }
 /* =========================================================
    NOTIFICATION DU GESTIONNAIRE
    ========================================================= */
