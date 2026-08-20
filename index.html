@@ -837,79 +837,172 @@ async function afficherUtilisateur() {
 
   zone.innerHTML = `
 
-    <span>
-      Bonjour
-      ${profil.prenom || ""}
-      ${profil.nom || ""}
-    </span>
-
-    <a href="mes-reservations.html">
-      Mes réservations
-    </a>
-
-    <a href="messages.html">
-      Mes messages
-    </a>
-<button
-  id="bouton-notifications"
-  type="button"
-  onclick="ouvrirNotifications()"
-  style="
-    position:relative;
-    border:none;
-    background:none;
-    cursor:pointer;
-    font-size:24px;
-  "
->
-  🔔
-
-  <span
-    id="badge-notifications"
-    style="
-      display:none;
-      position:absolute;
-      top:-5px;
-      right:-5px;
-      background:red;
-      color:white;
-      border-radius:50%;
-      min-width:18px;
-      height:18px;
-      font-size:11px;
-      line-height:18px;
-      text-align:center;
-      font-weight:bold;
-    "
-  >
-    0
+  <span>
+    Bonjour
+    ${profil.prenom || ""}
+    ${profil.nom || ""}
   </span>
 
-</button>
 
-<button
-  id="activer-notifications"
-  type="button"
-  onclick="activerNotifications()"
->
-  🔔 Activer les notifications
-</button>
+  <!-- MES RESERVATIONS -->
 
-<button
-  onclick="supprimerCompte()">
+  <a
+    href="mes-reservations.html"
+    style="position:relative;"
+  >
+    Mes réservations
 
-      Supprimer mon compte
+    <span
+      id="badge-reservations"
+      style="
+        display:none;
+        position:absolute;
+        top:-8px;
+        right:-12px;
+        background:red;
+        color:white;
+        border-radius:50%;
+        min-width:18px;
+        height:18px;
+        font-size:11px;
+        line-height:18px;
+        text-align:center;
+        font-weight:bold;
+      "
+    >
+      0
+    </span>
 
-    </button>
+  </a>
 
-    <button
-      onclick="deconnexion()">
 
-      Se déconnecter
+  <!-- MESSAGES -->
 
-    </button>
+  <a
+    href="messages.html"
+    style="position:relative;"
+  >
+    Mes messages
 
-  `;
+    <span
+      id="badge-messages"
+      style="
+        display:none;
+        position:absolute;
+        top:-8px;
+        right:-12px;
+        background:red;
+        color:white;
+        border-radius:50%;
+        min-width:18px;
+        height:18px;
+        font-size:11px;
+        line-height:18px;
+        text-align:center;
+        font-weight:bold;
+      "
+    >
+      0
+    </span>
+
+  </a>
+
+
+  <!-- PROPOSER UN CONSOMMABLE -->
+
+  <a
+    href="#section-proposition"
+    onclick="
+      document.getElementById('section-proposition').style.display = 'block';
+      document.getElementById('section-proposition').scrollIntoView({
+        behavior: 'smooth'
+      });
+    "
+  >
+    Proposer un consommable
+  </a>
+
+
+  <!-- RETOUR -->
+
+  <button
+    type="button"
+    onclick="history.back()"
+  >
+    ← Retour
+  </button>
+
+
+  <!-- NOTIFICATIONS -->
+
+  <button
+    id="bouton-notifications"
+    type="button"
+    onclick="ouvrirNotifications()"
+    style="
+      position:relative;
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-size:24px;
+    "
+    title="Notifications"
+  >
+    🔔
+
+    <span
+      id="badge-notifications"
+      style="
+        display:none;
+        position:absolute;
+        top:-5px;
+        right:-5px;
+        background:red;
+        color:white;
+        border-radius:50%;
+        min-width:18px;
+        height:18px;
+        font-size:11px;
+        line-height:18px;
+        text-align:center;
+        font-weight:bold;
+      "
+    >
+      0
+    </span>
+
+  </button>
+
+
+  <!-- ACTIVATION DES NOTIFICATIONS -->
+
+  <button
+    id="activer-notifications"
+    type="button"
+    onclick="activerNotifications()"
+  >
+    🔔 Activer les notifications
+  </button>
+
+
+  <!-- SUPPRIMER LE COMPTE -->
+
+  <button
+    onclick="supprimerCompte()"
+  >
+    Supprimer mon compte
+  </button>
+
+
+  <!-- DECONNEXION -->
+
+  <button
+    onclick="deconnexion()"
+  >
+    Se déconnecter
+  </button>
+
+`;
 
 
   /*
