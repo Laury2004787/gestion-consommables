@@ -506,7 +506,7 @@
     }
 
   </style>
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 
 
@@ -997,7 +997,13 @@
 
   </button>
 
+<button
+  class="primary"
+  onclick="telechargerTousLesConsommablesExcel()">
 
+  📥 Télécharger tous les consommables
+
+</button>
   <div
     id="formulaireAjout"
     style="display:none;">
@@ -10310,6 +10316,151 @@ async function marquerNotificationsPropositionsLues() {
 
 }
 
+/* =========================================================
+   TÉLÉCHARGER TOUS LES CONSOMMABLES EN EXCEL
+   ========================================================= */
+
+async function telechargerTousLesConsommablesExcel() {
+
+  const message = document.getElementById("messageExcel");
+
+  if (message) {
+    message.innerHTML = "⏳ Préparation du fichier Excel...";
+  }
+
+  const {
+    data: consommables,
+    error
+  } = await supabaseClient
+    .from("Consommables")
+    .select(`
+      id,
+      "Nom du sortant",
+      Categorie,
+      Description,
+      Quantite,
+      Laboratoire,
+      Date_ajout,
+      Actif,
+      Etat,
+      disponible,
+      photo
+    `)
+    .order(
+      "Date_ajout",
+      {
+        ascending: false
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur récupération consommables :",
+      error
+    );
+
+    if (message) {
+
+      message.innerHTML = `
+        <div class="error-box">
+          Impossible de récupérer les consommables.
+          <br><br>
+          ${error.message}
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+
+  if (!consommables || consommables.length === 0) {
+
+    if (message) {
+
+      message.innerHTML = `
+        <div class="info">
+          Aucun consommable à télécharger.
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+
+  /*
+   * Création du fichier Excel
+   */
+
+  const feuille =
+    XLSX.utils.json_to_sheet(
+      consommables
+    );
+
+
+  /*
+   * Ajustement automatique de la largeur
+   */
+
+  feuille["!cols"] = [
+    { wch: 38 },
+    { wch: 20 },
+    { wch: 45 },
+    { wch: 12 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 12 },
+    { wch: 20 },
+    { wch: 15 },
+    { wch: 50 },
+    { wch: 45 }
+  ];
+
+
+  /*
+   * Création du classeur
+   */
+
+  const classeur =
+    XLSX.utils.book_new();
+
+
+  XLSX.utils.book_append_sheet(
+    classeur,
+    feuille,
+    "Consommables"
+  );
+
+
+  /*
+   * Téléchargement
+   */
+
+  XLSX.writeFile(
+    classeur,
+    "Tous_les_consommables.xlsx"
+  );
+
+
+  if (message) {
+
+    message.innerHTML = `
+      <div class="success-box">
+        ✅ ${consommables.length}
+        consommable(s) exporté(s) avec succès.
+      </div>
+    `;
+
+  }
+
+}
 </script>
   
 </body>
