@@ -829,10 +829,37 @@ zone.innerHTML = `
   </a>
 <!-- INFORMATIONS -->
 
+<!-- INFORMATIONS -->
+
 <a
   href="#informations"
+  onclick="marquerInformationsLues()"
   style="position:relative;"
 >
+  ℹ️ Informations
+
+  <span
+    id="badge-informations"
+    style="
+      display:none;
+      position:absolute;
+      top:-8px;
+      right:-12px;
+      background:red;
+      color:white;
+      border-radius:50%;
+      min-width:18px;
+      height:18px;
+      font-size:11px;
+      line-height:18px;
+      text-align:center;
+      font-weight:bold;
+    "
+  >
+    0
+  </span>
+
+</a>
   ℹ️ Informations
 
   <span
@@ -1185,6 +1212,70 @@ async function chargerNotifications() {
   }
 
 }
+
+  /* =========================================================
+   MARQUER LES INFORMATIONS COMME LUES
+   ========================================================= */
+
+async function marquerInformationsLues() {
+
+  const {
+    user
+  } = await obtenirUtilisateurEtProfil();
+
+
+  if (!user) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "type",
+        "information"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture informations :",
+      error
+    );
+
+    return;
+  }
+
+
+  const badgeInformations =
+    document.getElementById(
+      "badge-informations"
+    );
+
+
+  if (badgeInformations) {
+
+    badgeInformations.style.display =
+      "none";
+
+  }
+
+
+  chargerNotifications();
+
+}
+  
 /* =========================================================
    OUVRIR LES NOTIFICATIONS
    ========================================================= */
