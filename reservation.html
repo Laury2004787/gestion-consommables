@@ -134,6 +134,27 @@
   value="1"
   required
 >
+    <label for="type_demande">
+  Type de demande
+</label>
+
+<select
+  id="type_demande"
+  required
+>
+  <option value="">
+    Sélectionnez une option
+  </option>
+
+  <option value="pret">
+    🔄 Prêt
+  </option>
+
+  <option value="don">
+    🎁 Don
+  </option>
+</select>
+    
     <label for="date_debut">
       Date de début
     </label>
@@ -144,15 +165,18 @@
       required
     >
 
-    <label for="date_retour">
-      Date de retour
-    </label>
+    <div id="blocDateRetour">
 
-    <input
-      type="date"
-      id="date_retour"
-      required
-    >
+  <label for="date_retour">
+    Date de retour
+  </label>
+
+  <input
+    type="date"
+    id="date_retour"
+  >
+
+</div>
 
     <label for="commentaire">
       Commentaire
@@ -297,7 +321,76 @@ champQuantite.value =
     ? 1
     : 0;  
 }
+const typeDemande =
+  document.getElementById(
+    "type_demande"
+  );
 
+const blocDateRetour =
+  document.getElementById(
+    "blocDateRetour"
+  );
+
+const dateRetour =
+  document.getElementById(
+    "date_retour"
+  );
+
+
+if (
+  typeDemande &&
+  blocDateRetour &&
+  dateRetour
+) {
+
+  typeDemande.addEventListener(
+    "change",
+    function() {
+
+      if (
+        this.value === "pret"
+      ) {
+
+        blocDateRetour.style.display =
+          "block";
+
+        dateRetour.required =
+          true;
+
+      }
+
+      else if (
+        this.value === "don"
+      ) {
+
+        blocDateRetour.style.display =
+          "none";
+
+        dateRetour.required =
+          false;
+
+        dateRetour.value =
+          "";
+
+      }
+
+      else {
+
+        blocDateRetour.style.display =
+          "none";
+
+        dateRetour.required =
+          false;
+
+        dateRetour.value =
+          "";
+
+      }
+
+    }
+  );
+
+}
 
 async function envoyerReservation(event) {
 
@@ -341,7 +434,26 @@ const quantite =
 
   const dateRetour =
     document.getElementById("date_retour").value;
+const typeDemande =
+  document.getElementById(
+    "type_demande"
+  ).value;
+  if (
+  typeDemande !== "pret" &&
+  typeDemande !== "don"
+) {
 
+  message.className =
+    "message error";
+
+  message.textContent =
+    "Veuillez choisir entre un prêt et un don.";
+
+  message.style.display =
+    "block";
+
+  return;
+}
   const commentaire =
     document.getElementById("commentaire").value.trim();
   if (
