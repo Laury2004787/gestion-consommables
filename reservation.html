@@ -604,7 +604,9 @@ quantite:
           dateDebut,
 
         date_retour:
-          dateRetour,
+  typeDemande === "don"
+    ? null
+    : dateRetour,
 type_demande:
   typeDemande,
         commentaire:
