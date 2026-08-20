@@ -753,6 +753,15 @@ async function afficherUtilisateur() {
     );
 
 
+  if (!zone) {
+    return;
+  }
+
+
+  /*
+   * UTILISATEUR NON CONNECTÉ
+   */
+
   if (!user) {
 
     zone.innerHTML = `
@@ -772,6 +781,10 @@ async function afficherUtilisateur() {
   }
 
 
+  /*
+   * PROFIL INTROUVABLE
+   */
+
   if (!profil) {
 
     zone.innerHTML = `
@@ -781,10 +794,9 @@ async function afficherUtilisateur() {
       </span>
 
       <button
-        onclick="deconnexion()">
-
+        onclick="deconnexion()"
+      >
         Se déconnecter
-
       </button>
 
     `;
@@ -795,7 +807,7 @@ async function afficherUtilisateur() {
 
 
   /*
-   * Gestionnaire ou administrateur
+   * GESTIONNAIRE OU ADMINISTRATEUR
    */
 
   if (
@@ -816,10 +828,9 @@ async function afficherUtilisateur() {
       </a>
 
       <button
-        onclick="deconnexion()">
-
+        onclick="deconnexion()"
+      >
         Se déconnecter
-
       </button>
 
     `;
@@ -830,198 +841,237 @@ async function afficherUtilisateur() {
 
 
   /*
-   * Utilisateur classique
+   * UTILISATEUR CLASSIQUE
    */
 
   zone.innerHTML = `
 
-  <span>
-    Bonjour
-    ${profil.prenom || ""}
-    ${profil.nom || ""}
-  </span>
+    <!-- PARTIE GAUCHE -->
 
-
-  <!-- MES RESERVATIONS -->
-
-  <a
-    href="mes-reservations.html"
-    style="position:relative;"
-  >
-    Mes réservations
-
-    <span
-      id="badge-reservations"
+    <div
       style="
-        display:none;
-        position:absolute;
-        top:-8px;
-        right:-12px;
-        background:red;
-        color:white;
-        border-radius:50%;
-        min-width:18px;
-        height:18px;
-        font-size:11px;
-        line-height:18px;
-        text-align:center;
-        font-weight:bold;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
       "
     >
-      0
-    </span>
 
-  </a>
+      <button
+        id="activer-notifications"
+        type="button"
+        onclick="activerNotifications()"
+      >
+        🔔 Activer les notifications
+      </button>
+
+      <button
+        onclick="supprimerCompte()"
+      >
+        Supprimer mon compte
+      </button>
+
+    </div>
 
 
-  <!-- MESSAGES -->
+    <!-- PARTIE DROITE -->
 
-  <a
-    href="messages.html"
-    style="position:relative;"
-  >
-    Mes messages
-
-    <span
-      id="badge-messages"
+    <div
       style="
-        display:none;
-        position:absolute;
-        top:-8px;
-        right:-12px;
-        background:red;
-        color:white;
-        border-radius:50%;
-        min-width:18px;
-        height:18px;
-        font-size:11px;
-        line-height:18px;
-        text-align:center;
-        font-weight:bold;
+        display:flex;
+        align-items:center;
+        gap:15px;
+        flex-wrap:wrap;
       "
     >
-      0
-    </span>
 
-  </a>
-
-
-  <!-- PROPOSER UN CONSOMMABLE -->
-
-  <a
-    href="#section-proposition"
-    onclick="
-      document.getElementById('section-proposition').style.display = 'block';
-      document.getElementById('section-proposition').scrollIntoView({
-        behavior: 'smooth'
-      });
-    "
-  >
-    Proposer un consommable
-  </a>
+      <span>
+        Bonjour
+        ${profil.prenom || ""}
+        ${profil.nom || ""}
+      </span>
 
 
-  <!-- RETOUR -->
+      <!-- MES RESERVATIONS -->
 
-  <button
-    type="button"
-    onclick="history.back()"
-  >
-    ← Retour
-  </button>
+      <a
+        href="mes-reservations.html"
+        style="position:relative;"
+      >
 
+        Mes réservations
 
-  <!-- NOTIFICATIONS -->
+        <span
+          id="badge-reservations"
+          style="
+            display:none;
+            position:absolute;
+            top:-8px;
+            right:-12px;
+            background:red;
+            color:white;
+            border-radius:50%;
+            min-width:18px;
+            height:18px;
+            font-size:11px;
+            line-height:18px;
+            text-align:center;
+            font-weight:bold;
+          "
+        >
+          0
+        </span>
 
-  <button
-    id="bouton-notifications"
-    type="button"
-    onclick="ouvrirNotifications()"
-    style="
-      position:relative;
-      border:none;
-      background:none;
-      cursor:pointer;
-      font-size:24px;
-    "
-    title="Notifications"
-  >
-    🔔
-
-    <span
-      id="badge-notifications"
-      style="
-        display:none;
-        position:absolute;
-        top:-5px;
-        right:-5px;
-        background:red;
-        color:white;
-        border-radius:50%;
-        min-width:18px;
-        height:18px;
-        font-size:11px;
-        line-height:18px;
-        text-align:center;
-        font-weight:bold;
-      "
-    >
-      0
-    </span>
-
-  </button>
+      </a>
 
 
-  <!-- ACTIVATION DES NOTIFICATIONS -->
+      <!-- MES MESSAGES -->
 
-  <button
-    id="activer-notifications"
-    type="button"
-    onclick="activerNotifications()"
-  >
-    🔔 Activer les notifications
-  </button>
+      <a
+        href="messages.html"
+        style="position:relative;"
+      >
+
+        Mes messages
+
+        <span
+          id="badge-messages"
+          style="
+            display:none;
+            position:absolute;
+            top:-8px;
+            right:-12px;
+            background:red;
+            color:white;
+            border-radius:50%;
+            min-width:18px;
+            height:18px;
+            font-size:11px;
+            line-height:18px;
+            text-align:center;
+            font-weight:bold;
+          "
+        >
+          0
+        </span>
+
+      </a>
 
 
-  <!-- SUPPRIMER LE COMPTE -->
+      <!-- PROPOSER UN CONSOMMABLE -->
 
-  <button
-    onclick="supprimerCompte()"
-  >
-    Supprimer mon compte
-  </button>
+      <a
+        href="#section-proposition"
+        onclick="
+          document.getElementById('section-proposition').style.display = 'block';
+
+          document.getElementById('section-proposition').scrollIntoView({
+            behavior: 'smooth'
+          });
+
+          return false;
+        "
+      >
+        Proposer un consommable
+      </a>
 
 
-  <!-- DECONNEXION -->
+      <!-- NOTIFICATIONS -->
 
-  <button
-    onclick="deconnexion()"
-  >
-    Se déconnecter
-  </button>
+      <button
+        id="bouton-notifications"
+        type="button"
+        onclick="ouvrirNotifications()"
+        style="
+          position:relative;
+          border:none;
+          background:none;
+          cursor:pointer;
+          font-size:24px;
+        "
+        title="Notifications"
+      >
 
-`;
+        🔔
+
+        <span
+          id="badge-notifications"
+          style="
+            display:none;
+            position:absolute;
+            top:-5px;
+            right:-5px;
+            background:red;
+            color:white;
+            border-radius:50%;
+            min-width:18px;
+            height:18px;
+            font-size:11px;
+            line-height:18px;
+            text-align:center;
+            font-weight:bold;
+          "
+        >
+          0
+        </span>
+
+      </button>
+
+
+      <!-- DECONNEXION -->
+
+      <button
+        onclick="deconnexion()"
+      >
+        Se déconnecter
+      </button>
+
+    </div>
+
+  `;
 
 
   /*
-   * Affichage de la zone
-   * de proposition
+   * AFFICHAGE DE LA PROPOSITION
    */
 
-  document.getElementById(
-    "section-proposition"
-  ).style.display = "block";
+  const sectionProposition =
+    document.getElementById(
+      "section-proposition"
+    );
 
 
-  document.getElementById(
-    "serviceUtilisateur"
-  ).textContent =
-    profil.service ||
-    "Non renseigné";
+  if (sectionProposition) {
 
+    sectionProposition.style.display =
+      "block";
+
+  }
+
+
+  const serviceUtilisateur =
+    document.getElementById(
+      "serviceUtilisateur"
+    );
+
+
+  if (serviceUtilisateur) {
+
+    serviceUtilisateur.textContent =
+      profil.service ||
+      "Non renseigné";
+
+  }
+
+
+  /*
+   * CHARGEMENT DES DONNEES
+   */
 
   chargerMesPropositions();
-chargerNotifications();
+
+  chargerNotifications();
+
 }
 /* =========================================================
    NOTIFICATIONS
