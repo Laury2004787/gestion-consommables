@@ -1211,7 +1211,47 @@ async function chargerNotifications() {
     }
 
   }
+/*
+ * =======================================================
+ * BADGE MESSAGES
+ * =======================================================
+ */
 
+const badgeMessages =
+  document.getElementById(
+    "badge-messages"
+  );
+
+
+if (badgeMessages) {
+
+  const messagesNonLus =
+    notifications.filter(
+      notification =>
+        notification.type === "message" &&
+        notification.lu === false
+    ).length;
+
+
+  if (messagesNonLus > 0) {
+
+    badgeMessages.textContent =
+      messagesNonLus > 99
+        ? "99+"
+        : messagesNonLus;
+
+    badgeMessages.style.display =
+      "block";
+
+  }
+  else {
+
+    badgeMessages.style.display =
+      "none";
+
+  }
+
+}
 }
 
   /* =========================================================
