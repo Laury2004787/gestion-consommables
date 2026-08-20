@@ -618,7 +618,7 @@
    <button
   class="nav-button"
   onclick="afficherSection('suiviPrets')">
-  Suivi des prêts
+  Suivi des prêts/don
 </button> 
 <button
   class="nav-button"
@@ -965,7 +965,7 @@
   class="section">
 
   <h2>
-    Suivi des prêts
+    Suivi des prêts/don
   </h2>
 
   <div
@@ -9156,7 +9156,9 @@ async function chargerSuiviRetours() {
 ) {
 
   if (
-    reservation.type_demande ===
+    String(
+      reservation.type_demande
+    ).toLowerCase().trim() ===
     "don"
   ) {
 
