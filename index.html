@@ -3888,7 +3888,64 @@ async function activerNotifications() {
 
 }
 </script>
+<!-- BOUTON RETOUR EN HAUT -->
 
+<button
+  id="bouton-retour-haut"
+  type="button"
+  onclick="window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })"
+  style="
+    display:none;
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:9999;
+    width:auto;
+    padding:12px 18px;
+    border-radius:8px;
+    border:1px solid #2563eb;
+    background:white;
+    color:#2563eb;
+    cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  "
+>
+  ↑ Retour en haut
+</button>
+
+</body>
+  <script>
+
+window.addEventListener("scroll", function() {
+
+  const bouton =
+    document.getElementById(
+      "bouton-retour-haut"
+    );
+
+  if (!bouton) {
+    return;
+  }
+
+  if (window.scrollY > 400) {
+
+    bouton.style.display =
+      "block";
+
+  } else {
+
+    bouton.style.display =
+      "none";
+
+  }
+
+});
+
+</script>
+  
 </body>
 
 </html>
