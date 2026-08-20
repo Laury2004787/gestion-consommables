@@ -285,7 +285,6 @@
 
 <body>
 
-
 <header>
 
   <h1>
@@ -302,33 +301,22 @@
       Créer un compte
     </a>
 
-    <a href="mes-reservations.html">
-      Mes réservations
-    </a>
 
-    <button
-      id="bouton-notifications"
-      type="button"
-      onclick="ouvrirNotifications()"
-      style="
-        position:relative;
-        border:none;
-        background:none;
-        cursor:pointer;
-        font-size:24px;
-        margin-left:10px;
-      "
-      title="Notifications"
+    <!-- MES RESERVATIONS -->
+
+    <a
+      href="mes-reservations.html"
+      style="position:relative;"
     >
-      🔔
+      Mes réservations
 
       <span
-        id="badge-notifications"
+        id="badge-reservations"
         style="
           display:none;
           position:absolute;
-          top:-5px;
-          right:-5px;
+          top:-8px;
+          right:-12px;
           background:red;
           color:white;
           border-radius:50%;
@@ -343,7 +331,86 @@
         0
       </span>
 
-        </button>
+    </a>
+
+
+    <!-- MESSAGES -->
+
+    <a
+      href="messages.html"
+      style="position:relative;"
+    >
+      Messages
+
+      <span
+        id="badge-messages"
+        style="
+          display:none;
+          position:absolute;
+          top:-8px;
+          right:-12px;
+          background:red;
+          color:white;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          font-size:11px;
+          line-height:18px;
+          text-align:center;
+          font-weight:bold;
+        "
+      >
+        0
+      </span>
+
+    </a>
+
+
+    <!-- PROPOSITIONS -->
+
+    <a
+      href="#"
+      id="bouton-propositions"
+      onclick="afficherPropositionConsommable(event)"
+      style="position:relative;"
+    >
+      Proposer un consommable
+
+      <span
+        id="badge-propositions"
+        style="
+          display:none;
+          position:absolute;
+          top:-8px;
+          right:-12px;
+          background:red;
+          color:white;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          font-size:11px;
+          line-height:18px;
+          text-align:center;
+          font-weight:bold;
+        "
+      >
+        0
+      </span>
+
+    </a>
+
+
+    <!-- RETOUR -->
+
+    <button
+      type="button"
+      onclick="history.back()"
+    >
+      ← Retour
+    </button>
+
+
+    <!-- ACTIVATION DES NOTIFICATIONS PUSH -->
 
     <button
       id="activer-notifications"
@@ -356,6 +423,7 @@
   </div>
 
 </header>
+
 
 
 <main>
