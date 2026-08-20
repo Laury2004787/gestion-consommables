@@ -844,191 +844,200 @@ async function afficherUtilisateur() {
    * UTILISATEUR CLASSIQUE
    */
 
-  zone.innerHTML = `
+zone.innerHTML = `
 
-    <!-- PARTIE GAUCHE -->
+  <!-- PARTIE GAUCHE -->
 
-    <div
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    "
+  >
+
+    <button
+      id="activer-notifications"
+      type="button"
+      onclick="activerNotifications()"
+    >
+      🔔 Activer les notifications
+    </button>
+
+    <button
+      onclick="supprimerCompte()"
+    >
+      Supprimer mon compte
+    </button>
+
+  </div>
+
+
+  <!-- PARTIE DROITE -->
+
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      gap:15px;
+      flex-wrap:wrap;
+    "
+  >
+
+    <!-- BONJOUR -->
+
+    <span>
+      Bonjour
+      ${profil.prenom || ""}
+      ${profil.nom || ""}
+    </span>
+
+
+    <!-- ACCUEIL -->
+
+    <a href="index.html">
+      🏠 Accueil
+    </a>
+
+
+    <!-- NOTIFICATIONS -->
+
+    <button
+      id="bouton-notifications"
+      type="button"
+      onclick="ouvrirNotifications()"
       style="
-        display:flex;
-        align-items:center;
-        gap:10px;
-        flex-wrap:wrap;
+        position:relative;
+        border:none;
+        background:none;
+        cursor:pointer;
+        font-size:24px;
       "
+      title="Notifications"
     >
 
-      <button
-        id="activer-notifications"
-        type="button"
-        onclick="activerNotifications()"
+      🔔
+
+      <span
+        id="badge-notifications"
+        style="
+          display:none;
+          position:absolute;
+          top:-5px;
+          right:-5px;
+          background:red;
+          color:white;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          font-size:11px;
+          line-height:18px;
+          text-align:center;
+          font-weight:bold;
+        "
       >
-        🔔 Activer les notifications
-      </button>
-
-      <button
-        onclick="supprimerCompte()"
-      >
-        Supprimer mon compte
-      </button>
-
-    </div>
-
-
-    <!-- PARTIE DROITE -->
-
-    <div
-      style="
-        display:flex;
-        align-items:center;
-        gap:15px;
-        flex-wrap:wrap;
-      "
-    >
-
-      <span>
-        Bonjour
-        ${profil.prenom || ""}
-        ${profil.nom || ""}
+        0
       </span>
 
-
-      <!-- MES RESERVATIONS -->
-
-      <a
-        href="mes-reservations.html"
-        style="position:relative;"
-      >
-
-        Mes réservations
-
-        <span
-          id="badge-reservations"
-          style="
-            display:none;
-            position:absolute;
-            top:-8px;
-            right:-12px;
-            background:red;
-            color:white;
-            border-radius:50%;
-            min-width:18px;
-            height:18px;
-            font-size:11px;
-            line-height:18px;
-            text-align:center;
-            font-weight:bold;
-          "
-        >
-          0
-        </span>
-
-      </a>
+    </button>
 
 
-      <!-- MES MESSAGES -->
+    <!-- PROPOSER UN CONSOMMABLE -->
 
-      <a
-        href="messages.html"
-        style="position:relative;"
-      >
+    <a
+      href="#section-proposition"
+      onclick="
+        document.getElementById('section-proposition').style.display = 'block';
 
-        Mes messages
+        document.getElementById('section-proposition').scrollIntoView({
+          behavior: 'smooth'
+        });
 
-        <span
-          id="badge-messages"
-          style="
-            display:none;
-            position:absolute;
-            top:-8px;
-            right:-12px;
-            background:red;
-            color:white;
-            border-radius:50%;
-            min-width:18px;
-            height:18px;
-            font-size:11px;
-            line-height:18px;
-            text-align:center;
-            font-weight:bold;
-          "
-        >
-          0
-        </span>
-
-      </a>
+        return false;
+      "
+    >
+      Proposer un consommable
+    </a>
 
 
-      <!-- PROPOSER UN CONSOMMABLE -->
+    <!-- MES RESERVATIONS -->
 
-      <a
-        href="#section-proposition"
-        onclick="
-          document.getElementById('section-proposition').style.display = 'block';
+    <a
+      href="mes-reservations.html"
+      style="position:relative;"
+    >
 
-          document.getElementById('section-proposition').scrollIntoView({
-            behavior: 'smooth'
-          });
+      Mes réservations
 
-          return false;
-        "
-      >
-        Proposer un consommable
-      </a>
-
-
-      <!-- NOTIFICATIONS -->
-
-      <button
-        id="bouton-notifications"
-        type="button"
-        onclick="ouvrirNotifications()"
+      <span
+        id="badge-reservations"
         style="
-          position:relative;
-          border:none;
-          background:none;
-          cursor:pointer;
-          font-size:24px;
+          display:none;
+          position:absolute;
+          top:-8px;
+          right:-12px;
+          background:red;
+          color:white;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          font-size:11px;
+          line-height:18px;
+          text-align:center;
+          font-weight:bold;
         "
-        title="Notifications"
       >
+        0
+      </span>
 
-        🔔
-
-        <span
-          id="badge-notifications"
-          style="
-            display:none;
-            position:absolute;
-            top:-5px;
-            right:-5px;
-            background:red;
-            color:white;
-            border-radius:50%;
-            min-width:18px;
-            height:18px;
-            font-size:11px;
-            line-height:18px;
-            text-align:center;
-            font-weight:bold;
-          "
-        >
-          0
-        </span>
-
-      </button>
+    </a>
 
 
-      <!-- DECONNEXION -->
+    <!-- MES MESSAGES -->
 
-      <button
-        onclick="deconnexion()"
+    <a
+      href="messages.html"
+      style="position:relative;"
+    >
+
+      Mes messages
+
+      <span
+        id="badge-messages"
+        style="
+          display:none;
+          position:absolute;
+          top:-8px;
+          right:-12px;
+          background:red;
+          color:white;
+          border-radius:50%;
+          min-width:18px;
+          height:18px;
+          font-size:11px;
+          line-height:18px;
+          text-align:center;
+          font-weight:bold;
+        "
       >
-        Se déconnecter
-      </button>
+        0
+      </span>
 
-    </div>
+    </a>
 
-  `;
+
+    <!-- DECONNEXION -->
+
+    <button
+      onclick="deconnexion()"
+    >
+      Se déconnecter
+    </button>
+
+  </div>
+
+`;
 
 
   /*
