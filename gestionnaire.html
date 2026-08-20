@@ -9038,6 +9038,10 @@ async function chargerSuiviRetours() {
     "retournee"
   ]
 )
+    .eq(
+  "type_demande",
+  "pret"
+)
 .neq(
   "type_demande",
   "don"
@@ -9500,7 +9504,38 @@ async function chargerSuiviPrets() {
 
       let statutTexte =
         reservation.statut;
+if (
+  reservation.type_demande === "don" &&
+  reservation.statut === "acceptee"
+) {
 
+  statutTexte = "Donnée";
+
+}
+
+else if (
+  reservation.type_demande === "pret" &&
+  reservation.statut === "acceptee" &&
+  reservation.date_retour &&
+  reservation.date_retour < new Date().toISOString().split("T")[0] &&
+  (
+    Number(reservation.quantite_retournee) || 0
+  ) < (
+    Number(reservation.quantite) || 0
+  )
+) {
+
+  statutTexte = "En retard";
+
+}
+
+else if (
+  reservation.statut === "acceptee"
+) {
+
+  statutTexte = "En prêt";
+
+}
 
       if (
         reservation.statut ===
