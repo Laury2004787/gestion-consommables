@@ -10164,6 +10164,152 @@ async function marquerNotificationsMessagesLues() {
   }
 
 }  
+
+/* =========================================================
+   MARQUER LES NOTIFICATIONS RESERVATIONS COMME LUES
+   ========================================================= */
+
+async function marquerNotificationsReservationsLues() {
+
+  const {
+    data: { user },
+    error: erreurUtilisateur
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (
+    erreurUtilisateur ||
+    !user
+  ) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "user_id",
+        user.id
+      )
+      .eq(
+        "type",
+        "reservation"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture notifications réservations :",
+      error
+    );
+
+    return;
+  }
+
+
+  const badgeReservations =
+    document.getElementById(
+      "badge-reservations"
+    );
+
+
+  if (badgeReservations) {
+
+    badgeReservations.textContent =
+      "0";
+
+    badgeReservations.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =========================================================
+   MARQUER LES NOTIFICATIONS PROPOSITIONS COMME LUES
+   ========================================================= */
+
+async function marquerNotificationsPropositionsLues() {
+
+  const {
+    data: { user },
+    error: erreurUtilisateur
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (
+    erreurUtilisateur ||
+    !user
+  ) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "user_id",
+        user.id
+      )
+      .eq(
+        "type",
+        "proposition"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture notifications propositions :",
+      error
+    );
+
+    return;
+  }
+
+
+  const badgePropositions =
+    document.getElementById(
+      "badge-propositions"
+    );
+
+
+  if (badgePropositions) {
+
+    badgePropositions.textContent =
+      "0";
+
+    badgePropositions.style.display =
+      "none";
+
+  }
+
+}
+
 </script>
   
 </body>
