@@ -827,7 +827,36 @@ zone.innerHTML = `
   <a href="index.html">
     🏠 Accueil
   </a>
+<!-- INFORMATIONS -->
 
+<a
+  href="#informations"
+  style="position:relative;"
+>
+  ℹ️ Informations
+
+  <span
+    id="badge-informations"
+    style="
+      display:none;
+      position:absolute;
+      top:-8px;
+      right:-12px;
+      background:red;
+      color:white;
+      border-radius:50%;
+      min-width:18px;
+      height:18px;
+      font-size:11px;
+      line-height:18px;
+      text-align:center;
+      font-weight:bold;
+    "
+  >
+    0
+  </span>
+
+</a>
 
   <!-- NOTIFICATIONS -->
 
@@ -1018,13 +1047,18 @@ async function chargerNotifications() {
     user
   } = await obtenirUtilisateurEtProfil();
 
+
   if (!user) {
     return;
   }
-console.log(
-  "ID utilisateur connecté :",
-  user.id
-);
+
+
+  console.log(
+    "ID utilisateur connecté :",
+    user.id
+  );
+
+
   const {
     data: notifications,
     error
@@ -1040,7 +1074,6 @@ console.log(
         date_creation,
         lien
       `)
-      
       .order(
         "date_creation",
         {
@@ -1059,43 +1092,95 @@ console.log(
     return;
 
   }
-console.log(
-  "Notifications récupérées :",
-  notifications
-);
 
-  const badge =
+
+  console.log(
+    "Notifications récupérées :",
+    notifications
+  );
+
+
+  /*
+   * =======================================================
+   * BADGE NOTIFICATIONS
+   * =======================================================
+   */
+
+  const badgeNotifications =
     document.getElementById(
       "badge-notifications"
     );
 
 
-  if (!badge) {
-    return;
+  if (badgeNotifications) {
+
+    const notificationsNonLues =
+      notifications.filter(
+        notification =>
+          notification.lu === false
+      ).length;
+
+
+    if (notificationsNonLues > 0) {
+
+      badgeNotifications.textContent =
+        notificationsNonLues > 99
+          ? "99+"
+          : notificationsNonLues;
+
+      badgeNotifications.style.display =
+        "block";
+
+    }
+    else {
+
+      badgeNotifications.style.display =
+        "none";
+
+    }
+
   }
 
 
-  const nonLues =
-    notifications.filter(
-      notification =>
-        notification.lu === false
-    ).length;
+  /*
+   * =======================================================
+   * BADGE INFORMATIONS
+   * =======================================================
+   */
+
+  const badgeInformations =
+    document.getElementById(
+      "badge-informations"
+    );
 
 
-  if (nonLues > 0) {
+  if (badgeInformations) {
 
-    badge.textContent =
-      nonLues > 99
-        ? "99+"
-        : nonLues;
+    const informationsNonLues =
+      notifications.filter(
+        notification =>
+          notification.type === "information" &&
+          notification.lu === false
+      ).length;
 
-    badge.style.display =
-      "block";
 
-  } else {
+    if (informationsNonLues > 0) {
 
-    badge.style.display =
-      "none";
+      badgeInformations.textContent =
+        informationsNonLues > 99
+          ? "99+"
+          : informationsNonLues;
+
+      badgeInformations.style.display =
+        "block";
+
+    }
+    else {
+
+      badgeInformations.style.display =
+        "none";
+
+    }
 
   }
 
