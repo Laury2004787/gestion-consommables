@@ -931,15 +931,17 @@ zone.innerHTML = `
 
   <a
     href="#section-proposition"
-    onclick="
-      document.getElementById('section-proposition').style.display = 'block';
+   onclick="
+  marquerPropositionsLues();
 
-      document.getElementById('section-proposition').scrollIntoView({
-        behavior: 'smooth'
-      });
+  document.getElementById('section-proposition').style.display = 'block';
 
-      return false;
-    "
+  document.getElementById('section-proposition').scrollIntoView({
+    behavior: 'smooth'
+  });
+
+  return false;
+"
   >
     Proposer un consommable
   </a>
@@ -1294,6 +1296,47 @@ if (badgeReservations) {
   }
 
 }
+  /*
+ * =======================================================
+ * BADGE PROPOSITIONS
+ * =======================================================
+ */
+
+const badgePropositions =
+  document.getElementById(
+    "badge-propositions"
+  );
+
+
+if (badgePropositions) {
+
+  const propositionsNonLues =
+    notifications.filter(
+      notification =>
+        notification.type === "proposition" &&
+        notification.lu === false
+    ).length;
+
+
+  if (propositionsNonLues > 0) {
+
+    badgePropositions.textContent =
+      propositionsNonLues > 99
+        ? "99+"
+        : propositionsNonLues;
+
+    badgePropositions.style.display =
+      "block";
+
+  }
+  else {
+
+    badgePropositions.style.display =
+      "none";
+
+  }
+
+}
 }
 
   /* =========================================================
@@ -1479,6 +1522,72 @@ async function marquerReservationsLues() {
   if (badgeReservations) {
 
     badgeReservations.style.display =
+      "none";
+
+  }
+
+
+  /*
+   * Mise à jour de la cloche
+   */
+
+  chargerNotifications();
+
+}
+  /* =========================================================
+   MARQUER LES PROPOSITIONS COMME LUES
+   ========================================================= */
+
+async function marquerPropositionsLues() {
+
+  const {
+    user
+  } = await obtenirUtilisateurEtProfil();
+
+
+  if (!user) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "type",
+        "proposition"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture propositions :",
+      error
+    );
+
+    return;
+  }
+
+
+  const badgePropositions =
+    document.getElementById(
+      "badge-propositions"
+    );
+
+
+  if (badgePropositions) {
+
+    badgePropositions.style.display =
       "none";
 
   }
