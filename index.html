@@ -980,10 +980,11 @@ zone.innerHTML = `
 
   <!-- MES MESSAGES -->
 
-  <a
-    href="messages.html"
-    style="position:relative;"
-  >
+ <a
+  href="messages.html"
+  onclick="marquerMessagesLus()"
+  style="position:relative;"
+>
 
     Mes messages
 
@@ -1271,6 +1272,73 @@ async function marquerInformationsLues() {
 
   }
 
+
+  chargerNotifications();
+
+}
+
+/* =========================================================
+   MARQUER LES MESSAGES COMME LUS
+   ========================================================= */
+
+async function marquerMessagesLus() {
+
+  const {
+    user
+  } = await obtenirUtilisateurEtProfil();
+
+
+  if (!user) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "type",
+        "message"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture messages :",
+      error
+    );
+
+    return;
+  }
+
+
+  const badgeMessages =
+    document.getElementById(
+      "badge-messages"
+    );
+
+
+  if (badgeMessages) {
+
+    badgeMessages.style.display =
+      "none";
+
+  }
+
+
+  /*
+   * Mise à jour de la cloche
+   */
 
   chargerNotifications();
 
