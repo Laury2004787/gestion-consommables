@@ -947,10 +947,11 @@ zone.innerHTML = `
 
   <!-- MES RESERVATIONS -->
 
-  <a
-    href="mes-reservations.html"
-    style="position:relative;"
-  >
+<a
+  href="mes-reservations.html"
+  onclick="marquerReservationsLues()"
+  style="position:relative;"
+>
 
     Mes réservations
 
@@ -1252,6 +1253,47 @@ if (badgeMessages) {
   }
 
 }
+  /*
+ * =======================================================
+ * BADGE RESERVATIONS
+ * =======================================================
+ */
+
+const badgeReservations =
+  document.getElementById(
+    "badge-reservations"
+  );
+
+
+if (badgeReservations) {
+
+  const reservationsNonLues =
+    notifications.filter(
+      notification =>
+        notification.type === "reservation" &&
+        notification.lu === false
+    ).length;
+
+
+  if (reservationsNonLues > 0) {
+
+    badgeReservations.textContent =
+      reservationsNonLues > 99
+        ? "99+"
+        : reservationsNonLues;
+
+    badgeReservations.style.display =
+      "block";
+
+  }
+  else {
+
+    badgeReservations.style.display =
+      "none";
+
+  }
+
+}
 }
 
   /* =========================================================
@@ -1371,6 +1413,72 @@ async function marquerMessagesLus() {
   if (badgeMessages) {
 
     badgeMessages.style.display =
+      "none";
+
+  }
+
+
+  /*
+   * Mise à jour de la cloche
+   */
+
+  chargerNotifications();
+
+}
+  /* =========================================================
+   MARQUER LES RESERVATIONS COMME LUES
+   ========================================================= */
+
+async function marquerReservationsLues() {
+
+  const {
+    user
+  } = await obtenirUtilisateurEtProfil();
+
+
+  if (!user) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "type",
+        "reservation"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture réservations :",
+      error
+    );
+
+    return;
+  }
+
+
+  const badgeReservations =
+    document.getElementById(
+      "badge-reservations"
+    );
+
+
+  if (badgeReservations) {
+
+    badgeReservations.style.display =
       "none";
 
   }
