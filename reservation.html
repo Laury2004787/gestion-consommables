@@ -570,19 +570,22 @@ if (
 
   return;
 }
-  if (dateRetour < dateDebut) {
+ if (
+  typeDemande === "pret" &&
+  dateRetour < dateDebut
+) {
 
-    message.className =
-      "message error";
+  message.className =
+    "message error";
 
-    message.textContent =
-      "La date de retour doit être après la date de début.";
+  message.textContent =
+    "La date de retour doit être après la date de début.";
 
-    message.style.display =
-      "block";
+  message.style.display =
+    "block";
 
-    return;
-  }
+  return;
+}
 
   const { error } =
     await supabaseClient
