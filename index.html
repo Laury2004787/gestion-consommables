@@ -288,126 +288,53 @@
 
 <header>
 
-  <h1>
-  Gratuité EXEBIO
-</h1>
-<a
-  href="index.html"
-  style="
-    margin-left:auto;
-    text-decoration:none;
-  "
->
-  🏠 Accueil
-</a>
-  <div id="zone-utilisateur">
+  <!-- LIGNE DU HAUT -->
 
-    <a href="connexion.html">
-      Se connecter
-    </a>
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      width:100%;
+      flex-wrap:wrap;
+    "
+  >
 
-    <a href="inscription.html">
-      Créer un compte
-    </a>
+    <h1>
+      Gratuité EXEBIO
+    </h1>
 
 
-    <!-- MES RESERVATIONS -->
+    <!-- PARTIE DROITE -->
 
-    <a
-      href="mes-reservations.html"
-      style="position:relative;"
+    <div
+      id="zone-utilisateur"
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:flex-end;
+        gap:15px;
+        flex-wrap:wrap;
+      "
     >
-      Mes réservations
+    </div>
 
-      <span
-        id="badge-reservations"
-        style="
-          display:none;
-          position:absolute;
-          top:-8px;
-          right:-12px;
-          background:red;
-          color:white;
-          border-radius:50%;
-          min-width:18px;
-          height:18px;
-          font-size:11px;
-          line-height:18px;
-          text-align:center;
-          font-weight:bold;
-        "
-      >
-        0
-      </span>
-
-    </a>
+  </div>
 
 
-    <!-- MESSAGES -->
+  <!-- LIGNE DU BAS -->
 
-    <a
-      href="messages.html"
-      style="position:relative;"
-    >
-      Messages
-
-      <span
-        id="badge-messages"
-        style="
-          display:none;
-          position:absolute;
-          top:-8px;
-          right:-12px;
-          background:red;
-          color:white;
-          border-radius:50%;
-          min-width:18px;
-          height:18px;
-          font-size:11px;
-          line-height:18px;
-          text-align:center;
-          font-weight:bold;
-        "
-      >
-        0
-      </span>
-
-    </a>
-
-
-    <!-- PROPOSITIONS -->
-
-    <a
-      href="#"
-      id="bouton-propositions"
-      onclick="afficherPropositionConsommable(event)"
-      style="position:relative;"
-    >
-      Proposer un consommable
-
-      <span
-        id="badge-propositions"
-        style="
-          display:none;
-          position:absolute;
-          top:-8px;
-          right:-12px;
-          background:red;
-          color:white;
-          border-radius:50%;
-          min-width:18px;
-          height:18px;
-          font-size:11px;
-          line-height:18px;
-          text-align:center;
-          font-weight:bold;
-        "
-      >
-        0
-      </span>
-
-    </a>
-
+  <div
+    id="zone-actions-gauche"
+    style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      width:100%;
+      flex-wrap:wrap;
+    "
+  >
   </div>
 
 </header>
@@ -842,21 +769,30 @@ async function afficherUtilisateur() {
 
 
   /*
-   * UTILISATEUR CLASSIQUE
-   */
+ * UTILISATEUR CLASSIQUE
+ */
 
-zone.innerHTML = `
 
-  <!-- PARTIE GAUCHE -->
+/*
+ * PARTIE GAUCHE
+ * Sous le titre
+ */
 
-  <div
-    style="
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    "
-  >
+const zoneActions =
+  document.getElementById(
+    "zone-actions-gauche"
+  );
+
+
+if (zoneActions) {
+
+  zoneActions.innerHTML = `
+
+    <button
+      onclick="supprimerCompte()"
+    >
+      Supprimer mon compte
+    </button>
 
     <button
       id="activer-notifications"
@@ -866,177 +802,166 @@ zone.innerHTML = `
       🔔 Activer les notifications
     </button>
 
-    <button
-      onclick="supprimerCompte()"
-    >
-      Supprimer mon compte
-    </button>
+  `;
 
-  </div>
+}
 
 
-  <!-- PARTIE DROITE -->
+/*
+ * PARTIE DROITE
+ */
 
-  <div
+zone.innerHTML = `
+
+  <!-- BONJOUR -->
+
+  <span>
+    Bonjour
+    ${profil.prenom || ""}
+    ${profil.nom || ""}
+  </span>
+
+
+  <!-- ACCUEIL -->
+
+  <a href="index.html">
+    🏠 Accueil
+  </a>
+
+
+  <!-- NOTIFICATIONS -->
+
+  <button
+    id="bouton-notifications"
+    type="button"
+    onclick="ouvrirNotifications()"
     style="
-      display:flex;
-      align-items:center;
-      gap:15px;
-      flex-wrap:wrap;
+      position:relative;
+      border:none;
+      background:none;
+      cursor:pointer;
+      font-size:24px;
     "
+    title="Notifications"
   >
 
-    <!-- BONJOUR -->
+    🔔
 
-    <span>
-      Bonjour
-      ${profil.prenom || ""}
-      ${profil.nom || ""}
+    <span
+      id="badge-notifications"
+      style="
+        display:none;
+        position:absolute;
+        top:-5px;
+        right:-5px;
+        background:red;
+        color:white;
+        border-radius:50%;
+        min-width:18px;
+        height:18px;
+        font-size:11px;
+        line-height:18px;
+        text-align:center;
+        font-weight:bold;
+      "
+    >
+      0
     </span>
 
-
-    <!-- ACCUEIL -->
-
-    <a href="index.html">
-      🏠 Accueil
-    </a>
+  </button>
 
 
-    <!-- NOTIFICATIONS -->
+  <!-- PROPOSER UN CONSOMMABLE -->
 
-    <button
-      id="bouton-notifications"
-      type="button"
-      onclick="ouvrirNotifications()"
+  <a
+    href="#section-proposition"
+    onclick="
+      document.getElementById('section-proposition').style.display = 'block';
+
+      document.getElementById('section-proposition').scrollIntoView({
+        behavior: 'smooth'
+      });
+
+      return false;
+    "
+  >
+    Proposer un consommable
+  </a>
+
+
+  <!-- MES RESERVATIONS -->
+
+  <a
+    href="mes-reservations.html"
+    style="position:relative;"
+  >
+
+    Mes réservations
+
+    <span
+      id="badge-reservations"
       style="
-        position:relative;
-        border:none;
-        background:none;
-        cursor:pointer;
-        font-size:24px;
-      "
-      title="Notifications"
-    >
-
-      🔔
-
-      <span
-        id="badge-notifications"
-        style="
-          display:none;
-          position:absolute;
-          top:-5px;
-          right:-5px;
-          background:red;
-          color:white;
-          border-radius:50%;
-          min-width:18px;
-          height:18px;
-          font-size:11px;
-          line-height:18px;
-          text-align:center;
-          font-weight:bold;
-        "
-      >
-        0
-      </span>
-
-    </button>
-
-
-    <!-- PROPOSER UN CONSOMMABLE -->
-
-    <a
-      href="#section-proposition"
-      onclick="
-        document.getElementById('section-proposition').style.display = 'block';
-
-        document.getElementById('section-proposition').scrollIntoView({
-          behavior: 'smooth'
-        });
-
-        return false;
+        display:none;
+        position:absolute;
+        top:-8px;
+        right:-12px;
+        background:red;
+        color:white;
+        border-radius:50%;
+        min-width:18px;
+        height:18px;
+        font-size:11px;
+        line-height:18px;
+        text-align:center;
+        font-weight:bold;
       "
     >
-      Proposer un consommable
-    </a>
+      0
+    </span>
+
+  </a>
 
 
-    <!-- MES RESERVATIONS -->
+  <!-- MES MESSAGES -->
 
-    <a
-      href="mes-reservations.html"
-      style="position:relative;"
+  <a
+    href="messages.html"
+    style="position:relative;"
+  >
+
+    Mes messages
+
+    <span
+      id="badge-messages"
+      style="
+        display:none;
+        position:absolute;
+        top:-8px;
+        right:-12px;
+        background:red;
+        color:white;
+        border-radius:50%;
+        min-width:18px;
+        height:18px;
+        font-size:11px;
+        line-height:18px;
+        text-align:center;
+        font-weight:bold;
+      "
     >
+      0
+    </span>
 
-      Mes réservations
-
-      <span
-        id="badge-reservations"
-        style="
-          display:none;
-          position:absolute;
-          top:-8px;
-          right:-12px;
-          background:red;
-          color:white;
-          border-radius:50%;
-          min-width:18px;
-          height:18px;
-          font-size:11px;
-          line-height:18px;
-          text-align:center;
-          font-weight:bold;
-        "
-      >
-        0
-      </span>
-
-    </a>
+  </a>
 
 
-    <!-- MES MESSAGES -->
+  <!-- DECONNEXION -->
 
-    <a
-      href="messages.html"
-      style="position:relative;"
-    >
-
-      Mes messages
-
-      <span
-        id="badge-messages"
-        style="
-          display:none;
-          position:absolute;
-          top:-8px;
-          right:-12px;
-          background:red;
-          color:white;
-          border-radius:50%;
-          min-width:18px;
-          height:18px;
-          font-size:11px;
-          line-height:18px;
-          text-align:center;
-          font-weight:bold;
-        "
-      >
-        0
-      </span>
-
-    </a>
-
-
-    <!-- DECONNEXION -->
-
-    <button
-      onclick="deconnexion()"
-    >
-      Se déconnecter
-    </button>
-
-  </div>
+  <button
+    onclick="deconnexion()"
+  >
+    Se déconnecter
+  </button>
 
 `;
 
