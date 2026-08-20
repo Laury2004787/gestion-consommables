@@ -557,7 +557,7 @@
     
 <button
   class="nav-button"
-  onclick="afficherSection('messages')"
+  onclick="afficherSection('messages'); marquerNotificationsMessagesLues()"
   style="position:relative;"
 >
   Messages
@@ -9951,6 +9951,82 @@ async function activerMiseAJourNotifications() {
  */
 
 activerMiseAJourNotifications();
+
+/* =========================================================
+   MARQUER LES NOTIFICATIONS MESSAGES COMME LUES
+   ========================================================= */
+
+async function marquerNotificationsMessagesLues() {
+
+  const {
+    data: { user },
+    error: erreurUtilisateur
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if (
+    erreurUtilisateur ||
+    !user
+  ) {
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("Notifications")
+      .update({
+        lu: true
+      })
+      .eq(
+        "user_id",
+        user.id
+      )
+      .eq(
+        "type",
+        "message"
+      )
+      .eq(
+        "lu",
+        false
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur lecture notifications messages :",
+      error
+    );
+
+    return;
+  }
+
+
+  /*
+   * Faire disparaître immédiatement le badge.
+   */
+
+  const badgeMessages =
+    document.getElementById(
+      "badge-messages"
+    );
+
+
+  if (badgeMessages) {
+
+    badgeMessages.textContent =
+      "0";
+
+    badgeMessages.style.display =
+      "none";
+
+  }
+
+}  
 </script>
   
 </body>
