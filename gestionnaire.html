@@ -9029,15 +9029,19 @@ async function chargerSuiviRetours() {
   Etat
 )
       `)
-      .in(
-        "statut",
-        [
-          "acceptee",
-          "retour_signale",
-          "retour_partiel",
-          "retournee"
-        ]
-      )
+     .in(
+  "statut",
+  [
+    "acceptee",
+    "retour_signale",
+    "retour_partiel",
+    "retournee"
+  ]
+)
+.neq(
+  "type_demande",
+  "don"
+)
       .order(
         "date_retour",
         {
@@ -9146,15 +9150,27 @@ async function chargerSuiviRetours() {
       reservation.statut;
 
 
-    if (
-      reservation.statut ===
-      "acceptee"
-    ) {
+   if (
+  reservation.statut ===
+  "acceptee"
+) {
 
-      statutTexte =
-        "En prêt";
+  if (
+    reservation.type_demande ===
+    "don"
+  ) {
 
-    }
+    statutTexte =
+      "Donnée";
+
+  } else {
+
+    statutTexte =
+      "En prêt";
+
+  }
+
+}
 
     else if (
       reservation.statut ===
@@ -9361,10 +9377,13 @@ async function chargerSuiviPrets() {
           Etat
         )
       `)
-      .eq(
-        "type_demande",
-        "pret"
-      )
+      .in(
+  "type_demande",
+  [
+    "pret",
+    "don"
+  ]
+)
       .order(
         "date_retour",
         {
@@ -9429,16 +9448,17 @@ async function chargerSuiviPrets() {
 
           <tr>
 
-            <th>Consommable</th>
-            <th>Demandeur</th>
-            <th>Service</th>
-            <th>Quantité</th>
-            <th>Date de début</th>
-            <th>Date de retour prévue</th>
-            <th>Date de retour réelle</th>
-            <th>Quantité retournée</th>
-            <th>État</th>
-            <th>Statut</th>
+           <th>Consommable</th>
+<th>Demandeur</th>
+<th>Service</th>
+<th>Type de demande</th>
+<th>Quantité</th>
+<th>Date de début</th>
+<th>Date de retour prévue</th>
+<th>Date de retour réelle</th>
+<th>Quantité retournée</th>
+<th>État</th>
+<th>Statut</th>
 
           </tr>
 
@@ -9549,99 +9569,108 @@ async function chargerSuiviPrets() {
 
       ligne.innerHTML = `
 
-        <td>
-          ${
-            echapperHTML(
-              reservation.Consommables?.[
-                "Nom du sortant"
-              ] ||
-              "Consommable"
-            )
-          }
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        reservation.Consommables?.[
+          "Nom du sortant"
+        ] ||
+        "Consommable"
+      )
+    }
+  </td>
 
 
-        <td>
-          ${
-            echapperHTML(
-              nomUtilisateur ||
-              "Utilisateur"
-            )
-          }
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        nomUtilisateur ||
+        "Utilisateur"
+      )
+    }
+  </td>
 
 
-        <td>
-          ${
-            echapperHTML(
-              reservation.Profils?.service ||
-              "Non renseigné"
-            )
-          }
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        reservation.Profils?.service ||
+        "Non renseigné"
+      )
+    }
+  </td>
 
 
-        <td>
-          ${quantite}
-        </td>
+  <td>
+    ${
+      reservation.type_demande === "don"
+        ? "Don"
+        : "Prêt"
+    }
+  </td>
 
 
-        <td>
-          ${
-            echapperHTML(
-              reservation.date_debut ||
-              "Non renseignée"
-            )
-          }
-        </td>
+  <td>
+    ${quantite}
+  </td>
 
 
-        <td>
-          ${
-            echapperHTML(
-              reservation.date_retour ||
-              "Non renseignée"
-            )
-          }
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        reservation.date_debut ||
+        "Non renseignée"
+      )
+    }
+  </td>
 
 
-        <td>
-          ${
-            echapperHTML(
-              reservation.date_retour_reel ||
-              "—"
-            )
-          }
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        reservation.date_retour ||
+        "Non renseignée"
+      )
+    }
+  </td>
 
 
-        <td>
-          ${quantiteRetournee}
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        reservation.date_retour_reel ||
+        "—"
+      )
+    }
+  </td>
 
 
-        <td>
-          ${
-            echapperHTML(
-              reservation.Consommables?.Etat ||
-              "—"
-            )
-          }
-        </td>
+  <td>
+    ${quantiteRetournee}
+  </td>
 
 
-        <td>
-          <strong>
-            ${
-              echapperHTML(
-                statutTexte
-              )
-            }
-          </strong>
-        </td>
+  <td>
+    ${
+      echapperHTML(
+        reservation.Consommables?.Etat ||
+        "—"
+      )
+    }
+  </td>
 
-      `;
+
+  <td>
+    <strong>
+      ${
+        echapperHTML(
+          statutTexte
+        )
+      }
+    </strong>
+  </td>
+
+`;
 
 
       tableauSuivi.appendChild(
