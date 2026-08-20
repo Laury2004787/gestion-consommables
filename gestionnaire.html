@@ -943,14 +943,44 @@
     Suivi des retours
   </h2>
 
-  <div
-    id="listeSuiviRetours">
+  <div class="table-container">
 
-    <div class="message">
-      Chargement du suivi des retours...
-    </div>
+  <table>
 
-  </div>
+    <thead>
+
+      <tr>
+
+        <th>Consommable</th>
+        <th>Utilisateur</th>
+        <th>Service</th>
+        <th>Quantité</th>
+        <th>Date du prêt</th>
+        <th>Date de retour prévue</th>
+        <th>Date de retour réelle</th>
+        <th>Quantité retournée</th>
+        <th>État</th>
+        <th>Statut</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="listeSuiviRetours">
+
+      <tr>
+
+        <td colspan="10">
+          Chargement du suivi des retours...
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
 
 </section>
 
@@ -8996,10 +9026,11 @@ async function chargerSuiviRetours() {
         ),
 
         Consommables!Réservations_consommable_id_fkey (
-          "Nom du sortant",
-          Categorie,
-          Laboratoire
-        )
+  "Nom du sortant",
+  Categorie,
+  Laboratoire,
+  Etat
+)
       `)
       .in(
         "statut",
@@ -9059,253 +9090,225 @@ async function chargerSuiviRetours() {
   }
 
 
-  zone.innerHTML = "";
+  zone.innerHTML = `
+
+  <div class="table-container">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>Consommable</th>
+          <th>Demandeur</th>
+          <th>Service</th>
+          <th>Quantité</th>
+          <th>Date de début</th>
+          <th>Date de retour prévue</th>
+          <th>Date de retour réelle</th>
+          <th>Quantité retournée</th>
+          <th>État</th>
+          <th>Statut</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody id="tableauSuiviRetours">
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+`;
+  const tableauSuivi =
+  document.getElementById(
+    "tableauSuiviRetours"
+  );
 
 
   data.forEach(
-    reservation => {
+  reservation => {
 
-      const quantite =
-        Number(
-          reservation.quantite
-        ) || 0;
+    const quantite =
+      Number(
+        reservation.quantite
+      ) || 0;
 
 
-      const quantiteRetournee =
-        Number(
-          reservation.quantite_retournee
-        ) || 0;
+    const quantiteRetournee =
+      Number(
+        reservation.quantite_retournee
+      ) || 0;
 
 
-      const quantiteRestante =
-        Math.max(
-          quantite -
-          quantiteRetournee,
-          0
-        );
+    let statutTexte =
+      reservation.statut;
 
 
-      let statutTexte =
-        reservation.statut;
+    if (
+      reservation.statut ===
+      "acceptee"
+    ) {
 
-
-      if (
-        reservation.statut ===
-        "acceptee"
-      ) {
-
-        statutTexte =
-          "En prêt";
-
-      }
-
-      else if (
-        reservation.statut ===
-        "retour_signale"
-      ) {
-
-        statutTexte =
-          "Retour signalé";
-
-      }
-
-      else if (
-        reservation.statut ===
-        "retour_partiel"
-      ) {
-
-        statutTexte =
-          "Retour partiel";
-
-      }
-
-      else if (
-        reservation.statut ===
-        "retournee"
-      ) {
-
-        statutTexte =
-          "Retour complet";
-
-      }
-
-
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "card";
-
-
-      card.innerHTML = `
-
-        <h3>
-
-          ${
-            echapperHTML(
-              reservation.Consommables?.[
-                "Nom du sortant"
-              ] ||
-              "Consommable"
-            )
-          }
-
-        </h3>
-
-
-        <p>
-
-          <strong>
-            Demandeur :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.Profils?.prenom ||
-              ""
-            )
-          }
-
-          ${
-            echapperHTML(
-              reservation.Profils?.nom ||
-              ""
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Service :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.Profils?.service ||
-              "Non renseigné"
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Quantité réservée :
-          </strong>
-
-          ${quantite}
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Quantité retournée :
-          </strong>
-
-          ${quantiteRetournee}
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Quantité restante :
-          </strong>
-
-          ${quantiteRestante}
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Date de début :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.date_debut ||
-              "Non renseignée"
-            )
-          }
-
-        </p>
-
-
-        <p>
-
-          <strong>
-            Date de retour prévue :
-          </strong>
-
-          ${
-            echapperHTML(
-              reservation.date_retour ||
-              "Non renseignée"
-            )
-          }
-
-        </p>
-
-
-        ${
-          reservation.date_retour_reel
-          ?
-
-          `
-            <p>
-
-              <strong>
-                Date réelle du dernier retour :
-              </strong>
-
-              ${echapperHTML(
-                reservation.date_retour_reel
-              )}
-
-            </p>
-          `
-
-          :
-
-          ""
-        }
-
-
-        <p class="statut">
-
-          <strong>
-            Statut :
-          </strong>
-
-          ${echapperHTML(
-            statutTexte
-          )}
-
-        </p>
-
-      `;
-
-
-      zone.appendChild(
-        card
-      );
+      statutTexte =
+        "En prêt";
 
     }
-  );
 
+    else if (
+      reservation.statut ===
+      "retour_signale"
+    ) {
+
+      statutTexte =
+        "Retour signalé";
+
+    }
+
+    else if (
+      reservation.statut ===
+      "retour_partiel"
+    ) {
+
+      statutTexte =
+        "Retour partiel";
+
+    }
+
+    else if (
+      reservation.statut ===
+      "retournee"
+    ) {
+
+      statutTexte =
+        "Retour complet";
+
+    }
+
+
+    const nomUtilisateur =
+      `${
+        reservation.Profils?.prenom ||
+        ""
+      } ${
+        reservation.Profils?.nom ||
+        ""
+      }`.trim();
+
+
+    const ligne =
+      document.createElement(
+        "tr"
+      );
+
+
+    ligne.innerHTML = `
+
+      <td>
+        ${
+          echapperHTML(
+            reservation.Consommables?.[
+              "Nom du sortant"
+            ] ||
+            "Consommable"
+          )
+        }
+      </td>
+
+
+      <td>
+        ${
+          echapperHTML(
+            nomUtilisateur ||
+            "Utilisateur"
+          )
+        }
+      </td>
+
+
+      <td>
+        ${
+          echapperHTML(
+            reservation.Profils?.service ||
+            "Non renseigné"
+          )
+        }
+      </td>
+
+
+      <td>
+        ${quantite}
+      </td>
+
+
+      <td>
+        ${
+          echapperHTML(
+            reservation.date_debut ||
+            "Non renseignée"
+          )
+        }
+      </td>
+
+
+      <td>
+        ${
+          echapperHTML(
+            reservation.date_retour ||
+            "Non renseignée"
+          )
+        }
+      </td>
+
+
+      <td>
+        ${
+          echapperHTML(
+            reservation.date_retour_reel ||
+            "—"
+          )
+        }
+      </td>
+
+
+      <td>
+        ${quantiteRetournee}
+      </td>
+
+
+      <td>
+        ${
+          echapperHTML(
+            reservation.Consommables?.Etat ||
+            "—"
+          )
+        }
+      </td>
+
+
+      <td>
+        <strong>
+          ${
+            echapperHTML(
+              statutTexte
+            )
+          }
+        </strong>
+      </td>
+
+    `;
+
+
+   tableauSuivi.appendChild(
+  ligne
+);
+
+  }
+);
 }
   async function activerNotifications() {
 
