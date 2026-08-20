@@ -44,7 +44,13 @@
       gap: 8px;
       flex-wrap: wrap;
     }
-
+.header-notifications {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
     main {
       max-width: 1300px;
       margin: 30px auto;
@@ -515,11 +521,59 @@
 
 <header>
 
-  <h1>
-    Tableau de bord gestionnaire
-  </h1>
+ <h1>
+  Tableau de bord gestionnaire
+</h1>
 
-  <div class="header-actions">
+<div class="header-notifications">
+<!-- CLOCHE DES NOTIFICATIONS -->
+<button
+  id="bouton-notifications"
+  type="button"
+  onclick="ouvrirNotifications()"
+  style="
+    position:relative;
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:24px;
+    margin-left:10px;
+  "
+  title="Notifications"
+>
+  🔔
+ 
+  <span
+    id="badge-notifications"
+    style="
+      display:none;
+      position:absolute;
+      top:-5px;
+      right:-5px;
+      background:red;
+      color:white;
+      border-radius:50%;
+      min-width:18px;
+      height:18px;
+      font-size:11px;
+      line-height:18px;
+      text-align:center;
+      font-weight:bold;
+    "
+  >
+    0
+  </span>
+</button>
+  <button
+  class="nav-button"
+  id="boutonNotificationsPush"
+  type="button"
+  onclick="activerNotifications()">
+  🔔 Activer les notifications
+</button>
+</div>
+
+<div class="header-actions">
 
     <button
       class="nav-button"
@@ -631,54 +685,10 @@
     0
   </span>
 </button>
-<!-- CLO​​CHE DES NOTIFICATIONS -->
-<button
-  id="bouton-notifications"
-  type="button"
-  onclick="ouvrirNotifications()"
-  style="
-    position:relative;
-    border:none;
-    background:none;
-    cursor:pointer;
-    font-size:24px;
-    margin-left:10px;
-  "
-  title="Notifications"
->
-  🔔
-
-  <span
-    id="badge-notifications"
-    style="
-      display:none;
-      position:absolute;
-      top:-5px;
-      right:-5px;
-      background:red;
-      color:white;
-      border-radius:50%;
-      min-width:18px;
-      height:18px;
-      font-size:11px;
-      line-height:18px;
-      text-align:center;
-      font-weight:bold;
-    "
-  >
-    0
-  </span>
-</button>
 
 
 <!-- ACTIVATION DES NOTIFICATIONS PUSH -->
-<button
-  class="nav-button"
-  id="boutonNotificationsPush"
-  type="button"
-  onclick="activerNotifications()">
-  🔔 Activer les notifications
-</button>
+
     <button
       class="nav-button"
       onclick="afficherSection('informations')">
